@@ -1,10 +1,12 @@
 <i18n>
 {
   "en": {
-    "process_dates": "Process dates"
+    "process_dates": "Process dates",
+    "identifiers": "Identifiers"
   },
   "fr": {
-   "process_dates": "Process dates"
+   "process_dates": "Process dates",
+   "identifiers": "Identifiants"
   }
 }
 </i18n>
@@ -12,9 +14,9 @@
   <span class="gdm-process-search">
    <table>
      <thead>
-     <th>Identifier</th>
+     <th>{{$t('identifiers')}}</th>
      <th>Status</th>
-     <th>Process Dates</th>
+     <th>{{$t('process_dates')}}</th>
 
      <th>Temporal Extent</th>
      <th>Other informations</th>
@@ -82,7 +84,7 @@ export default {
     }
   },
   created () {
-   // this.$i18n.locale = this.lang
+   this.$i18n.locale = this.lang
     moment.locale(this.lang)
 	  this.search()
   },

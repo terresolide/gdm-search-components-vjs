@@ -3,7 +3,7 @@ var webpack = require('webpack')
 var PACKAGE = require('./package.json');
 var buildVersion = PACKAGE.version;
 var buildName = PACKAGE.name;
-var CleanWebpackPlugin = require('clean-webpack-plugin');
+var {CleanWebpackPlugin} = require('clean-webpack-plugin');
 var prodUrl = PACKAGE.production.url + '/' + buildName + '@' + buildVersion +  '/dist/' ;
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 var pathsToClean = [
@@ -21,13 +21,18 @@ module.exports = {
     rules: [
       {
         test: /\.vue$/,
-        loader: 'vue-loader',
-        options: {
+        loader: 'vue-loader'
+       /* options: {
           loaders: {
         	  i18n: '@kazupon/vue-i18n-loader'
-          }
+          } 
           // other vue-loader options go here
-        }
+        }*/
+      },
+     {
+        resourceQuery: /blockType=i18n/,
+        type: 'javascript/auto',
+        loader: '@kazupon/vue-i18n-loader'
       },
       {
         test: /\.css$/,
@@ -81,6 +86,9 @@ if (process.env.NODE_ENV === 'development') {
 }
 if (process.env.NODE_ENV === 'production') {
   module.exports.devtool = '#source-map';
+  module.exports.optimization= {
+    minimize: true
+  }
   module.exports.output.publicPath = prodUrl;
   // http://vue-loader.vuejs.org/en/workflow/production.html
   module.exports.plugins = (module.exports.plugins || []).concat([
@@ -89,13 +97,13 @@ if (process.env.NODE_ENV === 'production') {
         NODE_ENV: '"production"'
       }
     }),
-    new CleanWebpackPlugin(pathsToClean),
-    new webpack.optimize.UglifyJsPlugin({
+    new CleanWebpackPlugin({cleanOnceBeforeBuildPatterns:pathsToClean}),
+   /* new webpack.optimize.UglifyJsPlugin({
       sourceMap: true,
       compress: {
         warnings: false
       }
-    }),
+    }),*/
     new webpack.LoaderOptionsPlugin({
       minimize: true
     })
