@@ -44,8 +44,11 @@
      {{printDate(feature.properties.temporalExtent[1])}}
      </td>
      <td>
-     <div v-for="prop in displayProperties" style="font-size:0.9em;">
-     <div><b>{{prop}}:</b> {{feature.properties[prop]}}</div>
+     <div v-for="index in 0..displayProperties.length">
+	     <div v-for="(prop, index) in displayProperties" style="font-size:0.9em;">
+	       <div><b>{{prop}}:</b> {{feature.properties[prop]}}</div>
+	     </div>
+	   </div>
      </div>
      </td>
      </tr>
@@ -79,14 +82,18 @@ export default {
   data () {
     return {
       dateFormat: 'YYYY-MM-DD hh:mm:ss',
-      features: [],
-      displayProperties: ['relativeOrbit','lookWrap', 'lookUnwrap', 'atmoCorrection', 'provider', 'subSwaths']
+      features: []
     }
   },
   created () {
    this.$i18n.locale = this.lang
+   console.log(this.$i18n);
+
     moment.locale(this.lang)
 	  this.search()
+  },
+  mounted () {
+    console.log(this.$t('process_dates'))
   },
   methods: {
     search () {
@@ -111,6 +118,9 @@ export default {
       case 401:
         console.log("Vous n'avez pas les droits suffisants!");
       }
+    },
+    getProperties (feature) {
+      
     },
     printDate (date, length) {
       if (!length) {

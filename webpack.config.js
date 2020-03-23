@@ -32,7 +32,7 @@ module.exports = {
      {
         resourceQuery: /blockType=i18n/,
         type: 'javascript/auto',
-        loader: '@kazupon/vue-i18n-loader'
+        loader: '@intlify/vue-i18n-loader'
       },
       {
         test: /\.css$/,
@@ -98,12 +98,7 @@ if (process.env.NODE_ENV === 'production') {
       }
     }),
     new CleanWebpackPlugin({cleanOnceBeforeBuildPatterns:pathsToClean}),
-   /* new webpack.optimize.UglifyJsPlugin({
-      sourceMap: true,
-      compress: {
-        warnings: false
-      }
-    }),*/
+  
     new webpack.LoaderOptionsPlugin({
       minimize: true
     })
