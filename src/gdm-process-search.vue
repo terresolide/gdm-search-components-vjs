@@ -12,6 +12,7 @@
 </i18n>
 <template>
   <span class="gdm-process-search">
+   <gdm-paging :page="pagination.page" :nb="pagination.nb" :offset="pagination.offset" @change="pageChange"></gdm-paging>
    <table>
      <thead>
      <th>{{$t('identifiers')}}</th>
@@ -44,11 +45,12 @@
      {{printDate(feature.properties.temporalExtent[1])}}
      </td>
      <td>
-     <div v-for="index in 0..displayProperties.length">
-	     <div v-for="(prop, index) in displayProperties" style="font-size:0.9em;">
-	       <div><b>{{prop}}:</b> {{feature.properties[prop]}}</div>
-	     </div>
-	   </div>
+     <div v-for="type in ['provider', 'position', 'parameters']" class="infos" >
+         <div v-if="feature.properties[type]"  >
+            <div v-for="(value, prop) in feature.properties[type]" >
+              <div><b>{{prop}}:</b> {{value}}</div>
+            </div>
+         </div>
      </div>
      </td>
      </tr>
@@ -82,7 +84,12 @@ export default {
   data () {
     return {
       dateFormat: 'YYYY-MM-DD hh:mm:ss',
-      features: []
+      features: [],
+      pagination: {
+        page: 1,
+        offset: 1,
+        nb: 1
+      }
     }
   },
   created () {
@@ -97,10 +104,14 @@ export default {
   },
   methods: {
     search () {
-      this.$http.get(this.api, {credentials: true})
+      var url = this.api + '?nb=' + this.pagination.nb + '&page=' + this.pagination.page
+      this.$http.get(url, {credentials: true})
       .then(
           response => this.display(response),
           response => this.error(response))
+    },
+    pageChange(event) {
+      console.log(event)
     },
     display (response) {
       console.log(response.body.features)
@@ -140,6 +151,7 @@ font-size: 0.9rem;
 table{
  border: 1px solid black;
  border-collapse: collapse;
+ margin:auto;
 
 }
 thead {
@@ -148,8 +160,9 @@ thead {
  text-align: left;
 }
 td, th{
-  padding:3px 5px;
+  padding:3px 8px;
   vertical-align:top;
+  border-bottom: 1px solid grey;
 }
 span.failed{
  color: darkred;
@@ -162,5 +175,11 @@ span.terminated{
 }
 span.terminated::before{
 content:"\2713";
+}
+div.infos {
+  float:left;
+  vertical-align:top;
+  font-size:0.9em;
+  margin: 0 5px;
 }
 </style>
