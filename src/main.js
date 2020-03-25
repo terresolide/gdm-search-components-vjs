@@ -14,6 +14,9 @@ Vue.use(VueI18n);
 import VueResource from 'vue-resource';
 Vue.use(VueResource);
 
+import {VueTools} from 'formater-commons-components-vjs'
+Vue.use(VueTools)
+
 import GdmProcessSearch from './gdm-process-search.vue';
 
 ljs.addAliases({

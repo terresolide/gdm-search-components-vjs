@@ -16,11 +16,13 @@
 </i18n>
 <template>
   <span class="gdm-process-search">
+  <div class="wrapper">
+   <!-- <gdm-form-process :user="parameters.user" :service="parameters.service" @remove="removeSelected"></gdm-form-process> -->
    <gdm-paging :start-index="pagination.startIndex" :max-records="pagination.maxRecords"  
    :count="pagination.count" :total-results="pagination.totalResults"
-   :lang="lang" @change="pageChange"></gdm-paging>
+   :lang="lang" :color="color" @change="pageChange"></gdm-paging>
    <table>
-     <thead>
+     <thead :style="{background:$shadeColor(color, 0.5)}">
      <th>{{$t('identifiers')}}</th>
      <th>Status</th>
      <th>{{$t('process_dates')}}</th>
@@ -32,12 +34,16 @@
      <tr v-for="feature in features">
      <td>
 	     <div><b>{{feature.properties.id}}</b></div>
-	     <div>{{feature.properties.serviceName}}</div>
+	     <div class="toSelect" :class="{selected: parameters.service}" 
+           @click="selectService({id:feature.properties.serviceId, name:feature.properties.serviceName})">
+           {{feature.properties.serviceName}}
+       </div>
 	     <div v-if="userId">{{feature.properties.email}}</div>
 	     <div v-else>
-	         <span class="select-user" @click="selectUser(feature.properties.userId)">
+	         <div class="toSelect" :class="{selected: parameters.user}" 
+	         @click="selectUser({id:feature.properties.userId, email:feature.properties.email})">
 	            {{feature.properties.email}}
-	          </span>
+	          </div>
 	     </div>
       
 	     <div v-if="feature.properties.processusName">({{feature.properties.processusName}})</div>
@@ -67,16 +73,19 @@
      </tr>
      </tbody>
    </table>
+   </div>
   </span>
 </template>
 <script>
 import GdmPaging from './gdm-paging.vue'
+import GdmFormProcess from './subcomponents/gdm-form-process.vue'
 import moment from 'moment'
 
 export default {
   name: 'GdmProcessSearch',
   components: {
-    GdmPaging
+    GdmPaging,
+    GdmFormProcess
   },
   props: {
 	  api: {
@@ -90,7 +99,11 @@ export default {
 	  userId: {
 	    type: Number,
 	    default: null
-	  }
+	  },
+    color: {
+      type: String,
+      default: '#808080'
+    }
   },
   data () {
     return {
@@ -102,8 +115,8 @@ export default {
         totalResults: null
       },
       parameters: {
-        userId: null,
-        serviceId: null,
+        user: null,
+        service: null,
         status: null,
         processStart: null,
         processEnd: null,
@@ -126,8 +139,11 @@ export default {
      var url = this.api + '?maxRecords=' + this.pagination.maxRecords + '&index=' + this.pagination.startIndex
      if (this.userId) {
         url += '&userId=' + this.userId
-     } else if (this.parameters.userId) {
-       url += '&userId=' + this.parameters.userId
+     } else if (this.parameters.user) {
+       url += '&userId=' + this.parameters.user.id
+     }
+     if (this.parameters.service) {
+       url += '&serviceId=' + this.parameters.service.id
      }
      this.$http.get(url, {credentials: true})
       .then(
@@ -148,11 +164,25 @@ export default {
         count: response.body.features.length
       }
       this.features = response.body.features
-      console.log(this.printDate(this.features[0].processStart))
-      
     },
-    selectUser (userId) {
-      this.parameters.userId = userId
+//     removeSelected (type) {
+//       this.parameters[type] = null
+//       this.search()
+//     },
+    selectUser (user) {
+      if (this.parameters.user && this.parameters.user.id === user.id) {
+        this.parameters.user = null
+      } else {
+        this.parameters.user = user
+      }
+      this.search()
+    },
+    selectService (service) {
+      if (this.parameters.service && this.parameters.service.id === service.id) {
+        this.parameters.service = null
+      } else {
+        this.parameters.service = service
+      }
       this.search()
     },
     error (response) {
@@ -184,10 +214,14 @@ export default {
 .gdm-process-search{
 font-size: 0.9rem;
 }
+.gdm-process-search div.wrapper {
+  max-width:1200px;
+  margin:auto;
+}
 table{
+ min-width: 1100px;
  border: 1px solid black;
  border-collapse: collapse;
- margin:auto;
 
 }
 thead {
@@ -202,6 +236,7 @@ td, th{
 }
 span.failed{
  color: darkred;
+ font-weight: 800;
 }
 span.failed::before{
 content:"\00D7";
@@ -212,10 +247,30 @@ span.terminated{
 span.terminated::before{
 content:"\2713";
 }
+div.toSelect {
+ cursor: pointer;
+ padding: 2px;
+  margin: 3px 0px;
+  background: #F0f0f0;
+  border: 1px solid #909090;
+  border-radius:2px;
+}
+div.toSelect.selected{
+ background: #f7f1ef;
+ border-color:darkred;
+}
+div.toSelect:hover {
+ background: #e5e5e5;
+}
+div.toSelect.selected:hover {
+ background: #f9eae6;
+}
+
 div.infos {
   float:left;
   vertical-align:top;
   font-size:0.9em;
   margin: 0 5px;
 }
+
 </style>

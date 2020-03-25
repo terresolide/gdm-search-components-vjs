@@ -18,14 +18,14 @@
  <span class="mtdt-paging">
   <div style="width:100%;height:33px;line-height:30px;text-align:center;">
   <span :class="{disabled: (currentPage===1 ? 'disabled': ''), 'mtdt-navigation':true}">
-  	<span class="fa fa-angle-double-left" @click="goToFirst()"></span>
-  	<span class="fa fa-angle-left" @click="changePage(-1)" ></span>
+  	<span class="fa fa-angle-double-left" :style="{background:color}" @click="goToFirst()"></span>
+  	<span class="fa fa-angle-left" :style="{background:color}" @click="changePage(-1)" ></span>
   </span>
   <span style="margin: 0 10px;" v-html="$tc('results', totalResults, {from: (totalResults === 0) ? 0 : startIndex + 1, to: to, notExactly: notExactly, count: totalResults})"></span>
    (<formater-select name="recordPerPage" :options="recordsPerPage" :defaut="recordPerPage + ''" type="associative" @input="nbRecordChange" color="#ffffff"></formater-select>)
    <span :class="{disabled: (!notExactly && (currentPage===nbPage || count=== 0) ? 'disabled': ''), 'mtdt-navigation':true}">
-	   <span class="fa fa-angle-right " @click="changePage(1)" ></span>
-	   <span class="fa fa-angle-double-right" @click="goToLast()"></span>
+	   <span class="fa fa-angle-right" :style="{background:color}" @click="changePage(1)" ></span>
+	   <span class="fa fa-angle-double-right" :style="{background:color}" @click="goToLast()"></span>
   </span>
  
    </div>
@@ -59,12 +59,24 @@ export default {
     lang: {
       type: String,
       default: 'en'
+    },
+    color: {
+      type: String,
+      default: '#808080'
     }
   },
   computed: {
+    from () {
+      return this.startIndex + 1
+    },
     to () {
-      console.log(this.count)
       return this.startIndex + this.count
+    },
+    nbPage () {
+      var nbPage = parseInt(this.totalResults / this.maxRecords) 
+      nbPage += (this.totalResults % this.maxRecords > 0 ? 1 : 0)
+      this.currentPage = parseInt(this.startIndex  / this.maxRecords) + 1
+      return nbPage
     },
     recordsPerPage () {
       var list = {};
@@ -87,30 +99,28 @@ export default {
     return {
       currentPage : 1,
       recordPerPage: this.maxRecords,
-      nbPage: 0,
-      from: 1,
       notExactly: '',
-      options: [1, 10, 25, 50, 100]
+      options: [1, 3, 10, 25, 50, 100]
     }
   },
   
   methods: {
  
    goToFirst () {
-     this.from = 1
+    // this.from = 1
      this.currentPage = 1
      this.emitChange()
    },
    goToLast () {
-     this.from = (this.nbPage -1) * this.recordPerPage + 1
+     console.log(this.nbPage)
+    // this.from = (this.nbPage -1) * this.recordPerPage + 1
      this.currentPage = this.nbPage
      this.emitChange()
    },
    handleReset(event) {
-     this.from = 1
+    //  this.from = 1
      this.currentPage = 1
    },
-  
    changePage(sens) {
      if (sens < 0 && this.currentPage === 1 ){
        return
@@ -127,7 +137,7 @@ export default {
      this.emitChange()
    },
    emitChange() {
-     var to = this.from + this.recordPerPage - 1
+     // var to = this.from + this.recordPerPage - 1
      this.$emit('change', { maxRecords:this.recordPerPage, startIndex: (this.currentPage - 1) * this.recordPerPage})
    }
   }
