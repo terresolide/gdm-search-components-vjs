@@ -21,7 +21,7 @@
   	<span class="fa fa-angle-double-left" @click="goToFirst()"></span>
   	<span class="fa fa-angle-left" @click="changePage(-1)" ></span>
   </span>
-  <span style="margin: 0 10px;" v-html="$tc('results', count, {from: (count === 0) ? 0 : from, to: to, notExactly: notExactly, count: count})"></span>
+  <span style="margin: 0 10px;" v-html="$tc('results', totalResults, {from: (totalResults === 0) ? 0 : startIndex + 1, to: to, notExactly: notExactly, count: totalResults})"></span>
    (<formater-select name="recordPerPage" :options="recordsPerPage" :defaut="recordPerPage + ''" type="associative" @input="nbRecordChange" color="#ffffff"></formater-select>)
    <span :class="{disabled: (!notExactly && (currentPage===nbPage || count=== 0) ? 'disabled': ''), 'mtdt-navigation':true}">
 	   <span class="fa fa-angle-right " @click="changePage(1)" ></span>
@@ -40,19 +40,19 @@ export default {
   },
   props: {
 
-    page: {
+    startIndex: {
       type: Number,
-      default: 1
+      default: 0
     },
-    offset: {
-      type: Number,
-      default: 1
-    },
-    nb: {
+    maxRecords: {
       type: Number,
       default: 25
     },
-    total: {
+    totalResults: {
+      type: Number,
+      default: 0
+    },
+    count: {
       type: Number,
       default: 0
     },
@@ -62,8 +62,21 @@ export default {
     }
   },
   computed: {
+    to () {
+      console.log(this.count)
+      return this.startIndex + this.count
+    },
+    recordsPerPage () {
+      var list = {};
+      var self = this
+      this.options.forEach( function (option) {
+        list[option] = option + ' ' + self.$t('per_page')
+      })
+      return list
+    }
   },
-  created: function() {
+  created () {
+    this.$i18n.locale = this.lang
   },
   mounted () {
   },
@@ -72,17 +85,10 @@ export default {
 
   data() {
     return {
-      count: 0,
       currentPage : 1,
-      recordsPerPage:{
-        1: '1 par page',
-        10: '10 par page',
-        25: '25 par page'
-      },
-      recordPerPage: this.nb,
+      recordPerPage: this.maxRecords,
       nbPage: 0,
       from: 1,
-      to: 24,
       notExactly: '',
       options: [1, 10, 25, 50, 100]
     }
@@ -104,28 +110,7 @@ export default {
      this.from = 1
      this.currentPage = 1
    },
-   handleSearch (event) {
-     if (this.depth != event.detail.depth) {
-       return
-     }
-     if (this.type === 'opensearch') {
-       event.detail.index = this.from
-       event.detail.maxRecords = this.recordPerPage
-     } else {
-      event.detail.from = this.from
-      event.detail.to = this.from + this.recordPerPage - 1
-     }
-     if (this.sortBy) {
-     	event.detail.sortBy = this.sortBy
-     }
-   },
-   handleTheme () {
-     var nodes = this.$el.querySelectorAll('.mtdt-paging span.mtdt-navigation span')
-     var self = this
-     nodes.forEach( function (node) {
-       node.style.backgroundColor = self.$store.state.style.primary
-     })
-   },
+  
    changePage(sens) {
      if (sens < 0 && this.currentPage === 1 ){
        return
@@ -143,9 +128,7 @@ export default {
    },
    emitChange() {
      var to = this.from + this.recordPerPage - 1
-     this.$emit('change', { nb:this.recordPerPage, page: this.currentPage})
-     var event = new CustomEvent('fmt:pageChangedEvent', {detail:{ depth: this.depth}})
-     document.dispatchEvent(event)
+     this.$emit('change', { maxRecords:this.recordPerPage, startIndex: (this.currentPage - 1) * this.recordPerPage})
    }
   }
 }

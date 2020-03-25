@@ -2,25 +2,30 @@
 {
   "en": {
     "process_dates": "Process dates",
-    "identifiers": "Identifiers"
+    "identifiers": "Identifiers",
+    "temporal_extent": "Temporal extent",
+    "parameters": "Parameters"
   },
   "fr": {
-   "process_dates": "Process dates",
-   "identifiers": "Identifiants"
+   "process_dates": "Dates du calcul",
+   "identifiers": "Identifiants",
+   "temporal_extent": "Etendue temporelle",
+   "parameters": "Paramètres"
   }
 }
 </i18n>
 <template>
   <span class="gdm-process-search">
-   <gdm-paging :page="pagination.page" :nb="pagination.nb" :offset="pagination.offset" @change="pageChange"></gdm-paging>
+   <gdm-paging :start-index="pagination.startIndex" :max-records="pagination.maxRecords"  
+   :count="pagination.count" :total-results="pagination.totalResults"
+   :lang="lang" @change="pageChange"></gdm-paging>
    <table>
      <thead>
      <th>{{$t('identifiers')}}</th>
      <th>Status</th>
      <th>{{$t('process_dates')}}</th>
-
-     <th>Temporal Extent</th>
-     <th>Other informations</th>
+     <th>{{$t('temporal_extent')}}</th>
+     <th>{{$t('parameters')}}</th>
      
      </thead>
      <tbody>
@@ -28,7 +33,13 @@
      <td>
 	     <div><b>{{feature.properties.id}}</b></div>
 	     <div>{{feature.properties.serviceName}}</div>
-	     <div>{{feature.properties.email}}</div>
+	     <div v-if="userId">{{feature.properties.email}}</div>
+	     <div v-else>
+	         <span class="select-user" @click="selectUser(feature.properties.userId)">
+	            {{feature.properties.email}}
+	          </span>
+	     </div>
+      
 	     <div v-if="feature.properties.processusName">({{feature.properties.processusName}})</div>
      </td>
      <td style="text-align:center;cursor:pointer;" :title="feature.properties.log">
@@ -86,9 +97,18 @@ export default {
       dateFormat: 'YYYY-MM-DD hh:mm:ss',
       features: [],
       pagination: {
-        page: 1,
-        offset: 1,
-        nb: 1
+        startIndex: 0,
+        maxRecords: 1,
+        totalResults: null
+      },
+      parameters: {
+        userId: null,
+        serviceId: null,
+        status: null,
+        processStart: null,
+        processEnd: null,
+        tempStart: null,
+        tempEnd: null
       }
     }
   },
@@ -100,24 +120,40 @@ export default {
 	  this.search()
   },
   mounted () {
-    console.log(this.$t('process_dates'))
   },
   methods: {
     search () {
-      var url = this.api + '?nb=' + this.pagination.nb + '&page=' + this.pagination.page
-      this.$http.get(url, {credentials: true})
+     var url = this.api + '?maxRecords=' + this.pagination.maxRecords + '&index=' + this.pagination.startIndex
+     if (this.userId) {
+        url += '&userId=' + this.userId
+     } else if (this.parameters.userId) {
+       url += '&userId=' + this.parameters.userId
+     }
+     this.$http.get(url, {credentials: true})
       .then(
           response => this.display(response),
           response => this.error(response))
     },
-    pageChange(event) {
-      console.log(event)
+    pageChange(values) {
+      this.pagination = values
+      this.search()
     },
     display (response) {
       console.log(response.body.features)
+      var pagination = response.body.properties
+      this.pagination = {
+        startIndex: pagination.startIndex,
+        totalResults: pagination.totalResults,
+        maxRecords: pagination.itemsPerPage,
+        count: response.body.features.length
+      }
       this.features = response.body.features
       console.log(this.printDate(this.features[0].processStart))
       
+    },
+    selectUser (userId) {
+      this.parameters.userId = userId
+      this.search()
     },
     error (response) {
       console.log(response)
