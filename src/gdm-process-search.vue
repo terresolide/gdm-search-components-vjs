@@ -111,7 +111,7 @@ export default {
       features: [],
       pagination: {
         startIndex: 0,
-        maxRecords: 1,
+        maxRecords: 25,
         totalResults: null
       },
       parameters: {
