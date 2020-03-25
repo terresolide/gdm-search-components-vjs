@@ -100,7 +100,7 @@ export default {
       currentPage : 1,
       recordPerPage: this.maxRecords,
       notExactly: '',
-      options: [1, 3, 10, 25, 50, 100]
+      options: [10, 25, 50, 100]
     }
   },
   
