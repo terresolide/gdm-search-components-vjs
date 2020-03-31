@@ -59,7 +59,7 @@
 		     <div v-if="feature.properties.processusName">({{feature.properties.processusName}})</div>
 	     </td>
 	     <td style="text-align:center;cursor:pointer;" :title="feature.properties.log">
-	        <span :class="feature.properties.status.toLowerCase()"></span>
+	        <span :class="statusToClass(feature.properties.status)"></span>
 	        <div style="font-style:italic;font-size:0.9rem;color:grey;">{{feature.properties.status}}</div>
 	        <a v-if="back"  :href="launchUrl + 'process/launch/' + feature.properties.id" class="button">Test Curl</a>
 	     <td style="text-align:left;">
@@ -225,6 +225,16 @@ export default {
       } else {
        return moment(date, this.dateFormat).format('DD/MM/YYYY HH:mm')
       }
+    },
+    statusToClass(status) {
+      switch(status) {
+      case 'RUNNING':
+      case 'WAITING':
+        return 'fa fa-refresh fa-spin fa-3x fa-fw ' + status.toLowerCase()
+        break
+        default:
+          return status.toLowerCase()
+      }
     }
   }
 }
@@ -264,8 +274,14 @@ span.terminated{
  color:darkgreen;
 }
 span.terminated::before{
-content:"\2713";
+ content:"\2713";
 }
+span.running, 
+span.waiting{
+  color: grey;
+  font-size:16px;
+}
+
 div.toSelect {
  cursor: pointer;
  padding: 2px;
