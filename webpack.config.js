@@ -11,6 +11,7 @@ var pathsToClean = [
 ]
 
 module.exports = {
+  mode: 'production',
   entry: './src/main.js',
   output: {
     path: path.resolve(__dirname, './dist'),
@@ -82,6 +83,7 @@ module.exports = {
   devtool: '#eval-source-map'
 }
 if (process.env.NODE_ENV === 'development') {
+  module.exports.mode ="development"
 	module.exports.output.filename='build.js'
 }
 if (process.env.NODE_ENV === 'production') {

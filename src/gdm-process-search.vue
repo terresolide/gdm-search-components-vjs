@@ -4,75 +4,87 @@
     "process_dates": "Process dates",
     "identifiers": "Identifiers",
     "temporal_extent": "Temporal extent",
-    "parameters": "Parameters"
+    "parameters": "Parameters",
+    "no_process": "No process visible for you",
+    "unauthorized": "Unauthorized"
   },
   "fr": {
    "process_dates": "Dates du calcul",
    "identifiers": "Identifiants",
    "temporal_extent": "Etendue temporelle",
-   "parameters": "Paramètres"
+   "parameters": "Paramètres",
+   "no_process": "Aucun calcul n'est accessible pour vous",
+   "unauthorized": "Accès interdit"
   }
 }
 </i18n>
 <template>
   <span class="gdm-process-search">
   <div class="wrapper">
-   <!-- <gdm-form-process :user="parameters.user" :service="parameters.service" @remove="removeSelected"></gdm-form-process> -->
-   <gdm-paging :start-index="pagination.startIndex" :max-records="pagination.maxRecords"  
-   :count="pagination.count" :total-results="pagination.totalResults"
-   :lang="lang" :color="color" @change="pageChange"></gdm-paging>
-   <table>
-     <thead :style="{background:$shadeColor(color, 0.5)}">
-     <th>{{$t('identifiers')}}</th>
-     <th>Status</th>
-     <th>{{$t('process_dates')}}</th>
-     <th>{{$t('temporal_extent')}}</th>
-     <th>{{$t('parameters')}}</th>
-     
-     </thead>
-     <tbody>
-     <tr v-for="feature in features">
-     <td>
-	     <div><b>{{feature.properties.id}}</b></div>
-	     <div class="toSelect" :class="{selected: parameters.service}" 
-           @click="selectService({id:feature.properties.serviceId, name:feature.properties.serviceName})">
-           {{feature.properties.serviceName}}
-       </div>
-	     <div v-if="userId">{{feature.properties.email}}</div>
-	     <div v-else>
-	         <div class="toSelect" :class="{selected: parameters.user}" 
-	         @click="selectUser({id:feature.properties.userId, email:feature.properties.email})">
-	            {{feature.properties.email}}
-	          </div>
+  <div v-if="features.length === 0" class="message">
+  {{$t('no_process')}}
+  </div>
+  <div v-else>
+	  <!--   <gdm-form-process :user="parameters.user" :service="parameters.service" @remove="removeSelected"></gdm-form-process> -->
+	   <gdm-paging :start-index="pagination.startIndex" :max-records="pagination.maxRecords"  
+	   :count="pagination.count" :total-results="pagination.totalResults"
+	   :lang="lang" :color="color" @change="pageChange"></gdm-paging>
+	   <table>
+	     <thead :style="{background:$shadeColor(color, 0.5)}">
+	     <th>{{$t('identifiers')}}</th>
+	     <th>Status</th>
+	     <th>{{$t('process_dates')}}</th>
+	     <th>{{$t('temporal_extent')}}</th>
+	     <th>{{$t('parameters')}}</th>
+	     
+	     </thead>
+	     <tbody>
+	     <tr v-for="feature in features">
+	     <td>
+		     <div><b>{{feature.properties.id}}</b></div>
+		     <div class="gdm-token" v-if="feature.properties.token">{{feature.properties.token}}</div>
+         
+		     <div class="toSelect" :class="{selected: parameters.service}" 
+	           @click="selectService({id:feature.properties.serviceId, name:feature.properties.serviceName})">
+	           {{feature.properties.serviceName}}
+	       </div>
+		     <div v-if="userId">{{feature.properties.email}}</div>
+		     <div v-else>
+		         <div class="toSelect" :class="{selected: parameters.user}" 
+		         @click="selectUser({id:feature.properties.userId, email:feature.properties.email})">
+		            {{feature.properties.email}}
+		          </div>
+		     </div>
+	      
+		     <div v-if="feature.properties.processusName">({{feature.properties.processusName}})</div>
+	     </td>
+	     <td style="text-align:center;cursor:pointer;" :title="feature.properties.log">
+	        <span :class="feature.properties.status.toLowerCase()"></span>
+	        <div style="font-style:italic;font-size:0.9rem;color:grey;">{{feature.properties.status}}</div>
+	        <a v-if="back"  :href="launchUrl + 'process/launch/' + feature.properties.id" class="button">Test Curl</a>
+	     <td style="text-align:left;">
+	     <b>Start: </b>{{printDate(feature.properties.processStart,true)}}<br/>
+	     <b>End: </b>{{printDate(feature.properties.processEnd, true)}}
+	     </td>
+	     
+	     <td style="text-align:center;">
+	     {{printDate(feature.properties.temporalExtent[0])}}
+	     <b>&rarr;</b>
+	     {{printDate(feature.properties.temporalExtent[1])}}
+	     </td>
+	     <td>
+	     <div v-for="type in ['provider', 'position', 'parameters']" class="infos" >
+	         <div v-if="feature.properties[type]"  >
+	            <div v-for="(value, prop) in feature.properties[type]" >
+	              <div><b>{{prop}}:</b> {{value}}</div>
+	            </div>
+	         </div>
 	     </div>
-      
-	     <div v-if="feature.properties.processusName">({{feature.properties.processusName}})</div>
-     </td>
-     <td style="text-align:center;cursor:pointer;" :title="feature.properties.log">
-        <span :class="feature.properties.status.toLowerCase()"></span>
-     </td>
-     <td style="text-align:left;">
-     <b>Start: </b>{{printDate(feature.properties.processStart,true)}}<br/>
-     <b>End: </b>{{printDate(feature.properties.processEnd, true)}}
-     </td>
-     
-     <td style="text-align:center;">
-     {{printDate(feature.properties.temporalExtent[0])}}
-     <b>&rarr;</b>
-     {{printDate(feature.properties.temporalExtent[1])}}
-     </td>
-     <td>
-     <div v-for="type in ['provider', 'position', 'parameters']" class="infos" >
-         <div v-if="feature.properties[type]"  >
-            <div v-for="(value, prop) in feature.properties[type]" >
-              <div><b>{{prop}}:</b> {{value}}</div>
-            </div>
-         </div>
-     </div>
-     </td>
-     </tr>
-     </tbody>
-   </table>
+	     </td>
+	     </tr>
+	     </tbody>
+	   </table>
+	   </div>
    </div>
   </span>
 </template>
@@ -103,6 +115,10 @@ export default {
     color: {
       type: String,
       default: '#808080'
+    },
+    back: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -121,11 +137,14 @@ export default {
         processStart: null,
         processEnd: null,
         tempStart: null,
-        tempEnd: null
+        tempEnd: null,
+        launchUrl: null
       }
     }
   },
   created () {
+   // launch url debug
+   this.launchUrl = this.api.substr(0, this.api.indexOf('api'))
    this.$i18n.locale = this.lang
    console.log(this.$i18n);
 
@@ -190,7 +209,7 @@ export default {
       switch (response.status) {
       case 403:
         console.log('Accès interdit, déconnecté?')
-        alert('Accès Interdit: deconnecté?')
+        alert(this.$i18n('unauthorized'))
         break
       case 401:
         console.log("Vous n'avez pas les droits suffisants!");
@@ -272,5 +291,10 @@ div.infos {
   font-size:0.9em;
   margin: 0 5px;
 }
-
+div.gdm-token{
+  font-weight:700;
+  color:grey;
+  font-size:0.9em;
+  font-style:italic;
+}
 </style>
