@@ -25,7 +25,7 @@
   {{$t('no_process')}}
   </div>
   <div v-else>
-	  <!--   <gdm-form-process :user="parameters.user" :service="parameters.service" @remove="removeSelected"></gdm-form-process> -->
+	   <gdm-form-process :user="parameters.user" :service="parameters.service" @remove="removeSelected"></gdm-form-process> 
 	   <gdm-paging :start-index="pagination.startIndex" :max-records="pagination.maxRecords"  
 	   :count="pagination.count" :total-results="pagination.totalResults"
 	   :lang="lang" :color="color" @change="pageChange"></gdm-paging>
@@ -202,6 +202,10 @@ export default {
       } else {
         this.parameters.service = service
       }
+      this.search()
+    },
+    removeSelected(type) {
+      this.parameters[type] = null
       this.search()
     },
     error (response) {

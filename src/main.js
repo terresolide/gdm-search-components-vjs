@@ -17,7 +17,9 @@ Vue.use(VueResource);
 import {VueTools} from 'formater-commons-components-vjs'
 Vue.use(VueTools)
 
-import GdmProcessSearch from './gdm-process-search.vue';
+import GdmProcessSearch from './gdm-process-search.vue'
+
+import AerisTheme from 'aeris-commons-components-vjs/src/aeris-theme/aeris-theme.vue'
 
 ljs.addAliases({
   dep: [
@@ -25,9 +27,12 @@ ljs.addAliases({
      'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css', 
      // leaflet
      'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.css',
+     'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment-with-locales.min.js'
+     
    ]
 })
 ljs.load('dep', function() {
   Vue.customElement('gdm-process-search', GdmProcessSearch)
+  Vue.customElement('aeris-theme', AerisTheme)
 })
     	  
