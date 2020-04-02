@@ -21,10 +21,10 @@
 <template>
   <span class="gdm-process-search">
   <div class="wrapper">
-	  <gdm-form-process :lang="lang" :color="color" :user="parameters.user" :service="parameters.service"
+	  <gdm-form-process :lang="lang" :feature-collection="featureCollection" :color="color" :user="parameters.user" :service="parameters.service"
 	   @remove="removeSelected" @dateChange="dateChange" @statusChange="statusChange"></gdm-form-process> 
 	    
-	  <div v-if="features.length === 0" class="message">
+	  <div v-if="featureCollection.features && featureCollection.features.length === 0" class="message">
 	      {{$t('no_process')}}
 	   </div>
 	   <div v-else>
@@ -41,7 +41,7 @@
 		     
 		     </thead>
 		     <tbody>
-		     <tr v-for="feature in features">
+		     <tr v-for="feature in featureCollection.features">
 		     <td>
 			     <div><b>{{feature.properties.id}}</b></div>
 			     <div class="gdm-token" v-if="feature.properties.token">{{feature.properties.token}}</div>
@@ -126,7 +126,7 @@ export default {
   data () {
     return {
       dateFormat: 'YYYY-MM-DD hh:mm:ss',
-      features: [],
+      featureCollection: {},
       pagination: {
         startIndex: 0,
         maxRecords: 25,
@@ -201,7 +201,9 @@ export default {
         maxRecords: pagination.itemsPerPage,
         count: response.body.features.length
       }
-      this.features = response.body.features
+      console.log(response.body)
+      this.featureCollection = response.body
+      console.log(this.featureCollection)
     },
 //     removeSelected (type) {
 //       this.parameters[type] = null
