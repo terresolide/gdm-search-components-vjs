@@ -20,10 +20,13 @@
 </i18n>
 <template>
   <span class="gdm-process-search">
+    <formater-draw-bbox :lang="lang" :color="color"></formater-draw-bbox>
   <div class="wrapper">
+   <div class="column-left">
 	  <gdm-form-process :lang="lang" :feature-collection="featureCollection" :color="color" :user="parameters.user" :service="parameters.service"
 	   @remove="removeSelected" @dateChange="dateChange" @statusChange="statusChange"></gdm-form-process> 
-	    
+	 </div>
+	 <div class="column-right">
 	  <div v-if="featureCollection.features && featureCollection.features.length === 0" class="message">
 	      {{$t('no_process')}}
 	   </div>
@@ -87,6 +90,7 @@
 		     </tbody>
 		   </table>
 	   </div>
+	   </div>
    </div>
   </span>
 </template>
@@ -94,12 +98,14 @@
 import GdmPaging from './gdm-paging.vue'
 import GdmFormProcess from './subcomponents/gdm-form-process.vue'
 import moment from 'moment'
+import FormaterDrawBbox from './subcomponents/formater-draw-bbox.vue'
 
 export default {
   name: 'GdmProcessSearch',
   components: {
     GdmPaging,
-    GdmFormProcess
+    GdmFormProcess,
+    FormaterDrawBbox
   },
   props: {
 	  api: {
@@ -273,11 +279,25 @@ export default {
 font-size: 0.9rem;
 }
 .gdm-process-search div.wrapper {
-  max-width:1200px;
+
   margin:auto;
 }
+.gdm-process-search div.column-left{
+  width:250px;
+  margin-left:5px;
+  float:left;
+}
+.gdm-process-search div.column-right{
+ width:calc(100% - 325px);
+  float:left;
+  display:box;
+  margin-left:10px;
+}
 table{
- min-width: 1100px;
+ width:100%;
+  float:left;
+  display:box;
+  margin-left:10px;
  border: 1px solid black;
  border-collapse: collapse;
 
@@ -333,13 +353,14 @@ div.toSelect.selected:hover {
 div.infos {
   float:left;
   vertical-align:top;
-  font-size:0.9em;
+  font-size:0.8em;
   margin: 0 5px;
 }
 div.gdm-token{
-  font-weight:700;
-  color:grey;
-  font-size:0.9em;
+  color:#202020;
+  font-size:0.8em;
   font-style:italic;
+  max-width: 190px;
+overflow-wrap: break-word;
 }
 </style>

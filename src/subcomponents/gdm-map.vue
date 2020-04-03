@@ -19,24 +19,29 @@ export default {
   data () {
     return {
       map: null,
-      controlLayer: null
+      controlLayer: null,
+      featureGroup: null
     }
   },
-  computed: {
-    features () {
-      var featureGroup = null
-      if (this.map && this.featureCollection) {
+  watch: {
+    featureCollection(newCollection) {
+      if (this.featureGroup) {
+        this.featureGroup.clearLayers()
+        this.featureGroup = null
+      }
+      if (this.map && newCollection) {
         console.log('add to map')
-        featureGroup = this.features =  L.geoJSON(this.featureCollection, {
+        this.featureGroup =  L.geoJSON(newCollection, {
           style: function (feature) {
             console.log(feature)
            return {color: '#ff0000'};
            }
-		     }).bindPopup(function (layer) {
-		         return layer.feature.properties.name;
-		     }).addTo(this.map);
+         }).bindPopup(function (layer) {
+             return layer.feature.properties.name;
+         }).addTo(this.map);
+        this.map.fitBounds(this.featureGroup.getBounds())
       }
-      return featureGroup
+      
     }
   },
   created () {
@@ -52,16 +57,6 @@ export default {
       this.controlLayer = new L.Control.Fmtlayer(null, null,{position: 'topright'})
       this.controlLayer.tiles.arcgisTopo.layer.addTo(this.map)
       this.controlLayer.addTo(this.map)
-//       if (this.featureCollection) {
-// 	      this.features =  L.geoJSON(this.featureCollection, {
-// 	        style: function (feature) {
-// 	             console.log(feature)
-// 	            return {color: '#ff0000'};
-// 	        }
-// 		    }).bindPopup(function (layer) {
-// 		        return layer.feature.properties.name;
-// 		    }).addTo(this.map);
-//       }
 
     }
   
@@ -75,7 +70,7 @@ export default {
 }
 div[id="gdmMap"] {
  position:relative;
- width: 400px;
- height: 300px;
+ width: 248px;
+ height: 200px;
 }
 </style>
