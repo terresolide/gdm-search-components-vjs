@@ -5,16 +5,18 @@
     "identifiers": "Identifiers",
     "temporal_extent": "Temporal extent",
     "parameters": "Parameters",
-    "no_process": "No process visible for you",
-    "unauthorized": "Unauthorized"
+    "no_process": "No process",
+    "unauthorized": "Access Unauthorized",
+    "forbidden": "Access Forbidden: deconnected?"
   },
   "fr": {
    "process_dates": "Dates du calcul",
    "identifiers": "Identifiants",
    "temporal_extent": "Etendue temporelle",
    "parameters": "Paramètres",
-   "no_process": "Aucun calcul n'est accessible pour vous",
-   "unauthorized": "Accès interdit"
+   "no_process": "Aucun calcul",
+   "unauthorized": "Accès non autorisé à cette ressource",
+    "forbidden": "Access interdit: deconnecté?"
   }
 }
 </i18n>
@@ -24,10 +26,12 @@
   <div class="wrapper">
    <div class="column-left">
 	  <gdm-form-process :lang="lang" :feature-collection="featureCollection" :color="color" :user="parameters.user" :service="parameters.service"
-	   @remove="removeSelected" @dateChange="dateChange" @statusChange="statusChange"></gdm-form-process> 
+	   @remove="removeSelected" @dateChange="dateChange" @statusChange="statusChange" 
+	   @textChange="textChange" @reset="reset"></gdm-form-process> 
 	 </div>
 	 <div class="column-right">
-	  <div v-if="featureCollection.features && featureCollection.features.length === 0" class="message">
+	 <div id="fmtLargeMap" style="width:calc(100%);"></div>
+	  <div v-if="!featureCollection.features || featureCollection.features.length === 0" class="message">
 	      {{$t('no_process')}}
 	   </div>
 	   <div v-else>
@@ -35,7 +39,7 @@
 		   :count="pagination.count" :total-results="pagination.totalResults"
 		   :lang="lang" :color="color" @change="pageChange"></gdm-paging>
 		   <table>
-		     <thead :style="{background:$shadeColor(color, 0.5)}">
+		     <thead :style="{background:$shadeColor(color, 0.8)}">
 		     <th>{{$t('identifiers')}}</th>
 		     <th>Status</th>
 		     <th>{{$t('process_dates')}}</th>
@@ -98,7 +102,7 @@
 import GdmPaging from './gdm-paging.vue'
 import GdmFormProcess from './subcomponents/gdm-form-process.vue'
 import moment from 'moment'
-import FormaterDrawBbox from './subcomponents/formater-draw-bbox.vue'
+import FormaterDrawBbox from 'formater-metadata-vjs/src/formater-draw-bbox.vue'
 
 export default {
   name: 'GdmProcessSearch',
@@ -199,7 +203,6 @@ export default {
       this.search()
     },
     display (response) {
-      console.log(response.body.features)
       var pagination = response.body.properties
       this.pagination = {
         startIndex: pagination.startIndex,
@@ -207,14 +210,15 @@ export default {
         maxRecords: pagination.itemsPerPage,
         count: response.body.features.length
       }
-      console.log(response.body)
       this.featureCollection = response.body
-      console.log(this.featureCollection)
     },
-//     removeSelected (type) {
-//       this.parameters[type] = null
-//       this.search()
-//     },
+
+    reset () {
+      for (var prop in this.parameters) {
+        this.parameters[prop] = null
+      }
+      this.search()
+    },
     selectUser (user) {
       if (this.parameters.user && this.parameters.user.id === user.id) {
         this.parameters.user = null
@@ -235,19 +239,29 @@ export default {
       this.parameters.status = e
       this.search()
     },
+    textChange (value) {
+      console.log(value)
+    },
     removeSelected(type) {
       this.parameters[type] = null
       this.search()
     },
     error (response) {
-      console.log(response)
+      this.pagination = {
+          startIndex: 0,
+          totalResults: 0,
+          maxRecords: 25,
+          count: 0
+        }
+        this.featureCollection = {}
       switch (response.status) {
       case 403:
         console.log('Accès interdit, déconnecté?')
-        alert(this.$i18n('unauthorized'))
+        alert(this.$i18n.t('forbidden'))
         break
       case 401:
         console.log("Vous n'avez pas les droits suffisants!");
+        alert(this.$i18n.t('unauthorized'))
       }
     },
     getProperties (feature) {
@@ -288,29 +302,35 @@ font-size: 0.9rem;
   float:left;
 }
 .gdm-process-search div.column-right{
- width:calc(100% - 325px);
+ width:calc(100% - 275px);
   float:left;
-  display:box;
+  display:block;
   margin-left:10px;
+}
+div.message {
+	font-size: 0.9rem;
+	margin:auto;
+	text-align: center;
+	font-style: italic;
 }
 table{
  width:100%;
   float:left;
   display:box;
-  margin-left:10px;
- border: 1px solid black;
+ border: 1px solid #ccc;
  border-collapse: collapse;
+ box-shadow: 1px 1px 1px 2px rgba(0, 0, 0, 0.1);
 
 }
 thead {
- border: 1px solid black;
+ border: 1px solid #ccc;
  background: lightgrey;
  text-align: left;
 }
 td, th{
   padding:3px 8px;
   vertical-align:top;
-  border-bottom: 1px solid grey;
+  border-bottom: 1px solid #CCC;
 }
 span.failed{
  color: darkred;
