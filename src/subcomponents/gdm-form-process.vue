@@ -4,14 +4,18 @@
      "temporal_extent": "Temporal Extent",
      "spatial_extent": "Spatial Extent",
      "filters": "Filters",
-     "no_filter": "No filter"
+     "no_filter": "No filter",
+     "reset": "Reset",
+     "search": "Search"
    },
    "fr":{
      "process_extent": "Dates du calcul",
      "temporal_extent": "Etendue temporelle",
       "spatial_extent": "Etendue spatiale",
      "filters": "Filtres",
-     "no_filter": "Aucun filtre"
+     "no_filter": "Aucun filtre",
+     "reset": "Intialiser",
+     "search": "Rechercher"
     }
 }
 </i18n>

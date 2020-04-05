@@ -102,7 +102,7 @@
 import GdmPaging from './gdm-paging.vue'
 import GdmFormProcess from './subcomponents/gdm-form-process.vue'
 import moment from 'moment'
-import FormaterDrawBbox from 'formater-metadata-vjs/src/formater-draw-bbox.vue'
+import FormaterDrawBbox from './subcomponents/gdm-draw-bbox.vue'
 
 export default {
   name: 'GdmProcessSearch',
@@ -142,6 +142,7 @@ export default {
         maxRecords: 25,
         totalResults: null
       },
+      spatialChangeListener: null,
       parameters: {
         user: null,
         service: null,
@@ -150,18 +151,23 @@ export default {
         processEnd: null,
         tempStart: null,
         tempEnd: null,
-        launchUrl: null
+        q: null,
+        bbox: null
       }
     }
   },
   created () {
    // launch url debug
+   this.spatialChangeListener = this.spatialChange.bind(this)
+   document.addEventListener('fmt:spatialChangeEvent', this.spatialChangeListener)
    this.launchUrl = this.api.substr(0, this.api.indexOf('api'))
    this.$i18n.locale = this.lang
-   console.log(this.$i18n);
-
-    moment.locale(this.lang)
-	  this.search()
+   moment.locale(this.lang)
+	 this.search()
+  },
+  destroyed () {
+    document.removeEventListener('fmt:spatialChangeEvent', this.spatialChangeListener)
+    this.spatialChangeListener = null
   },
   mounted () {
   },
@@ -178,6 +184,12 @@ export default {
      }
      if (this.parameters.status) {
        url += '&status=' + this.parameters.status
+     }
+     if (this.parameters.q) {
+       url += '&q=' + this.parameters.q
+     }
+     if (this.parameters.bbox) {
+       url +='&bbox=' + this.parameters.bbox
      }
      var self = this
      var dateType = ['processStart', 'processEnd', 'tempStart', 'tempEnd']
@@ -202,6 +214,7 @@ export default {
       this.parameters[name] = e.value
       this.search()
     },
+   
     display (response) {
       var pagination = response.body.properties
       this.pagination = {
@@ -235,12 +248,27 @@ export default {
       }
       this.search()
     },
+    spatialChange(e) {
+      var event = new CustomEvent('aerisSearchEvent', {detail: {}})
+      document.dispatchEvent(event)
+      if (event.detail.geometry) {
+        this.parameters.bbox = event.detail.geometry
+      } else {
+        this.parameters.bbox = null
+      }
+      this.search()
+    },
     statusChange(e) {
       this.parameters.status = e
       this.search()
     },
     textChange (value) {
-      console.log(value)
+      if (value) {
+         this.parameters.q = encodeURIComponent(value)
+      } else {
+        this.parameters.q = null
+      }
+      this.search()
     },
     removeSelected(type) {
       this.parameters[type] = null

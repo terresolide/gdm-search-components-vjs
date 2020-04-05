@@ -1,6 +1,6 @@
 <template>
 <span class="gdm-map">
-<div id="fmtMap" class="fmt-small"></div>
+<div id="fmtMap" class="mtdt-small"></div>
 </span>
 </template>
 <script>
@@ -78,27 +78,28 @@ export default {
   float:left;
   margin-right: 10px;
 }
+
 div[id="fmtMap"]{
  position:relative;
- width: 248px;
- height: 200px;
+ width: 100%;
+ min-height: 200px;
  z-index: 0;
 }
-div[id="fmtMap"].fmt-small {
+div[id="fmtMap"].mtdt-small {
  max-height:200px;
 }
-div[id="fmtMap"].fmt-small .leaflet-top .leaflet-control{
+div[id="fmtMap"].mtdt-small .leaflet-top .leaflet-control{
    margin-top: 3px;
 }
-div[id="fmtMap"].fmt-small .leaflet-left .leaflet-control{
+div[id="fmtMap"].mtdt-small .leaflet-left .leaflet-control{
    margin-left: 3px;
 }
-div[id="fmtMap"].fmt-small .leaflet-control .leaflet-control-zoom-in, 
-div[id="fmtMap"].fmt-small .leaflet-control .leaflet-control-zoom-out{
+div[id="fmtMap"].mtdt-small.leaflet-control .leaflet-control-zoom-in, 
+div[id="fmtMap"].mtdt-small .leaflet-control .leaflet-control-zoom-out{
   font-size:16px;
 }
-div[id="fmtMap"].fmt-small .leaflet-bar a,
-div[id="fmtMap"].fmt-small .leaflet-control a{
+div[id="fmtMap"].mtdt-small .leaflet-bar a,
+div[id="fmtMap"].mtdt-small .leaflet-control a{
  width: 15px;
  height:15px;
  line-height:15px;
@@ -108,13 +109,65 @@ div[id="fmtMap"].fmt-small .leaflet-control a{
    width:100%;
    font-size: 16px;
  }
+ div[id="fmtMap"] a.leaflet-control-layers-toggle{
+  background-image: none;
+  color: black;
+  text-decoration: none;
+  text-align:center;
+ }
+  div[id="fmtMap"] a.leaflet-control-layers-toggle::before{
+   font-family:Formater;
+   content: "\e806";
+  }
+  
+
+    div[id="fmtMap"] .leaflet-control-layers-expanded {
+          padding: 3px 5px;
+   }
+    div[id="fmtMap"] section.leaflet-control-layers-list input[type=radio],
+     div[id="fmtMap"] section.leaflet-control-layers-list input[type=checkbox]{
+     display:none;
+ }
+    div[id="fmtMap"] section.leaflet-control-layers-list  input[type=radio] + span:before {
+     font-family: FontAwesome;
+     content: "\f10c";
+     opacity:0.8;
+     cursor: pointer;
+     
+  }
+  div[id="fmtMap"] section.leaflet-control-layers-list input[type=radio]:checked + span:before {
+     content: "\f111";
+     opacity:1;
+     
+  }
+  div[id="fmtMap"] section.leaflet-control-layers-list  input[type=checkbox] + span:before {
+     font-family: FontAwesome;
+     content: "\f096";
+     opacity:0.8;
+     cursor: pointer;
+  }
+    
+  div[id="fmtMap"] section.leaflet-control-layers-list input[type=checkbox]:checked + span:before {
+     content: "\f046";
+     opacity:1;
+     
+  }
+
+ div[id="fmtMap"] .leaflet-control-layers-base label span{
+   vertical-align: middle;
+ }
+ 
+ div[id="fmtMap"].mtdt-fullscreen{
+   min-height:300px;
+   font-size: 16px;
+ }
  div[id="fmtMap"].mtdt-fullscreen a.leaflet-control-layers-toggle{
    width: 30px;
    height: 30px;
    border-radius: 2px;
    line-height: 30px;
  }
- div[id="fmtMap"].mtdt-fullscreen a..leaflet-control-layers{
+ div[id="fmtMap"].mtdt-fullscreen a.leaflet-control-layers{
    border-radius: 2px;
- }
+   }
 </style>
