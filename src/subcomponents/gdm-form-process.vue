@@ -80,7 +80,7 @@ export default {
       default: null
     },
     service: {
-      type: Array,
+      type: Object,
       default: null
     },
     status: {
@@ -133,9 +133,6 @@ export default {
     }
   },
   methods: {
-    getStatus () {
-      
-    },
     removeFilter (type) {
       this.$emit('remove', type)
     },
@@ -171,6 +168,7 @@ export default {
       }
 	  },
 	  reset(e) {
+	    this.textSearch = ""
 	    var event = new CustomEvent('aerisResetEvent')
 	    document.dispatchEvent(event)
 	    this.$emit('reset')  

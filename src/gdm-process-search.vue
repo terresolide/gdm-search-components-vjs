@@ -47,8 +47,9 @@
 		     <th>{{$t('parameters')}}</th>
 		     
 		     </thead>
-		     <tbody>
-		     <tr v-for="feature in featureCollection.features">
+		     <tbody @mouseleave="highlight(null)">
+		     <tr v-for="feature in featureCollection.features" :class="'row' + feature.properties.id" 
+		     @mouseenter="highlight(feature.properties.id)" @click="selectProcess(feature.properties.id)">
 		     <td>
 			     <div><b>{{feature.properties.id}}</b></div>
 			     <div class="gdm-token" v-if="feature.properties.token">{{feature.properties.token}}</div>
@@ -143,6 +144,8 @@ export default {
         totalResults: null
       },
       spatialChangeListener: null,
+      selectProcessLayerListener: null,
+      selectedProcessId: null,
       parameters: {
         user: null,
         service: null,
@@ -160,6 +163,8 @@ export default {
    // launch url debug
    this.spatialChangeListener = this.spatialChange.bind(this)
    document.addEventListener('fmt:spatialChangeEvent', this.spatialChangeListener)
+    this.selectProcessLayerListener = this.selectedLayerChange.bind(this)
+   document.addEventListener('gdm:selectProcessLayer', this.selectProcessLayerListener)
    this.launchUrl = this.api.substr(0, this.api.indexOf('api'))
    this.$i18n.locale = this.lang
    moment.locale(this.lang)
@@ -185,8 +190,8 @@ export default {
      if (this.parameters.status) {
        url += '&status=' + this.parameters.status
      }
-     if (this.parameters.q) {
-       url += '&q=' + this.parameters.q
+     if (this.parameters.any) {
+       url += '&any=' + this.parameters.any
      }
      if (this.parameters.bbox) {
        url +='&bbox=' + this.parameters.bbox
@@ -203,14 +208,10 @@ export default {
           response => this.display(response),
           response => this.error(response))
     },
-    pageChange(values) {
-      this.pagination = values
-      this.search()
-    },
+   
     dateChange (e) {
       var change = {'from': 'Start', 'to': 'End'}
       var name = e.name.replace('from','Start').replace('to', 'End')
-      console.log(name)
       this.parameters[name] = e.value
       this.search()
     },
@@ -224,55 +225,6 @@ export default {
         count: response.body.features.length
       }
       this.featureCollection = response.body
-    },
-
-    reset () {
-      for (var prop in this.parameters) {
-        this.parameters[prop] = null
-      }
-      this.search()
-    },
-    selectUser (user) {
-      if (this.parameters.user && this.parameters.user.id === user.id) {
-        this.parameters.user = null
-      } else {
-        this.parameters.user = user
-      }
-      this.search()
-    },
-    selectService (service) {
-      if (this.parameters.service && this.parameters.service.id === service.id) {
-        this.parameters.service = null
-      } else {
-        this.parameters.service = service
-      }
-      this.search()
-    },
-    spatialChange(e) {
-      var event = new CustomEvent('aerisSearchEvent', {detail: {}})
-      document.dispatchEvent(event)
-      if (event.detail.geometry) {
-        this.parameters.bbox = event.detail.geometry
-      } else {
-        this.parameters.bbox = null
-      }
-      this.search()
-    },
-    statusChange(e) {
-      this.parameters.status = e
-      this.search()
-    },
-    textChange (value) {
-      if (value) {
-         this.parameters.q = encodeURIComponent(value)
-      } else {
-        this.parameters.q = null
-      }
-      this.search()
-    },
-    removeSelected(type) {
-      this.parameters[type] = null
-      this.search()
     },
     error (response) {
       this.pagination = {
@@ -292,8 +244,40 @@ export default {
         alert(this.$i18n.t('unauthorized'))
       }
     },
-    getProperties (feature) {
-      
+    highlight (featureId) {
+      // remove all highlight
+      var nodes = document.querySelectorAll('.gdm-process-search .highlight')
+      nodes.forEach(function(node) {
+        node.classList.remove('highlight')
+      })
+      var nodes = document.querySelectorAll('.row' + featureId)
+      nodes.forEach(function (node) {
+        node.classList.add('highlight')
+      })
+      var event = new CustomEvent('gdm:processHighlight', {detail: {id: featureId}})
+      document.dispatchEvent(event)
+    },
+    selectProcess (featureId) {
+      var selectedProcessId = this.selectedProcessId
+      var nodes = document.querySelectorAll('.gdm-process-search .selected')
+      nodes.forEach(function(node) {
+        node.classList.remove('selected')
+      })
+      if (featureId !== selectedProcessId) {
+	      var nodes = document.querySelectorAll('.row' + featureId)
+	      nodes.forEach(function (node) {
+	        node.classList.add('selected')
+	      })
+	      this.selectedProcessId = featureId
+      } else {
+        this.selectedProcessId = null
+      }
+      var event = new CustomEvent('gdm:processSelect', {detail: {id: featureId}})
+      document.dispatchEvent(event)
+    },
+    pageChange(values) {
+      this.pagination = values
+      this.search()
     },
     printDate (date, length) {
       if (!length) {
@@ -302,6 +286,51 @@ export default {
       } else {
        return moment(date, this.dateFormat).format('DD/MM/YYYY HH:mm')
       }
+    },
+    removeSelected(type) {
+      this.parameters[type] = null
+      this.search()
+    },
+    reset () {
+      for (var prop in this.parameters) {
+        this.parameters[prop] = null
+      }
+      this.search()
+    },
+    selectedLayerChange (e) {
+      var id = e.detail.id
+      this.selectProcess(id)
+    },
+    
+    selectService (service) {
+      if (this.parameters.service && this.parameters.service.id === service.id) {
+        this.parameters.service = null
+      } else {
+        this.parameters.service = service
+      }
+      this.search()
+    },
+    selectUser (user) {
+      if (this.parameters.user && this.parameters.user.id === user.id) {
+        this.parameters.user = null
+      } else {
+        this.parameters.user = user
+      }
+      this.search()
+    },
+    spatialChange(e) {
+      var event = new CustomEvent('aerisSearchEvent', {detail: {}})
+      document.dispatchEvent(event)
+      if (event.detail.geometry) {
+        this.parameters.bbox = event.detail.geometry
+      } else {
+        this.parameters.bbox = null
+      }
+      this.search()
+    },
+    statusChange(e) {
+      this.parameters.status = e
+      this.search()
     },
     statusToClass(status) {
       switch(status) {
@@ -312,7 +341,17 @@ export default {
         default:
           return status.toLowerCase()
       }
+    },
+    textChange (value) {
+      if (value) {
+         this.parameters.any = encodeURIComponent(value)
+      } else {
+        this.parameters.any = null
+      }
+      this.search()
     }
+    
+    
   }
 }
 </script>
@@ -323,6 +362,12 @@ font-size: 0.9rem;
 .gdm-process-search div.wrapper {
 
   margin:auto;
+}
+.gdm-process-search tr.highlight {
+  background: #EFF6F6;
+}
+.gdm-process-search tr.selected {
+  background: #F6EFEF;
 }
 .gdm-process-search div.column-left{
   width:250px;
