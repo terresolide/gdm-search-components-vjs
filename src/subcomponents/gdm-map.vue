@@ -74,8 +74,11 @@ export default {
            interactive: true,
            zIndex: 100
          }).addTo(this.map);
-        this.map.fitBounds(this.featureGroup.getBounds())
-        
+        if (this.featureGroup && this.featureGroup.getLayers().length > 0) {
+            this.map.fitBounds(this.featureGroup.getBounds())
+        } else {
+          this.map.fitBounds([[-60,-120],[75,130]])
+        }
       }
       
     }
