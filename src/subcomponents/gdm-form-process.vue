@@ -30,25 +30,25 @@
       <gdm-map :feature-collection="featureCollection"></gdm-map>
    
      <formater-search-box header-icon-class="fa fa-globe" open-icon-class="fa fa-caret-right" :title="$t('spatial_extent')" :deployed="false" type="empty" >
-       <formater-spatial-search :lang="lang"></formater-spatial-search>
+       <gdm-spatial-search :lang="lang"></gdm-spatial-search>
      </formater-search-box>
      
      <formater-search-box header-icon-class="fa fa-calendar" open-icon-class="fa fa-caret-right" :title="$t('temporal_extent')" :deployed="false" type="empty" >
-         <formater-temporal-search name="temp" lang="fr" daymin="2014-04-03" @change="dateChange"></formater-temporal-search>
+         <formater-temporal-search name="temp" lang="fr" :format="format" daymin="2014-04-03" @change="dateChange"></formater-temporal-search>
      </formater-search-box>
      <formater-search-box header-icon-class="fa fa-cog" open-icon-class="fa fa-caret-right" title="Status" :deployed="false" type="empty" >
       <formater-select  :options="statusList" :defaut="parameters.status" @input="statusChange" width="228px"></formater-select>
     </formater-search-box>
      <formater-search-box header-icon-class="fa fa-hourglass-end" open-icon-class="fa fa-caret-right" :title="$t('process_extent')" :deployed="false" type="empty" >
 
-       <formater-temporal-search name="process" lang="fr" daymin="2020-03-01" @change="dateChange"></formater-temporal-search>
+       <formater-temporal-search name="process" lang="fr" :format="format" daymin="2020-03-01" @change="dateChange"></formater-temporal-search>
     </formater-search-box>
 
     <formater-search-box  header-icon-class="fa fa-filter" open-icon-class="fa fa-caret-right" :title="$t('filters')" :deployed="false" type="empty" >
      <div style="margin-left:10px;min-height:70px;">
      <div v-if="!user && !service" style="font-style:italic;color:grey;">{{$t('no_filter')}}</div>
-	   <div v-if="user" class="selected">{{user.email}}<span class="fa fa-close" @click="removeFilter('user')"></span></div>
-	   <div v-if="service" class="selected">{{service.name}}<span class="fa fa-close" @click="removeFilter('service')"></span></div>
+	   <div v-if="user" class="selectedUser">{{user.email}}<span class="fa fa-close" @click="removeFilter('user')"></span></div>
+	   <div v-if="service" class="selectedService">{{service.name}}<span class="fa fa-close" @click="removeFilter('service')"></span></div>
 	   </div>
 	  </formater-search-box>
 
@@ -62,14 +62,14 @@ import moment from 'moment';
 // import FormaterTemporalSearch from './formater-temporal-search.vue'
 
 import {FormaterSearchBox, FormaterTemporalSearch, FormaterSelect} from 'formater-commons-components-vjs'
-import FormaterSpatialSearch from 'formater-metadata-vjs/src/formater-spatial-search.vue'
+import GdmSpatialSearch from './gdm-spatial-search.vue'
 import GdmMap from './gdm-map.vue'
 
 export default {
   name: 'GdmFormProcess',
   components: {
     FormaterTemporalSearch,
-    FormaterSpatialSearch,
+    GdmSpatialSearch,
     FormaterSelect,
     FormaterSearchBox,
     GdmMap
@@ -109,6 +109,11 @@ export default {
   },
   created () {
     this.$i18n.locale = this.lang
+    if (this.lang === 'fr') {
+      this.format = 'DD/MM/YYYY'
+    } else {
+      this.format = 'MM/DD/YYYY'
+    }
   },
   mounted () {
   },
@@ -123,6 +128,7 @@ export default {
         daymin: '2020-01-01',
         daymax: 'now'
       },
+      format: 'DD/MM/YYYY',
       statusList: ['WAITING', 'TERMINATED', 'RUNNING', 'FAILED', 'PURGED'],
       textSearch: null,
       dateFormat: 'DD/MM/YYYY',
@@ -192,13 +198,17 @@ box-shadow: 1px 1px 1px 2px rgba(0, 0, 0, 0.1);
     width: 100%;
     box-shadow: 0 2px 5px -5px rgba(0, 0, 0, 0.2);
 }
+.gdm-form-process .formater-search-box .content{
+    margin: 0;
+}
 .gdm-form-process .fa-close{
   color: darkred;
   margin-left:10px;
   cursor:pointer;
   vertical-align:top;
 }
-.gdm-form-process div.selected{
+.gdm-form-process div.selectedUser,
+.gdm-form-process div.selectedService{
   float:left;
   padding: 3px;
   margin: 0px 5px 5px 0px;

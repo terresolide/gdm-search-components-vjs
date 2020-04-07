@@ -53,8 +53,7 @@ export default {
              layer.className = 'row' + feature.properties.id
              layer.id = feature.properties.id
              var html = ''
-             if (feature.properties.processusName) {
-               console.log(feature.properties.name)
+             if (typeof feature.properties.processusName !== 'undefined') {
                html += '<h3>' + feature.properties.processusName + '</h3>'
                 
              }
@@ -89,6 +88,12 @@ export default {
   },
   mounted () {
     this.initialize()
+  },
+  destroyed () {
+    document.removeEventListener('gdm:processHighlight', this.highlightListener)
+    this.highlightListener = null
+    document.removeEventListener('gdm:processSelect', this.selectListener)
+    this.selectListener = null
   },
   methods: {
    changeHighlightedLayer (event) {

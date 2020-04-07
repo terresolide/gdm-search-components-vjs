@@ -54,13 +54,13 @@
 			     <div><b>{{feature.properties.id}}</b></div>
 			     <div class="gdm-token" v-if="feature.properties.token">{{feature.properties.token}}</div>
 	         
-			     <div class="toSelect" :class="{selected: parameters.service}" 
+			     <div class="toSelect" :class="{selectedService: parameters.service}" 
 		           @click="selectService({id:feature.properties.serviceId, name:feature.properties.serviceName})">
 		           {{feature.properties.serviceName}}
 		       </div>
 			     <div v-if="userId">{{feature.properties.email}}</div>
 			     <div v-else>
-			         <div class="toSelect" :class="{selected: parameters.user}" 
+			         <div class="toSelect" :class="{selectedUser: parameters.user}" 
 			         @click="selectUser({id:feature.properties.userId, email:feature.properties.email})">
 			            {{feature.properties.email}}
 			          </div>
@@ -137,6 +137,7 @@ export default {
   data () {
     return {
       dateFormat: 'YYYY-MM-DD hh:mm:ss',
+      dateFormatDisplay: 'DD/MM/YYYY',
       featureCollection: {},
       pagination: {
         startIndex: 0,
@@ -168,6 +169,11 @@ export default {
    this.launchUrl = this.api.substr(0, this.api.indexOf('api'))
    this.$i18n.locale = this.lang
    moment.locale(this.lang)
+   if (this.lang === 'en') {
+     this.dateFormatDisplay = 'MM/DD/YYYY'
+   } else {
+     this.dateFormatDisplay = 'DD/MM/YYYY'
+   }
 	 this.search()
   },
   destroyed () {
@@ -281,10 +287,10 @@ export default {
     },
     printDate (date, length) {
       if (!length) {
-        return moment(date, this.dateFormat).format('DD/MM/YYYY')
+        return moment(date, this.dateFormat).format(this.dateFormatDisplay)
         
       } else {
-       return moment(date, this.dateFormat).format('DD/MM/YYYY HH:mm')
+       return moment(date, this.dateFormat).format(this.dateFormatDisplay + ' HH:mm')
       }
     },
     removeSelected(type) {
@@ -292,6 +298,7 @@ export default {
       this.search()
     },
     reset () {
+      this.selectProcess(null)
       for (var prop in this.parameters) {
         this.parameters[prop] = null
       }
@@ -432,14 +439,16 @@ div.toSelect {
   border: 1px solid #909090;
   border-radius:2px;
 }
-div.toSelect.selected{
+div.toSelect.selectedUser,
+div.toSelect.selectedService{
  background: #f7f1ef;
  border-color:darkred;
 }
 div.toSelect:hover {
  background: #e5e5e5;
 }
-div.toSelect.selected:hover {
+div.toSelect.selectedUser:hover,
+div.toSelect.selectedService:hover  {
  background: #f9eae6;
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "gdm-search-components-vjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "GDM Search Components",
   "production": {
     "url": "https://cdn.jsdelivr.net/gh/terresolide"
@@ -20,7 +20,6 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
   },
   "dependencies": {
-    "formater-metadata-vjs": "github:terresolide/formater-metadata-vjs",
     "leaflet": "^1.6.0",
     "leaflet-draw": "^1.0.4",
     "moment": "^2.24.0",
