@@ -55,13 +55,13 @@
 			     <div class="gdm-token" v-if="feature.properties.token">{{feature.properties.token}}</div>
 	         
 			     <div class="toSelect" :class="{selectedService: parameters.service}" 
-		           @click="selectService({id:feature.properties.serviceId, name:feature.properties.serviceName})">
+		           @click="selectService({id:feature.properties.serviceId, name:feature.properties.serviceName}, $event)">
 		           {{feature.properties.serviceName}}
 		       </div>
 			     <div v-if="userId">{{feature.properties.email}}</div>
 			     <div v-else>
 			         <div class="toSelect" :class="{selectedUser: parameters.user}" 
-			         @click="selectUser({id:feature.properties.userId, email:feature.properties.email})">
+			         @click="selectUser({id:feature.properties.userId, email:feature.properties.email}, $event)">
 			            {{feature.properties.email}}
 			          </div>
 			     </div>
@@ -263,24 +263,7 @@ export default {
       var event = new CustomEvent('gdm:processHighlight', {detail: {id: featureId}})
       document.dispatchEvent(event)
     },
-    selectProcess (featureId) {
-      var selectedProcessId = this.selectedProcessId
-      var nodes = document.querySelectorAll('.gdm-process-search .selected')
-      nodes.forEach(function(node) {
-        node.classList.remove('selected')
-      })
-      if (featureId !== selectedProcessId) {
-	      var nodes = document.querySelectorAll('.row' + featureId)
-	      nodes.forEach(function (node) {
-	        node.classList.add('selected')
-	      })
-	      this.selectedProcessId = featureId
-      } else {
-        this.selectedProcessId = null
-      }
-      var event = new CustomEvent('gdm:processSelect', {detail: {id: featureId}})
-      document.dispatchEvent(event)
-    },
+   
     pageChange(values) {
       this.pagination = values
       this.search()
@@ -308,22 +291,41 @@ export default {
       var id = e.detail.id
       this.selectProcess(id)
     },
-    
-    selectService (service) {
+    selectProcess (featureId) {
+      var selectedProcessId = this.selectedProcessId
+      var nodes = document.querySelectorAll('.gdm-process-search .selected')
+      nodes.forEach(function(node) {
+        node.classList.remove('selected')
+      })
+      if (featureId !== selectedProcessId) {
+        var nodes = document.querySelectorAll('.row' + featureId)
+        nodes.forEach(function (node) {
+          node.classList.add('selected')
+        })
+        this.selectedProcessId = featureId
+      } else {
+        this.selectedProcessId = null
+      }
+      var event = new CustomEvent('gdm:processSelect', {detail: {id: featureId}})
+      document.dispatchEvent(event)
+    },
+    selectService (service, event) {
       if (this.parameters.service && this.parameters.service.id === service.id) {
         this.parameters.service = null
       } else {
         this.parameters.service = service
       }
       this.search()
+      event.stopPropagation()
     },
-    selectUser (user) {
+    selectUser (user, event) {
       if (this.parameters.user && this.parameters.user.id === user.id) {
         this.parameters.user = null
       } else {
         this.parameters.user = user
       }
       this.search()
+      event.stopPropagation()
     },
     spatialChange(e) {
       var event = new CustomEvent('aerisSearchEvent', {detail: {}})
