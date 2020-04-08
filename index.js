@@ -3,5 +3,5 @@
  */
 
 import GdmProcessSearch from './src/gdm-process-search.vue'
-
-export {GdmProcessSearch}
+import GdmManageStep from './src/gdm-manage-step.vue'
+export {GdmProcessSearch, GdmManageStep}

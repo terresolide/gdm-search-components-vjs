@@ -18,7 +18,7 @@ import {VueTools} from 'formater-commons-components-vjs'
 Vue.use(VueTools)
 
 import GdmProcessSearch from './gdm-process-search.vue'
-
+import GdmManageStep from './gdm-manage-step.vue'
 import AerisTheme from 'aeris-commons-components-vjs/src/aeris-theme/aeris-theme.vue'
 
 ljs.addAliases({
@@ -33,6 +33,7 @@ ljs.addAliases({
 })
 ljs.load('dep', function() {
   Vue.customElement('gdm-process-search', GdmProcessSearch)
+    Vue.customElement('gdm-manage-step', GdmManageStep)
   Vue.customElement('aeris-theme', AerisTheme)
 })
     	  
