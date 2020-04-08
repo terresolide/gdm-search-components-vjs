@@ -74,7 +74,10 @@
 		        <a v-if="back"  :href="launchUrl + 'process/launch/' + feature.properties.id" class="button">Test Curl</a>
 		     <td style="text-align:left;">
 		     <b>Start: </b>{{printDate(feature.properties.processStart,true)}}<br/>
-		     <b>End: </b>{{printDate(feature.properties.processEnd, true)}}
+		     <b>End: </b>{{printDate(feature.properties.processEnd, true)}}<br />
+		      <span v-if="feature.properties.datePurge" style="font-size:0.9em;color:#333;font-style:italic;"> 
+		        (<b>Purge: </b>{{printDate(feature.properties.datePurge)}})
+         </span>
 		     </td>
 		     
 		     <td style="text-align:center;">
