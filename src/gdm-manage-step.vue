@@ -78,7 +78,7 @@ export default {
     add () {
       if (this.api && this.serviceId) {
         this.$http.post(
-            this.api + '/stepAdd/' + this.serviceId, 
+            this.api + '/add/' + this.serviceId, 
             this.newStep, 
             { emulateJSON: true,
               credentials: true})
@@ -90,7 +90,7 @@ export default {
     },
     getSteps () {
       if (this.api && this.serviceId) {
-        this.$http.get(this.api + '/stepsGet/' + this.serviceId, {credentials: true})
+        this.$http.get(this.api + '/get/' + this.serviceId, {credentials: true})
         .then(
             response => this.display(response),
             response => this.error(response)
@@ -136,7 +136,7 @@ export default {
     remove (index) {
       if (this.api && this.serviceId) {
         this.$http.post(
-            this.api + '/stepRemove/' + this.serviceId, 
+            this.api + '/remove/' + this.serviceId, 
             {step_id: this.steps[index]['stp_id']}, 
             { emulateJSON: true,
               credentials: true})
@@ -149,7 +149,7 @@ export default {
     reverse (step1, step2) {
       if (this.api && this.serviceId) {
         this.$http.post(
-            this.api + '/stepsReverse/' + this.serviceId, 
+            this.api + '/reverse/' + this.serviceId, 
             {step1: step1, step2: step2}, 
             { emulateJSON: true,
               credentials: true})
@@ -172,7 +172,7 @@ export default {
       delete step.edit
       if (this.api && this.serviceId) {
         this.$http.post(
-            this.api + '/stepUpdate/' + this.serviceId, 
+            this.api + '/update/' + this.serviceId, 
             step, 
             { emulateJSON: true,
               credentials: true})
