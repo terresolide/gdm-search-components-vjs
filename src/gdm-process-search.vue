@@ -25,7 +25,7 @@
     <formater-draw-bbox :lang="lang" :color="color"></formater-draw-bbox>
   <div class="wrapper">
    <div class="column-left">
-	  <gdm-form-process :lang="lang" :feature-collection="featureCollection" :color="color" :user="parameters.user" :service="parameters.service"
+	  <gdm-form-process :lang="lang" :status="statusList" :feature-collection="featureCollection" :color="color" :user="parameters.user" :service="parameters.service"
 	   @remove="removeSelected" @dateChange="dateChange" @statusChange="statusChange" 
 	   @textChange="textChange" @reset="reset"></gdm-form-process> 
 	 </div>
@@ -147,6 +147,7 @@ export default {
         maxRecords: 25,
         totalResults: null
       },
+      statusList: [],
       spatialChangeListener: null,
       selectProcessLayerListener: null,
       selectedProcessId: null,
@@ -232,6 +233,9 @@ export default {
         totalResults: pagination.totalResults,
         maxRecords: pagination.itemsPerPage,
         count: response.body.features.length
+      }
+      if (this.statusList.length <= 1) {
+        this.statusList = response.body.properties.status
       }
       this.featureCollection = response.body
     },
