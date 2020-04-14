@@ -347,9 +347,21 @@ export default {
     statusToClass(status) {
       switch(status) {
       case 'RUNNING':
-      case 'WAITING':
+      case 'ACCEPTED':
         return 'fa fa-refresh fa-spin fa-3x fa-fw ' + status.toLowerCase()
         break
+      case 'WAITING':
+        return 'fa fa-play waiting';
+        break;
+      case 'FAILED':
+        return 'fa fa-close failed';
+        break;
+      case 'TERMINATED':
+        return 'fa fa-check terminated';
+        break;
+      case 'PURGED':
+        return 'fa fa-trash-o purged';
+        break;
         default:
           return status.toLowerCase()
       }
@@ -419,17 +431,13 @@ td, th{
 }
 span.failed{
  color: darkred;
- font-weight: 800;
 }
-span.failed::before{
-content:"\00D7";
-}
+
 span.terminated{
  color:darkgreen;
 }
-span.terminated::before{
- content:"\2713";
-}
+
+
 span.running, 
 span.waiting{
   color: grey;
