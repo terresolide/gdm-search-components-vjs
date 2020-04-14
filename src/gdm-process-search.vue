@@ -443,6 +443,7 @@ span.terminated{
 
 
 span.running, 
+span.accepted,
 span.waiting{
   color: grey;
   font-size:16px;
