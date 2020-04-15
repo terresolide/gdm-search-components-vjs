@@ -72,7 +72,7 @@
 		        <span :class="statusToClass(feature.properties.status)"></span>
 		        <div style="font-style:italic;font-size:0.9rem;color:grey;">{{feature.properties.status}}</div>
 		        <a v-if="back && !feature.properties.token && feature.properties.status === 'WAITING'"  :href="launchUrl + 'process/launch/' + feature.properties.id" class="button">Test Curl</a>
-		        <span class="button" v-if="back && feature.properties.token && feature.properties.status === 'RUNNING'" @click="getStatus(feature.properties.id, $event)" >Test getStatus</span>
+		        <span class="button" v-if="back && feature.properties.token && ['RUNNING', 'ACCEPTED'].indexOf(feature.properties.status) >= 0" @click="getStatus(feature.properties.id, $event)" >Test getStatus</span>
        
 		     <td style="text-align:left;">
 		     <b>Start: </b>{{printDate(feature.properties.processStart,true)}}<br/>
