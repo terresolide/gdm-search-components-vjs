@@ -79,7 +79,7 @@
 		        <span class="button" v-if="back && feature.properties.token && ['RUNNING', 'ACCEPTED'].indexOf(feature.properties.status) >= 0" @click="getStatus(feature.properties.id, $event)" >Test getStatus 1</span>
              <span class="button" v-if="back && feature.properties.token && ['RUNNING', 'ACCEPTED'].indexOf(feature.properties.status) >= 0" @click="getStatusCurl(feature.properties.id, $event)" >Test getStatus 2</span>
            
-            <span class="button" v-if="back && feature.properties.token && ['FAILED', 'TERMINATED'].indexOf(feature.properties.status) >= 0" @click="restart(feature.properties.token, $event)" >Restart</span>
+            <span class="button" v-if="back &&  ['FAILED', 'TERMINATED', 'KILLED', 'PURGED'].indexOf(feature.properties.status) >= 0" @click="restart(feature.properties.token, $event)" >Restart</span>
        
 		     <td style="text-align:left;">
 		     <b>Start: </b>{{printDate(feature.properties.processStart,true)}}<br/>
