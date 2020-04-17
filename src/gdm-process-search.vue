@@ -79,7 +79,7 @@
 		        <span class="button" v-if="back && feature.properties.token && ['RUNNING', 'ACCEPTED'].indexOf(feature.properties.status) >= 0" @click="getStatus(feature.properties.id, $event)" >Test getStatus 1</span>
              <span class="button" v-if="back && feature.properties.token && ['RUNNING', 'ACCEPTED'].indexOf(feature.properties.status) >= 0" @click="getStatusCurl(feature.properties.id, $event)" >Test getStatus 2</span>
            
-            <span class="button" v-if="back &&  ['FAILED', 'TERMINATED', 'KILLED', 'PURGED'].indexOf(feature.properties.status) >= 0" @click="restart(feature.properties.token, $event)" >Restart</span>
+            <span class="button" v-if="back &&  ['FAILED', 'TERMINATED', 'KILLED', 'PURGED'].indexOf(feature.properties.status) >= 0" @click="restart(feature.properties.id, $event)" >Restart</span>
        
 		     <td style="text-align:left;">
 		     <b>Start: </b>{{printDate(feature.properties.processStart,true)}}<br/>
@@ -315,14 +315,11 @@ export default {
       }
       this.search()
     },
-    restart (token, event) {
+    restart (id, event) {
       event.stopPropagation()
-      var url = this.launchUrl + 'api/setStatus' 
-      var postdata = {
-        process_token: token,
-        status: 'WAITING'
-      }
-      this.$http.post(url, postdata, {credentials: true})
+      var url = this.launchUrl + 'api/restart/' + id
+
+      this.$http.get(url, {credentials: true})
       .then(response => {this.search()})
     },
     selectedLayerChange (e) {
