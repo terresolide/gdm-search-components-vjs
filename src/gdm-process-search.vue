@@ -71,14 +71,12 @@
 		     <td style="text-align:center;cursor:pointer;" :title="feature.properties.log">
 		        <span :class="statusToClass(feature.properties.status)"></span>
 		        <div style="font-style:italic;font-size:0.9rem;color:grey;">{{feature.properties.status}}</div>
-		        <a v-if="back  && feature.properties.status === 'WAITING'"  :href="launchUrl + 'process/launch/' + feature.properties.id" class="button">Test Curl 1</a>
-		         <a v-if="back  && feature.properties.status === 'WAITING'"  :href="launchUrl + 'process/launchTest/' + feature.properties.id" class="button">Test Curl 2</a>
-           
+		        <a v-if="back  && feature.properties.status === 'WAITING'"  :href="launchUrl + 'process/launch/' + feature.properties.id" class="button">Test Curl</a>
+		        
 		        <a v-if="back" :href="launchUrl + 'process/postdata/' + feature.properties.id" class="button" target="_blanck">Voir postdata</a>
             
-		        <span class="button" v-if="back && feature.properties.token && ['RUNNING', 'ACCEPTED'].indexOf(feature.properties.status) >= 0" @click="getStatus(feature.properties.id, $event)" >Test getStatus 1</span>
-             <span class="button" v-if="back && feature.properties.token && ['RUNNING', 'ACCEPTED'].indexOf(feature.properties.status) >= 0" @click="getStatusCurl(feature.properties.id, $event)" >Test getStatus 2</span>
-           
+		        <span class="button" v-if="back && feature.properties.token && ['RUNNING', 'ACCEPTED'].indexOf(feature.properties.status) >= 0" @click="getStatus(feature.properties.id, $event)" >Test getStatus</span>
+             
             <span class="button" v-if="back &&  ['FAILED', 'TERMINATED', 'KILLED', 'PURGED'].indexOf(feature.properties.status) >= 0" @click="restart(feature.properties.id, $event)" >Restart</span>
        
 		     <td style="text-align:left;">
@@ -269,12 +267,6 @@ export default {
     getStatus (id, event) {
       event.stopPropagation()
       var url = this.launchUrl + 'api/getStatus/' + id
-      this.$http.get(url, {credentials: true})
-      .then( this.search())
-    },
-    getStatusCurl (id, event) {
-      event.stopPropagation()
-      var url = this.launchUrl + 'api/getStatusCurl/' + id
       this.$http.get(url, {credentials: true})
       .then( this.search())
     },
