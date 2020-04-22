@@ -7,16 +7,18 @@
     "parameters": "Parameters",
     "no_process": "No process",
     "unauthorized": "Access Unauthorized",
-    "forbidden": "Access Forbidden: deconnected?"
+    "forbidden": "Access Forbidden: deconnected?",
+    "launch": "Launch"
   },
   "fr": {
-   "process_dates": "Dates du calcul",
-   "identifiers": "Identifiants",
-   "temporal_extent": "Etendue temporelle",
-   "parameters": "Paramètres",
-   "no_process": "Aucun calcul",
-   "unauthorized": "Accès non autorisé à cette ressource",
-    "forbidden": "Access interdit: deconnecté?"
+    "process_dates": "Dates du calcul",
+    "identifiers": "Identifiants",
+    "temporal_extent": "Etendue temporelle",
+    "parameters": "Paramètres",
+    "no_process": "Aucun calcul",
+    "unauthorized": "Accès non autorisé à cette ressource",
+    "forbidden": "Access interdit: deconnecté?",
+    "launch": "Lancer"
   }
 }
 </i18n>
@@ -72,12 +74,15 @@
 		        <span :class="statusToClass(feature.properties.status)"></span>
 		        <div style="font-style:italic;font-size:0.9rem;color:grey;">{{feature.properties.status}}</div>
 		        <a v-if="back  && feature.properties.status === 'WAITING'"  :href="launchUrl + 'process/launch/' + feature.properties.id" class="button">Test Curl</a>
-		        
+		        <span v-if="!back && feature.properties.status === 'WAITING'"  @click="launch(feature.properties.id, $event)" class="button">{{$t('launch')}}</span>
+            
 		        <a v-if="back" :href="launchUrl + 'process/postdata/' + feature.properties.id" class="button" target="_blanck">Voir postdata</a>
             
 		        <span class="button" v-if="back && feature.properties.token && ['RUNNING', 'ACCEPTED'].indexOf(feature.properties.status) >= 0" @click="getStatus(feature.properties.id, $event)" >Test getStatus</span>
-             
+             <span class="button" v-if="feature.properties.hasDismiss && feature.properties.token && ['RUNNING', 'ACCEPTED'].indexOf(feature.properties.status) >= 0" @click="dismiss(feature.properties.id, $event)" >Dismiss</span>
+            
             <span class="button" v-if="back &&  ['FAILED', 'TERMINATED', 'KILLED', 'PURGED'].indexOf(feature.properties.status) >= 0" @click="restart(feature.properties.id, $event)" >Restart</span>
+          <span class="button" v-if=" feature.properties.hasPurge && ['TERMINATED'].indexOf(feature.properties.status) >= 0" @click="purge(feature.properties.id, $event)" >Purge</span>
        
 		     <td style="text-align:left;">
 		     <b>Start: </b>{{printDate(feature.properties.processStart,true)}}<br/>
@@ -232,7 +237,12 @@ export default {
       this.parameters[name] = e.value
       this.search()
     },
-   
+    dismiss (id, event) {
+      event.stopPropagation()
+      var url = this.launchUrl + 'api/dismiss/' + id
+      this.$http.get(url, {credentials: true})
+      .then( this.search())
+    },
     display (response) {
       var pagination = response.body.properties
       this.pagination = {
@@ -283,7 +293,12 @@ export default {
       var event = new CustomEvent('gdm:processHighlight', {detail: {id: featureId}})
       document.dispatchEvent(event)
     },
-   
+    launch (id, event) {
+      event.stopPropagation()
+      var url = this.launchUrl + 'api/launchz/' + id
+      this.$http.get(url, {credentials: true})
+      .then( this.search())
+    },
     pageChange(values) {
       this.pagination = values
       this.search()
@@ -295,6 +310,12 @@ export default {
       } else {
        return moment(date, this.dateFormat).format(this.dateFormatDisplay + ' HH:mm')
       }
+    },
+    purge (id, event) {
+      event.stopPropagation()
+      var url = this.launchUrl + 'api/purge/' + id
+      this.$http.get(url, {credentials: true})
+      .then( this.search())
     },
     removeSelected(type) {
       this.parameters[type] = null
@@ -503,4 +524,37 @@ div.gdm-token{
   max-width: 190px;
 overflow-wrap: break-word;
 }
+.button{
+    font-family: Arial;
+    font-size: 1em;
+    display: inline-block;
+    margin: 0px 7px 3px 0;
+    padding: 3px 12px;
+    height: auto;
+    line-height: 1.43;
+    white-space: normal;
+    text-align: center;
+    background: #ececea;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 3px;
+    border-color: #ffffff #d4d4cf #d4d4cf;
+    color: #000;
+    text-decoration: none;
+  /*  text-shadow: 0 -1px 1px #bcbcb4, 1px 0 1px #d4d4cf, 0 1px 1px #d4d4cf, -1px 0 1px #bcbcb4;*/
+    vertical-align: top;
+    cursor: pointer;
+    pointer-events: auto;
+    box-sizing: border-box;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);}
+    
+.button:hover
+{
+   background: #f0f0e6;
+   text-decoration: none;
+ }
+.button:disabled{
+    color: #999;
+    pointer-events: none;
+  }
 </style>
