@@ -66,9 +66,6 @@ export default {
     }
   },
   computed: {
-    from () {
-      return this.startIndex + 1
-    },
     to () {
       return this.startIndex + this.count
     },
@@ -88,6 +85,7 @@ export default {
     }
   },
   created () {
+    this.from = this.startIndex + 1
     this.$i18n.locale = this.lang
   },
   mounted () {
@@ -97,6 +95,7 @@ export default {
 
   data() {
     return {
+      from: 1,
       currentPage : 1,
       recordPerPage: this.maxRecords,
       notExactly: '',
