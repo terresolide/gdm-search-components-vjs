@@ -432,6 +432,10 @@ font-size: 0.9rem;
 
   margin:auto;
 }
+.gdm-process-search tr{
+   min-height:100px;
+   height:100px;
+}
 .gdm-process-search tr.highlight {
   background: #EFF6F6;
 }
