@@ -99,7 +99,7 @@
 		     </td>
 		     <td>
 		     <div v-for="type in ['provider', 'position', 'parameters']" class="infos" >
-		         <div v-if="feature.properties[type]"  >
+		         <div v-if="feature.properties[type] && Object.keys(feature.properties[type]).length < 10"  >
 		            <div v-for="(value, prop) in feature.properties[type]" >
 		              <div><b>{{prop}}:</b> {{value}}</div>
 		            </div>
