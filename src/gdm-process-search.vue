@@ -31,25 +31,25 @@
 	   @remove="removeSelected" @dateChange="dateChange" @statusChange="statusChange" 
 	   @textChange="textChange" @reset="reset"></gdm-form-process> 
 	 </div>
-	 <div class="column-right">
+	 <div class="column-right" >
 	 <div id="fmtLargeMap" style="width:calc(100%);"></div>
 	  <div v-if="!featureCollection.features || featureCollection.features.length === 0" class="message">
 	      {{$t('no_process')}}
 	   </div>
-	   <div v-else>
+	   <div v-else >
 		   <gdm-paging :start-index="pagination.startIndex" :max-records="pagination.maxRecords"  
 		   :count="pagination.count" :total-results="pagination.totalResults"
 		   :lang="lang" :color="color" @change="pageChange"></gdm-paging>
-		   <table>
-		     <thead :style="{background:$shadeColor(color, 0.8)}">
-		     <th>{{$t('identifiers')}}</th>
-		     <th>Status</th>
-		     <th>{{$t('process_dates')}}</th>
-		     <th>{{$t('temporal_extent')}}</th>
-		     <th>{{$t('parameters')}}</th>
+		   <table class="gdm-list-process" :style="{height: heightList + 'px'}">
+		     <thead >
+		     <th :style="{background:$shadeColor(color, 0.8)}">{{$t('identifiers')}}</th>
+		     <th :style="{background:$shadeColor(color, 0.8)}">Status</th>
+		     <th :style="{background:$shadeColor(color, 0.8)}">{{$t('process_dates')}}</th>
+		     <th :style="{background:$shadeColor(color, 0.8)}">{{$t('temporal_extent')}}</th>
+		     <th :style="{background:$shadeColor(color, 0.8)}">{{$t('parameters')}}</th>
 		     
 		     </thead>
-		     <tbody @mouseleave="highlight(null)">
+		     <tbody @mouseleave="highlight(null)" >
 		     <tr v-for="feature in featureCollection.features" :class="'row' + feature.properties.id" 
 		     @mouseenter="highlight(feature.properties.id)" @click="selectProcess(feature.properties.id)">
 		     <td>
@@ -159,6 +159,7 @@ export default {
         maxRecords: 25,
         totalResults: null
       },
+      listHeight: 700,
       statusList: [],
       spatialChangeListener: null,
       selectProcessLayerListener: null,
@@ -428,6 +429,12 @@ export default {
 .gdm-process-search{
 font-size: 0.9rem;
 }
+
+table.gdm-list-process {
+  display:block;
+  height: 600px;
+  overflow:auto;
+}
 .gdm-process-search div.wrapper {
 
   margin:auto;
@@ -448,10 +455,9 @@ font-size: 0.9rem;
   float:left;
 }
 .gdm-process-search div.column-right{
- width:calc(100% - 275px);
-  float:left;
-  display:block;
-  margin-left:10px;
+ width: calc(100% - 275px);
+display: block;
+margin-left: 265px;
 }
 div.message {
 	font-size: 0.9rem;
@@ -461,19 +467,28 @@ div.message {
 }
 table{
  width:100%;
-  float:left;
-  display:box;
+  display:block;
  border: 1px solid #ccc;
  border-collapse: collapse;
  box-shadow: 1px 1px 1px 2px rgba(0, 0, 0, 0.1);
 
 }
-thead {
- border: 1px solid #ccc;
- background: lightgrey;
- text-align: left;
+table.gdm-list-process th {
+  position: sticky; 
+  top: 0;
+   padding:3px 8px;
+  vertical-align:top;
+  background:   #E8E8E8;
+   border: 1px solid #ccc;
+   text-align:left;
+    border-bottom: 2px solid #CCC;
 }
-td, th{
+/**thead {
+ border: 1px solid #ccc;
+ background: 
+ text-align: left;
+}**/
+td{
   padding:3px 8px;
   vertical-align:top;
   border-bottom: 1px solid #CCC;
