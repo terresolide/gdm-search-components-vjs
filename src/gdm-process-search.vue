@@ -186,6 +186,8 @@ export default {
    document.addEventListener('gdm:selectProcessLayer', this.selectProcessLayerListener)
    this.resizeListener = this.resize.bind(this)
    window.addEventListener('resize', this.resizeListener)
+   this.mapListener = this.resize.bind(this)
+   document.addEventListener('mapNodeChange', this.mapListener)
    this.launchUrl = this.api.substr(0, this.api.indexOf('api'))
    this.$i18n.locale = this.lang
    moment.locale(this.lang)
@@ -338,7 +340,9 @@ export default {
       this.search()
     },
     resize () {
-      this.listHeight = window.innerHeight - 50
+      var maph = this.$el.querySelector('#fmtLargeMap').offsetHeight
+      var wh = window.innerHeight - 50
+      this.listHeight = wh - maph
     },
     restart (id, event) {
       event.stopPropagation()
