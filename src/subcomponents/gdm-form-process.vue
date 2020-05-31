@@ -47,10 +47,10 @@
     <formater-search-box  header-icon-class="fa fa-filter" open-icon-class="fa fa-caret-right" :title="$t('filters')" :deployed="false" type="empty" >
      <div style="margin-left:10px;min-height:70px;">
      <div v-if="!user && !service" style="font-style:italic;color:grey;">{{$t('no_filter')}}</div>
-	   <div v-if="user" class="selectedUser">{{user.email}}<span class="fa fa-close" @click="removeFilter('user')"></span></div>
-	   <div v-if="service" class="selectedService">{{service.name}}<span class="fa fa-close" @click="removeFilter('service')"></span></div>
-	   </div>
-	  </formater-search-box>
+     <div v-if="user" class="selectedUser">{{user.email}}<span class="fa fa-close" @click="removeFilter('user')"></span></div>
+     <div v-if="service" class="selectedService">{{service.name}}<span class="fa fa-close" @click="removeFilter('service')"></span></div>
+     </div>
+    </formater-search-box>
 
 
 </div>
@@ -154,42 +154,42 @@ export default {
       } else {
         return moment(date).format(this.format)
       }
-	  },
-	  str2date( str, format){
-	      if( str == "now"){
-	          return moment();
-	      }else{
-	          return moment( str, format);
-	      }
-	  },
-	  dateChange(e) {
-	    this.$emit('dateChange', e)
-	  },
-	  statusChange(e) {
-	    if (e === '---') {
-	      e = null
-	    }
-	    this.$emit('statusChange', e)
-	  },
-	  textChange(event) {
-	    if (event.which == 13 || event.keyCode == 13) {
+    },
+    str2date( str, format){
+        if( str == "now"){
+            return moment();
+        }else{
+            return moment( str, format);
+        }
+    },
+    dateChange(e) {
+      this.$emit('dateChange', e)
+    },
+    statusChange(e) {
+      if (e === '---') {
+        e = null
+      }
+      this.$emit('statusChange', e)
+    },
+    textChange(event) {
+      if (event.which == 13 || event.keyCode == 13) {
         this.$emit('textChange', this.textSearch)
       }
-	  },
-	  reset(e) {
-	    this.textSearch = ""
-	    var event = new CustomEvent('aerisResetEvent')
-	    document.dispatchEvent(event)
-	    this.$emit('reset')  
-	  }
+    },
+    reset(e) {
+      this.textSearch = ""
+      var event = new CustomEvent('aerisResetEvent')
+      document.dispatchEvent(event)
+      this.$emit('reset')  
+    }
   }
 }
 </script>
 <style scoped>
 .gdm-form-process {
-  margin-bottom: 30px;
+  margin-bottom: 0px;
   min-height: 20px;
-  padding: 0px 0px 30px 0px;
+  padding: 0px 0px 0px 0px;
 border: 1px solid #ccc;
 box-shadow: 1px 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
@@ -234,19 +234,19 @@ width: calc(100% - 20px);
 }
 .gdm-form-process input#globalReset {
   margin: 0 0 3px 7px;
-	padding: 3px 12px;
-	text-align: center;
-	border-radius: 1px;
-	font-size: 16px;
-	line-height: 1.7;
-	border:1px solid #393933;
+  padding: 3px 12px;
+  text-align: center;
+  border-radius: 1px;
+  font-size: 16px;
+  line-height: 1.7;
+  border:1px solid #393933;
   background-color: #808080;
-	color: #fff;
-	cursor: pointer;
-	text-decoration:none;
-	pointer-events: auto;
-	box-sizing: border-box;
-	box-shadow: 0 1px 5px rgba(0,0,0,.65);
+  color: #fff;
+  cursor: pointer;
+  text-decoration:none;
+  pointer-events: auto;
+  box-sizing: border-box;
+  box-shadow: 0 1px 5px rgba(0,0,0,.65);
   opacity:0.8;
 }
 .gdm-form-process input#globalReset:hover{

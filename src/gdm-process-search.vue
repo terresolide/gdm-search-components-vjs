@@ -27,90 +27,91 @@
     <formater-draw-bbox :lang="lang" :color="color"></formater-draw-bbox>
   <div class="wrapper">
    <div class="column-left" >
-	  <gdm-form-process :lang="lang" :status="statusList" :feature-collection="featureCollection" :color="color" :user="parameters.user" :service="parameters.service"
-	   @remove="removeSelected" @dateChange="dateChange" @statusChange="statusChange" 
-	   @textChange="textChange" @reset="reset"></gdm-form-process> 
-	 </div>
-	 <div class="column-right" >
-	 <div id="fmtLargeMap" style="width:calc(100%);"></div>
-	  <div v-if="!featureCollection.features || featureCollection.features.length === 0" class="message">
-	      {{$t('no_process')}}
-	   </div>
-	   <div v-else >
-		   <gdm-paging :start-index="pagination.startIndex" :max-records="pagination.maxRecords"  
-		   :count="pagination.count" :total-results="pagination.totalResults"
-		   :lang="lang" :color="color" @change="pageChange"></gdm-paging>
-		   <table class="gdm-list-process" :style="{height: listHeight + 'px'}">
-		     <thead >
-		     <th :style="{background:$shadeColor(color, 0.8)}">{{$t('identifiers')}}</th>
-		     <th :style="{background:$shadeColor(color, 0.8)}">Status</th>
-		     <th :style="{background:$shadeColor(color, 0.8)}">{{$t('process_dates')}}</th>
-		     <th :style="{background:$shadeColor(color, 0.8)}">{{$t('temporal_extent')}}</th>
-		     <th :style="{background:$shadeColor(color, 0.8)}">{{$t('parameters')}}</th>
-		     
-		     </thead>
-		     <tbody @mouseleave="highlight(null)" >
-		     <tr v-for="feature in featureCollection.features" :class="'row' + feature.properties.id" 
-		     @mouseenter="highlight(feature.properties.id)" @click="selectProcess(feature.properties.id)">
-		     <td>
-			     <div><b>{{feature.properties.id}}</b></div>
-			     <div class="gdm-token" v-if="feature.properties.token">{{feature.properties.token}}</div>
-	         
-			     <div class="toSelect" :class="{selectedService: parameters.service}" 
-		           @click="selectService({id:feature.properties.serviceId, name:feature.properties.serviceName}, $event)">
-		           {{feature.properties.serviceName}}
-		       </div>
-			     <div v-if="userId">{{feature.properties.email}}</div>
-			     <div v-else>
-			         <div class="toSelect" :class="{selectedUser: parameters.user}" 
-			         @click="selectUser({id:feature.properties.userId, email:feature.properties.email}, $event)">
-			            {{feature.properties.email}}
-			          </div>
-			     </div>
-		      
-			     <div v-if="feature.properties.processusName">({{feature.properties.processusName}})</div>
-		     </td>
-		     <td style="text-align:center;cursor:pointer;" :title="feature.properties.log">
-		        <span :class="statusToClass(feature.properties.status)"></span>
-		        <div style="font-style:italic;font-size:0.9rem;color:grey;">{{feature.properties.status}}</div>
-		        <a v-if="back  && feature.properties.status === 'WAITING'"  :href="launchUrl + 'process/launch/' + feature.properties.id" class="button">Test Curl</a>
-		        <span v-if="!back && feature.properties.status === 'WAITING'"  @click="launch(feature.properties.id, $event)" class="button">{{$t('launch')}}</span>
+    <gdm-form-process :lang="lang" :status="statusList" :feature-collection="featureCollection" 
+    :color="color" :user="parameters.user" :service="parameters.service" :height="height"
+     @remove="removeSelected" @dateChange="dateChange" @statusChange="statusChange" 
+     @textChange="textChange" @reset="reset"></gdm-form-process> 
+   </div>
+   <div class="column-right" >
+   <div id="fmtLargeMap" style="width:calc(100%);"></div>
+    <div v-if="!featureCollection.features || featureCollection.features.length === 0" class="message">
+        {{$t('no_process')}}
+     </div>
+     <div v-else >
+       <gdm-paging :start-index="pagination.startIndex" :max-records="pagination.maxRecords"  
+       :count="pagination.count" :total-results="pagination.totalResults"
+       :lang="lang" :color="color" @change="pageChange"></gdm-paging>
+       <table class="gdm-list-process" :style="{height: listHeight + 'px'}">
+         <thead >
+         <th :style="{background:$shadeColor(color, 0.8)}">{{$t('identifiers')}}</th>
+         <th :style="{background:$shadeColor(color, 0.8)}">Status</th>
+         <th :style="{background:$shadeColor(color, 0.8)}">{{$t('process_dates')}}</th>
+         <th :style="{background:$shadeColor(color, 0.8)}">{{$t('temporal_extent')}}</th>
+         <th :style="{background:$shadeColor(color, 0.8)}">{{$t('parameters')}}</th>
+         
+         </thead>
+         <tbody @mouseleave="highlight(null)" >
+         <tr v-for="feature in featureCollection.features" :class="'row' + feature.properties.id" 
+         @mouseenter="highlight(feature.properties.id)" @click="selectProcess(feature.properties.id)">
+         <td>
+           <div><b>{{feature.properties.id}}</b></div>
+           <div class="gdm-token" v-if="feature.properties.token">{{feature.properties.token}}</div>
+           
+           <div class="toSelect" :class="{selectedService: parameters.service}" 
+               @click="selectService({id:feature.properties.serviceId, name:feature.properties.serviceName}, $event)">
+               {{feature.properties.serviceName}}
+           </div>
+           <div v-if="userId">{{feature.properties.email}}</div>
+           <div v-else>
+               <div class="toSelect" :class="{selectedUser: parameters.user}" 
+               @click="selectUser({id:feature.properties.userId, email:feature.properties.email}, $event)">
+                  {{feature.properties.email}}
+                </div>
+           </div>
+          
+           <div v-if="feature.properties.processusName">({{feature.properties.processusName}})</div>
+         </td>
+         <td style="text-align:center;cursor:pointer;" :title="feature.properties.log">
+            <span :class="statusToClass(feature.properties.status)"></span>
+            <div style="font-style:italic;font-size:0.9rem;color:grey;">{{feature.properties.status}}</div>
+            <a v-if="back  && feature.properties.status === 'WAITING'"  :href="launchUrl + 'process/launch/' + feature.properties.id" class="button">Test Curl</a>
+            <span v-if="!back && feature.properties.status === 'WAITING'"  @click="launch(feature.properties.id, $event)" class="button">{{$t('launch')}}</span>
             
-		        <a v-if="back" :href="launchUrl + 'process/postdata/' + feature.properties.id" class="button" target="_blanck">Voir postdata</a>
+            <a v-if="back" :href="launchUrl + 'process/postdata/' + feature.properties.id" class="button" target="_blanck">Voir postdata</a>
             
-		        <span class="button" v-if="back && feature.properties.token && ['RUNNING', 'ACCEPTED'].indexOf(feature.properties.status) >= 0" @click="getStatus(feature.properties.id, $event)" >Test getStatus</span>
+            <span class="button" v-if="back && feature.properties.token && ['RUNNING', 'ACCEPTED'].indexOf(feature.properties.status) >= 0" @click="getStatus(feature.properties.id, $event)" >Test getStatus</span>
              <span class="button" v-if="feature.properties.hasDismiss && feature.properties.token && ['RUNNING', 'ACCEPTED'].indexOf(feature.properties.status) >= 0" @click="dismiss(feature.properties.id, $event)" >Dismiss</span>
             
             <span class="button" v-if="back &&  ['FAILED', 'TERMINATED', 'KILLED', 'PURGED'].indexOf(feature.properties.status) >= 0" @click="restart(feature.properties.id, $event)" >Restart</span>
           <span class="button" v-if=" feature.properties.hasPurge && ['TERMINATED'].indexOf(feature.properties.status) >= 0" @click="purge(feature.properties.id, $event)" >Purge</span>
        
-		     <td style="text-align:left;">
-		     <b>Start: </b>{{printDate(feature.properties.processStart,true)}}<br/>
-		     <b>End: </b>{{printDate(feature.properties.processEnd, true)}}<br />
-		      <span v-if="feature.properties.datePurge" style="font-size:0.9em;color:#333;font-style:italic;"> 
-		        (<b>Purge: </b>{{printDate(feature.properties.datePurge)}})
+         <td style="text-align:left;">
+         <b>Start: </b>{{printDate(feature.properties.processStart,true)}}<br/>
+         <b>End: </b>{{printDate(feature.properties.processEnd, true)}}<br />
+          <span v-if="feature.properties.datePurge" style="font-size:0.9em;color:#333;font-style:italic;"> 
+            (<b>Purge: </b>{{printDate(feature.properties.datePurge)}})
          </span>
-		     </td>
-		     
-		     <td style="text-align:center;">
-		     {{printDate(feature.properties.temporalExtent[0])}}
-		     <b>&rarr;</b>
-		     {{printDate(feature.properties.temporalExtent[1])}}
-		     </td>
-		     <td>
-		     <div v-for="type in ['provider', 'position', 'parameters']" class="infos" >
-		         <div v-if="feature.properties[type] && Object.keys(feature.properties[type]).length < 10"  >
-		            <div v-for="(value, prop) in feature.properties[type]" >
-		              <div><b>{{prop}}:</b> {{value}}</div>
-		            </div>
-		         </div>
-		     </div>
-		     </td>
-		     </tr>
-		     </tbody>
-		   </table>
-	   </div>
-	   </div>
+         </td>
+         
+         <td style="text-align:center;">
+         {{printDate(feature.properties.temporalExtent[0])}}
+         <b>&rarr;</b>
+         {{printDate(feature.properties.temporalExtent[1])}}
+         </td>
+         <td>
+         <div v-for="type in ['provider', 'position', 'parameters']" class="infos" >
+             <div v-if="feature.properties[type] && Object.keys(feature.properties[type]).length < 10"  >
+                <div v-for="(value, prop) in feature.properties[type]" >
+                  <div><b>{{prop}}:</b> {{value}}</div>
+                </div>
+             </div>
+         </div>
+         </td>
+         </tr>
+         </tbody>
+       </table>
+     </div>
+     </div>
    </div>
   </span>
 </template>
@@ -128,18 +129,18 @@ export default {
     FormaterDrawBbox
   },
   props: {
-	  api: {
+    api: {
       type: String,
       default: null
-	  },
-	  lang: {
-	    type: String,
-	    default: 'fr'
-	  },
-	  userId: {
-	    type: Number,
-	    default: null
-	  },
+    },
+    lang: {
+      type: String,
+      default: 'fr'
+    },
+    userId: {
+      type: Number,
+      default: null
+    },
     color: {
       type: String,
       default: '#808080'
@@ -160,6 +161,7 @@ export default {
         totalResults: null
       },
       listHeight: 700,
+      height: 700,
       statusList: [],
       spatialChangeListener: null,
       selectProcessLayerListener: null,
@@ -196,7 +198,7 @@ export default {
    } else {
      this.dateFormatDisplay = 'DD/MM/YYYY'
    }
-	 this.search()
+   this.search()
   },
   destroyed () {
     document.removeEventListener('fmt:spatialChangeEvent', this.spatialChangeListener)
@@ -341,8 +343,8 @@ export default {
     },
     resize () {
       var maph = this.$el.querySelector('#fmtLargeMap').offsetHeight
-      var wh = window.innerHeight - 50
-      this.listHeight = wh - maph
+      this.height = window.innerHeight - 65
+      this.listHeight = this.height - maph - 32
     },
     restart (id, event) {
       event.stopPropagation()
@@ -453,6 +455,7 @@ table.gdm-list-process {
   display:block;
   height: 600px;
   overflow:auto;
+  margin-bottom:5px;
 }
 .gdm-process-search div.wrapper {
 
@@ -470,11 +473,11 @@ display: block;
 margin-left: 265px;
 }
 div.message {
-	font-size: 0.9rem;
-	margin: auto;
-	padding: 40px 0;
-	text-align: center;
-	font-style: italic;
+  font-size: 0.9rem;
+  margin: auto;
+  padding: 40px 0;
+  text-align: center;
+  font-style: italic;
 }
 table{
  width:100%;
