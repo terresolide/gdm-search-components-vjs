@@ -165,5 +165,8 @@ export default {
   opacity:1;
   font-size:1.31em;
 }
+ .mtdt-paging .formater-select:not(.formater-multiple) select {
+  padding: .3em 2.5em .5em .5em;
+}
 
 </style>

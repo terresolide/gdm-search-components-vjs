@@ -110,9 +110,9 @@ export default {
       this.controlLayer = new L.Control.Fmtlayer(null, null,{position: 'topleft'})
       this.controlLayer.tiles.arcgisTopo.layer.addTo(this.map)
       this.controlLayer.addTo(this.map)
-       var fullscreen = new L.Control.Fullscreen('fmtLargeMap', this.$i18n.locale)
-    fullscreen.addTo(this.map)
-    this.map.getPane('overlayPane').style.pointerEvents = 'auto'
+      var fullscreen = new L.Control.Fullscreen('fmtLargeMap', this.$i18n.locale)
+      fullscreen.addTo(this.map)
+      this.map.getPane('overlayPane').style.pointerEvents = 'auto'
 
     },
     highlightLayer (id)

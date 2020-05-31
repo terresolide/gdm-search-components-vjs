@@ -26,7 +26,7 @@
   <span class="gdm-process-search">
     <formater-draw-bbox :lang="lang" :color="color"></formater-draw-bbox>
   <div class="wrapper">
-   <div class="column-left">
+   <div class="column-left" >
 	  <gdm-form-process :lang="lang" :status="statusList" :feature-collection="featureCollection" :color="color" :user="parameters.user" :service="parameters.service"
 	   @remove="removeSelected" @dateChange="dateChange" @statusChange="statusChange" 
 	   @textChange="textChange" @reset="reset"></gdm-form-process> 
@@ -40,7 +40,7 @@
 		   <gdm-paging :start-index="pagination.startIndex" :max-records="pagination.maxRecords"  
 		   :count="pagination.count" :total-results="pagination.totalResults"
 		   :lang="lang" :color="color" @change="pageChange"></gdm-paging>
-		   <table class="gdm-list-process" :style="{height: heightList + 'px'}">
+		   <table class="gdm-list-process" :style="{height: listHeight + 'px'}">
 		     <thead >
 		     <th :style="{background:$shadeColor(color, 0.8)}">{{$t('identifiers')}}</th>
 		     <th :style="{background:$shadeColor(color, 0.8)}">Status</th>
@@ -163,6 +163,7 @@ export default {
       statusList: [],
       spatialChangeListener: null,
       selectProcessLayerListener: null,
+      resizeListener: null,
       selectedProcessId: null,
       parameters: {
         user: null,
@@ -181,8 +182,10 @@ export default {
    // launch url debug
    this.spatialChangeListener = this.spatialChange.bind(this)
    document.addEventListener('fmt:spatialChangeEvent', this.spatialChangeListener)
-    this.selectProcessLayerListener = this.selectedLayerChange.bind(this)
+   this.selectProcessLayerListener = this.selectedLayerChange.bind(this)
    document.addEventListener('gdm:selectProcessLayer', this.selectProcessLayerListener)
+   this.resizeListener = this.resize.bind(this)
+   window.addEventListener('resize', this.resizeListener)
    this.launchUrl = this.api.substr(0, this.api.indexOf('api'))
    this.$i18n.locale = this.lang
    moment.locale(this.lang)
@@ -196,8 +199,13 @@ export default {
   destroyed () {
     document.removeEventListener('fmt:spatialChangeEvent', this.spatialChangeListener)
     this.spatialChangeListener = null
+    document.removeEventListener('gdm:selectProcessLayer', this.selectProcessLayerListener) 
+    this.selectProcessLayerListener = null
+    window.removeEventListener('resize', this.resizeListener)
+    this.resizeListener = null
   },
   mounted () {
+    this.resize()
   },
   methods: {
     search () {
@@ -329,6 +337,9 @@ export default {
       }
       this.search()
     },
+    resize () {
+      this.listHeight = window.innerHeight - 50
+    },
     restart (id, event) {
       event.stopPropagation()
       var url = this.launchUrl + 'api/restart/' + id
@@ -393,13 +404,17 @@ export default {
     statusToClass(status) {
       switch(status) {
       case 'RUNNING':
-      case 'ACCEPTED':
         return 'fa fa-refresh fa-spin fa-3x fa-fw ' + status.toLowerCase()
         break
       case 'WAITING':
-        return 'fa fa-play waiting';
+        return 'fa fa-clock-o waiting'
+        break
+      case 'ACCEPTED':
+
+        return 'fa fa-pause waiting';
         break;
       case 'FAILED':
+      case 'INVALID':
         return 'fa fa-close failed';
         break;
       case 'TERMINATED':
@@ -439,16 +454,7 @@ table.gdm-list-process {
 
   margin:auto;
 }
-.gdm-process-search tr{
-   min-height:100px;
-   height:100px;
-}
-.gdm-process-search tr.highlight {
-  background: #EFF6F6;
-}
-.gdm-process-search tr.selected {
-  background: #F6EFEF;
-}
+
 .gdm-process-search div.column-left{
   width:250px;
   margin-left:5px;
@@ -461,7 +467,8 @@ margin-left: 265px;
 }
 div.message {
 	font-size: 0.9rem;
-	margin:auto;
+	margin: auto;
+	padding: 40px 0;
 	text-align: center;
 	font-style: italic;
 }
@@ -476,22 +483,34 @@ table{
 table.gdm-list-process th {
   position: sticky; 
   top: 0;
-   padding:3px 8px;
+  padding:3px 8px;
   vertical-align:top;
   background:   #E8E8E8;
-   border: 1px solid #ccc;
-   text-align:left;
-    border-bottom: 2px solid #CCC;
+  text-align:left;
+  border-bottom: 2px solid #CCC;
+  z-index:200;
+}
+.gdm-process-search tr{
+   min-height:100px;
+   height:100px;
+}
+.gdm-process-search tr.highlight {
+  background: #EFF6F6;
+}
+.gdm-process-search tr.selected {
+  background: #F6EFEF;
 }
 /**thead {
  border: 1px solid #ccc;
  background: 
  text-align: left;
 }**/
-td{
+table.gdm-list-process td{
   padding:3px 8px;
   vertical-align:top;
-  border-bottom: 1px solid #CCC;
+  border-bottom: 1px solid #ccc;
+  border-left: none;
+  border-right: none;
 }
 span.failed{
  color: darkred;

@@ -20,7 +20,7 @@
 }
 </i18n>
 <template>
- <div class="gdm-form-process">
+ <div class="gdm-form-process" style="overflow-y:auto;overflow-x:hidden;" :style="{maxHeight:height + 'px'}">
        <div style="text-align:center;margin: 10px 0 30px 0;">
         <input id="globalReset" :style="$buttonStyle(color)" type="button" @click="reset" :value="$t('reset')"/>
        </div>
@@ -102,6 +102,10 @@ export default {
     bbox: {
       type: String,
       default: null
+    },
+    height: {
+      type: Number,
+      default: 700
     }
   },
   computed: {
