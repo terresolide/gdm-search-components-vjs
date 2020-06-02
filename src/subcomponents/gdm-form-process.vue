@@ -27,7 +27,7 @@
        <div class="text-search" :style="{background: backgroundColor()}">
        <input id="any" name="any" v-model="textSearch" :placeholder="$t('search')" @keypress="textChange"  /><i class="fa fa-search"></i>
       </div>
-      <gdm-map :feature-collection="featureCollection"></gdm-map>
+      <gdm-map :feature-collection="featureCollection" fullscreen="fmtLargeMap"></gdm-map>
    
      <formater-search-box header-icon-class="fa fa-globe" open-icon-class="fa fa-caret-right" :title="$t('spatial_extent')" :deployed="false" type="empty" >
        <gdm-spatial-search :lang="lang"></gdm-spatial-search>
