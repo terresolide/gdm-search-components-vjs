@@ -74,7 +74,8 @@
          <td style="text-align:center;cursor:pointer;" :title="feature.properties.log">
             <span :class="statusToClass(feature.properties.status)"></span>
             <div style="font-style:italic;font-size:0.9rem;color:grey;">{{feature.properties.status}}</div>
-            <a v-if="back  && feature.properties.status === 'WAITING'"  :href="launchUrl + 'process/launch/' + feature.properties.id" class="button">Test Curl</a>
+            <a :href="launchUrl + 'process/' + feature.properties.id" class="button">Voir</a>
+          <!--   <a v-if="back  && feature.properties.status === 'WAITING'"  :href="launchUrl + 'process/launch/' + feature.properties.id" class="button">Test Curl</a>
             <span v-if="!back && feature.properties.status === 'WAITING'"  @click="launch(feature.properties.id, $event)" class="button">{{$t('launch')}}</span>
             
             <a v-if="back" :href="launchUrl + 'process/postdata/' + feature.properties.id" class="button" target="_blanck">Voir postdata</a>
@@ -84,7 +85,7 @@
             
             <span class="button" v-if="back &&  ['FAILED', 'TERMINATED', 'KILLED', 'PURGED'].indexOf(feature.properties.status) >= 0" @click="restart(feature.properties.id, $event)" >Restart</span>
           <span class="button" v-if=" feature.properties.hasPurge && ['TERMINATED'].indexOf(feature.properties.status) >= 0" @click="purge(feature.properties.id, $event)" >Purge</span>
-       
+       --> 
          <td style="text-align:left;">
          <b>Start: </b>{{printDate(feature.properties.processStart,true)}}<br/>
          <b>End: </b>{{printDate(feature.properties.processEnd, true)}}<br />
