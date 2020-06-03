@@ -74,7 +74,7 @@
          <td style="text-align:center;cursor:pointer;" :title="feature.properties.log">
             <span :class="statusToClass(feature.properties.status)"></span>
             <div style="font-style:italic;font-size:0.9rem;color:grey;">{{feature.properties.status}}</div>
-            <a :href="launchUrl + 'process/' + feature.properties.id" class="button">Voir</a>
+            <a v-if="url" :href="url + feature.properties.id" class="button">Voir</a>
           <!--   <a v-if="back  && feature.properties.status === 'WAITING'"  :href="launchUrl + 'process/launch/' + feature.properties.id" class="button">Test Curl</a>
             <span v-if="!back && feature.properties.status === 'WAITING'"  @click="launch(feature.properties.id, $event)" class="button">{{$t('launch')}}</span>
             
@@ -133,6 +133,11 @@ export default {
     api: {
       type: String,
       default: null
+    },
+    url: {
+      type: String,
+      default: null
+      
     },
     lang: {
       type: String,
