@@ -1,6 +1,7 @@
 <i18n>
 {
   "en": {
+    "consult": "Consult",
     "process_dates": "Process dates",
     "identifiers": "Identifiers",
     "temporal_extent": "Temporal extent",
@@ -8,9 +9,19 @@
     "no_process": "No process",
     "unauthorized": "Access Unauthorized",
     "forbidden": "Access Forbidden: deconnected?",
-    "launch": "Launch"
+    "TERMINATED": "The job ended succefully",
+    "WAITING": "The job is only record here",
+    "SAVED": "The job is record here and by the service.",
+    "EVALUATED": "The job cost has been evaluated by the service",
+    "INVALID": "The job was refused by the service because it's invalid",
+    "KILLED": "The job was stopped",
+    "FAILED": "The job ended in failure",
+    "PURGED": "All results has been cleared",
+    "RUNNING": "In progress",
+    "ACCEPTED": "The service has accepted the job but has not yet started"
   },
   "fr": {
+    "consult": "Consulter",
     "process_dates": "Dates du calcul",
     "identifiers": "Identifiants",
     "temporal_extent": "Etendue temporelle",
@@ -18,7 +29,17 @@
     "no_process": "Aucun calcul",
     "unauthorized": "Accès non autorisé à cette ressource",
     "forbidden": "Access interdit: deconnecté?",
-    "launch": "Lancer"
+    "TERMINATED": "Le job s'est terminé avec succès",
+    "WAITING": "Le calcul est juste enregistré ici",
+    "SAVED": "Le job a été enregistré auprès du service.",
+    "EVALUATED": "Le coût du job a été estimé par le service",
+    "INVALID": "Le job a été refusé par le service, car il est invalide",
+    "KILLED": "Le job a été stoppé",
+    "FAILED": "Le job s'est terminé en échec",
+    "PURGED": "Tous les résultats ont été effacés",
+    "RUNNING": "Traitement en cours",
+    "ACCEPTED": "Le service a accepté le job, mais ce dernier n'a pas encore démarré "
+ 
   }
 }
 </i18n>
@@ -71,10 +92,12 @@
           
            <div v-if="feature.properties.processusName">({{feature.properties.processusName}})</div>
          </td>
-         <td style="text-align:center;cursor:pointer;" :title="feature.properties.log">
-            <span :class="statusToClass(feature.properties.status)"></span>
-            <div style="font-style:italic;font-size:0.9rem;color:grey;">{{feature.properties.status}}</div>
-            <a v-if="url" :href="url + feature.properties.id" class="button">Voir</a>
+         <td style="text-align:center;cursor:pointer;" :title="$t(feature.properties.status)">
+            <span :class="statusToClass(feature.properties.status)" ></span>
+            <div style="font-style:italic;font-size:0.9rem;color:grey;margin-bottom:5px;">{{feature.properties.status}}</div>
+            <div>
+              <a v-if="url" :href="url + feature.properties.id" class="button">{{$t('consult')}}</a>
+            </div>
           <!--   <a v-if="back  && feature.properties.status === 'WAITING'"  :href="launchUrl + 'process/launch/' + feature.properties.id" class="button">Test Curl</a>
             <span v-if="!back && feature.properties.status === 'WAITING'"  @click="launch(feature.properties.id, $event)" class="button">{{$t('launch')}}</span>
             
@@ -100,10 +123,24 @@
          {{printDate(feature.properties.temporalExtent[1])}}
          </td>
          <td>
-         <div v-for="type in ['provider', 'position', 'parameters']" class="infos" >
-             <div v-if="feature.properties[type] && Object.keys(feature.properties[type]).length < 10"  >
-                <div v-for="(value, prop) in feature.properties[type]" >
+	         <div class="infos">
+		         <div v-for="type in ['provider', 'position']" >
+			          <div v-if="feature.properties[type]" >
+	                <div v-for="(value, prop) in feature.properties[type]" >
+	                  <div><b>{{prop}}:</b> {{value}}</div>
+	                </div>
+			         </div>
+		         </div>
+	         </div>
+	          <div class="infos" >
+             <div v-if="feature.properties.parameters && Object.keys(feature.properties.parameters).length < 10"  >
+                <div v-for="(value, prop) in feature.properties.parameters" >
                   <div><b>{{prop}}:</b> {{value}}</div>
+                </div>
+             </div>
+             <div v-else>
+                <div v-for="prop in ['correl_split_date', 'correl_input_mode', 'correl_correlator', 'do_analysis', 'do_correction_filtering']" >
+                  <div><b>{{camelCased(prop)}}:</b> {{feature.properties.parameters[prop]}}</div>
                 </div>
              </div>
          </div>
@@ -218,6 +255,9 @@ export default {
     this.resize()
   },
   methods: {
+    camelCased (myString) {
+      return myString.replace(/_([a-z])/g, function (g) { return g[1].toUpperCase(); });
+    },
     search () {
      var url = this.api + '?maxRecords=' + this.pagination.maxRecords + '&index=' + this.pagination.startIndex
      if (this.userId) {
@@ -256,12 +296,12 @@ export default {
       this.parameters[name] = e.value
       this.search()
     },
-    dismiss (id, event) {
-      event.stopPropagation()
-      var url = this.launchUrl + 'api/dismiss/' + id
-      this.$http.get(url, {credentials: true})
-      .then( this.search())
-    },
+//     dismiss (id, event) {
+//       event.stopPropagation()
+//       var url = this.launchUrl + 'api/dismiss/' + id
+//       this.$http.get(url, {credentials: true})
+//       .then( this.search())
+//     },
     display (response) {
       var pagination = response.body.properties
       this.pagination = {
@@ -293,12 +333,12 @@ export default {
         alert(this.$i18n.t('unauthorized'))
       }
     },
-    getStatus (id, event) {
-      event.stopPropagation()
-      var url = this.launchUrl + 'api/getStatus/' + id
-      this.$http.get(url, {credentials: true})
-      .then( this.search())
-    },
+//     getStatus (id, event) {
+//       event.stopPropagation()
+//       var url = this.launchUrl + 'api/getStatus/' + id
+//       this.$http.get(url, {credentials: true})
+//       .then( this.search())
+//     },
     highlight (featureId) {
       // remove all highlight
       var nodes = document.querySelectorAll('.gdm-process-search .highlight')
@@ -312,12 +352,12 @@ export default {
       var event = new CustomEvent('gdm:processHighlight', {detail: {id: featureId}})
       document.dispatchEvent(event)
     },
-    launch (id, event) {
-      event.stopPropagation()
-      var url = this.launchUrl + 'api/launchz/' + id
-      this.$http.get(url, {credentials: true})
-      .then( this.search())
-    },
+//     launch (id, event) {
+//       event.stopPropagation()
+//       var url = this.launchUrl + 'api/launchz/' + id
+//       this.$http.get(url, {credentials: true})
+//       .then( this.search())
+//     },
     pageChange(values) {
       this.pagination = values
       this.search()
@@ -330,12 +370,12 @@ export default {
        return moment(date, this.dateFormat).format(this.dateFormatDisplay + ' HH:mm')
       }
     },
-    purge (id, event) {
-      event.stopPropagation()
-      var url = this.launchUrl + 'api/purge/' + id
-      this.$http.get(url, {credentials: true})
-      .then( this.search())
-    },
+//     purge (id, event) {
+//       event.stopPropagation()
+//       var url = this.launchUrl + 'api/purge/' + id
+//       this.$http.get(url, {credentials: true})
+//       .then( this.search())
+//     },
     removeSelected(type) {
       this.parameters[type] = null
       this.search()
@@ -415,29 +455,28 @@ export default {
     },
     statusToClass(status) {
       switch(status) {
-      case 'RUNNING':
-        return 'fa fa-refresh fa-spin fa-3x fa-fw ' + status.toLowerCase()
-        break
-      case 'WAITING':
-        return 'fa fa-clock-o waiting'
-        break
-      case 'ACCEPTED':
-
-        return 'fa fa-pause waiting';
-        break;
-      case 'FAILED':
-      case 'INVALID':
-        return 'fa fa-close failed';
-        break;
-      case 'TERMINATED':
-        return 'fa fa-check terminated';
-        break;
-      case 'PURGED':
-        return 'fa fa-trash-o purged';
-        break;
-        default:
-          return status.toLowerCase()
-      }
+	      case 'RUNNING':
+	        return 'fa fa-refresh fa-spin fa-3x fa-fw ' + status.toLowerCase()
+	        break
+	      case 'WAITING':
+	      case 'ACCEPTED':
+	      case 'SAVED':
+	      case 'EVALUATED':
+	        return 'fa fa-pause waiting';
+	        break;
+	      case 'FAILED':
+	      case 'INVALID':
+	        return 'fa fa-close failed';
+	        break;
+	      case 'TERMINATED':
+	        return 'fa fa-check terminated';
+	        break;
+	      case 'PURGED':
+	        return 'fa fa-trash-o purged';
+	        break;
+	        default:
+	          return status.toLowerCase()
+	      }
     },
     textChange (value) {
       if (value) {
@@ -469,14 +508,14 @@ table.gdm-list-process {
 }
 
 .gdm-process-search div.column-left{
-  width:250px;
+  width:270px;
   margin-left:5px;
   float:left;
 }
 .gdm-process-search div.column-right{
- width: calc(100% - 275px);
+ width: calc(100% - 295px);
 display: block;
-margin-left: 265px;
+margin-left: 285px;
 }
 div.message {
   font-size: 0.9rem;
