@@ -8,17 +8,7 @@
     "parameters": "Parameters",
     "no_process": "No process",
     "unauthorized": "Access Unauthorized",
-    "forbidden": "Access Forbidden: deconnected?",
-    "TERMINATED": "The job ended succefully",
-    "WAITING": "The job is only record here",
-    "SAVED": "The job is record here and by the service.",
-    "EVALUATED": "The job cost has been evaluated by the service",
-    "INVALID": "The job was refused by the service because it's invalid",
-    "KILLED": "The job was stopped",
-    "FAILED": "The job ended in failure",
-    "PURGED": "All results has been cleared",
-    "RUNNING": "In progress",
-    "ACCEPTED": "The service has accepted the job but has not yet started"
+    "forbidden": "Access Forbidden: deconnected?"
   },
   "fr": {
     "consult": "Consulter",
@@ -28,18 +18,7 @@
     "parameters": "Paramètres",
     "no_process": "Aucun calcul",
     "unauthorized": "Accès non autorisé à cette ressource",
-    "forbidden": "Access interdit: deconnecté?",
-    "TERMINATED": "Le job s'est terminé avec succès",
-    "WAITING": "Le calcul est juste enregistré ici",
-    "SAVED": "Le job a été enregistré auprès du service.",
-    "EVALUATED": "Le coût du job a été estimé par le service",
-    "INVALID": "Le job a été refusé par le service, car il est invalide",
-    "KILLED": "Le job a été stoppé",
-    "FAILED": "Le job s'est terminé en échec",
-    "PURGED": "Tous les résultats ont été effacés",
-    "RUNNING": "Traitement en cours",
-    "ACCEPTED": "Le service a accepté le job, mais ce dernier n'a pas encore démarré "
- 
+    "forbidden": "Access interdit: deconnecté?"
   }
 }
 </i18n>
@@ -92,11 +71,10 @@
           
            <div v-if="feature.properties.processusName">({{feature.properties.processusName}})</div>
          </td>
-         <td style="text-align:center;cursor:pointer;" :title="$t(feature.properties.status)">
-            <span :class="statusToClass(feature.properties.status)" ></span>
-            <div style="font-style:italic;font-size:0.9rem;color:grey;margin-bottom:5px;">{{feature.properties.status}}</div>
+         <td style="text-align:center;cursor:pointer;">
+            <gdm-process-status :status="feature.properties.status" :lang="lang"></gdm-process-status>
             <div>
-              <a v-if="url" :href="url + feature.properties.id" class="button">{{$t('consult')}}</a>
+               <a v-if="url" :href="url + feature.properties.id" class="button">{{$t('consult')}}</a>
             </div>
           <!--   <a v-if="back  && feature.properties.status === 'WAITING'"  :href="launchUrl + 'process/launch/' + feature.properties.id" class="button">Test Curl</a>
             <span v-if="!back && feature.properties.status === 'WAITING'"  @click="launch(feature.properties.id, $event)" class="button">{{$t('launch')}}</span>
@@ -160,13 +138,15 @@ import GdmPaging from './gdm-paging.vue'
 import GdmFormProcess from './subcomponents/gdm-form-process.vue'
 import moment from 'moment'
 import FormaterDrawBbox from './subcomponents/gdm-draw-bbox.vue'
+import GdmProcessStatus from './subcomponents/gdm-process-status.vue'
 
 export default {
   name: 'GdmProcessSearch',
   components: {
     GdmPaging,
     GdmFormProcess,
-    FormaterDrawBbox
+    FormaterDrawBbox,
+    GdmProcessStatus
   },
   props: {
     api: {
@@ -455,31 +435,6 @@ export default {
       this.parameters.status = e
       this.search()
     },
-    statusToClass(status) {
-      switch(status) {
-	      case 'RUNNING':
-	        return 'fa fa-refresh fa-spin fa-3x fa-fw ' + status.toLowerCase()
-	        break
-	      case 'WAITING':
-	      case 'ACCEPTED':
-	      case 'SAVED':
-	      case 'EVALUATED':
-	        return 'fa fa-pause waiting';
-	        break;
-	      case 'FAILED':
-	      case 'INVALID':
-	        return 'fa fa-close failed';
-	        break;
-	      case 'TERMINATED':
-	        return 'fa fa-check terminated';
-	        break;
-	      case 'PURGED':
-	        return 'fa fa-trash-o purged';
-	        break;
-	        default:
-	          return status.toLowerCase()
-	      }
-    },
     textChange (value) {
       if (value) {
          this.parameters.any = encodeURIComponent(value)
@@ -566,21 +521,7 @@ table.gdm-list-process td{
   border-left: none;
   border-right: none;
 }
-span.failed{
- color: darkred;
-}
 
-span.terminated{
- color:darkgreen;
-}
-
-
-span.running, 
-span.accepted,
-span.waiting{
-  color: grey;
-  font-size:16px;
-}
 
 div.toSelect {
  cursor: pointer;
