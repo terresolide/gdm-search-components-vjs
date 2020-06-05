@@ -42,49 +42,9 @@ export default {
     }
   },
   watch: {
-    featureCollection(newCollection) {
-      if (this.featureGroup) {
-        this.featureGroup.clearLayers()
-        this.featureGroup = null
-      }
-      if (this.map && newCollection && newCollection.type) {
-        var self = this
-        this.featureGroup =  L.geoJSON(newCollection, {
-          style: function (feature) {
-           return self.defaultRectangleOptions;
-           },
-           onEachFeature: function (feature, layer) {
-             layer.className = 'row' + feature.properties.id
-             layer.id = feature.properties.id
-             var html = ''
-             if (typeof feature.properties.processusName !== 'undefined') {
-               html += '<h3>' + feature.properties.processusName + '</h3>'
-                
-             }
-             html += '<div><label>Id</label>: ' + layer.id + '</div>'
-             if (feature.properties.token) {
-                html += '<div><label>token</label>: ' + feature.properties.token + '</div>'
-             }
-             html += '<div><label>email</label>: ' + feature.properties.email + '</div>'
-             html += '<div><label>service</label>: ' + feature.properties.serviceName + '</div>'
-             layer.bindPopup(html)
-             layer.on('click', function () {
-               this.openPopup()
-               var event = new CustomEvent('gdm:selectProcessLayer', {detail: {id: layer.id}})
-               document.dispatchEvent(event)
-             
-             })
-           },
-           interactive: true,
-           zIndex: 100
-         }).addTo(this.map);
-        if (this.featureGroup && this.featureGroup.getLayers().length > 0) {
-            this.map.fitBounds(this.featureGroup.getBounds())
-        } else {
-          this.map.fitBounds([[-60,-120],[75,130]])
-        }
-      }
-      
+    featureCollection(newCollections) {
+      console.log(newCollections)
+       this.initFeatureCollection()
     }
   },
   created () {
@@ -119,7 +79,50 @@ export default {
 	      fullscreen.addTo(this.map)
       }
       this.map.getPane('overlayPane').style.pointerEvents = 'auto'
-
+      this.initFeatureCollection()
+    },
+    initFeatureCollection () {
+      if (this.featureGroup) {
+        this.featureGroup.clearLayers()
+        this.featureGroup = null
+      }
+      if (this.map && this.featureCollection && this.featureCollection.type) {
+        var self = this
+        this.featureGroup =  L.geoJSON(this.featureCollection, {
+          style: function (feature) {
+           return self.defaultRectangleOptions;
+           },
+           onEachFeature: function (feature, layer) {
+             layer.className = 'row' + feature.properties.id
+             layer.id = feature.properties.id
+             var html = ''
+             if (typeof feature.properties.processusName !== 'undefined') {
+               html += '<h3>' + feature.properties.processusName + '</h3>'
+                
+             }
+             html += '<div><label>Id</label>: ' + layer.id + '</div>'
+             if (feature.properties.token) {
+                html += '<div><label>token</label>: ' + feature.properties.token + '</div>'
+             }
+             html += '<div><label>email</label>: ' + feature.properties.email + '</div>'
+             html += '<div><label>service</label>: ' + feature.properties.serviceName + '</div>'
+             layer.bindPopup(html)
+             layer.on('click', function () {
+               this.openPopup()
+               var event = new CustomEvent('gdm:selectProcessLayer', {detail: {id: layer.id}})
+               document.dispatchEvent(event)
+             
+             })
+           },
+           interactive: true,
+           zIndex: 100
+         }).addTo(this.map);
+        if (this.featureGroup && this.featureGroup.getLayers().length > 0) {
+            this.map.fitBounds(this.featureGroup.getBounds())
+        } else {
+          this.map.fitBounds([[-60,-120],[75,130]])
+        }
+      }
     },
     highlightLayer (id)
     {

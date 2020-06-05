@@ -8,67 +8,56 @@
 }
 </i18n>
 <template>
- <span class="gdm-process-view">
- <h1>@todo - {{process.s_name}} N°{{process.up_id}}<span v-if="process.up_name"> - {{process.up_name }}</span></h1>
- <div class="gdm-process-header">
-   <div class="header-1">
-     <div style="width:300px;margin:auto;">
-      <gdm-map :feature-collection="feature"></gdm-map>
-     </div>
-      <div style="text-align:center;">
-         {{date2str(process.up_start, true)}}
-         <span class="fa fa-long-arrow-right"></span>
-         {{date2str(process.up_end, true)}}
-     </div>
-   </div>
-   <div class="header-2">
-      <div>Status: {{process.status}}</div>
-      <div>Progress: {{process.progress}}</div>
-      <div>
-        Dates process: {{date2str(process.up_date)}}
-        <span class="fa fa-long-arrow-right"></span>
-        {{date2str(process.ps_date)}}
-      </div>
-   </div>
-   <div class="header-3">
-    <div v-if="back">
-    </div>
-    <div v-else>
-       
-      <div v-if="process.status === 'SAVED'">
-       <a class="button" :href="url + 'process/' + process.up_id + '/edit'">Edit</a>
-       <a class="button" @click="todo" disabled>Evaluate</a>
-      </div>
-      <div v-if="process.status === 'EVALUATED'">
-       <a class="button" :href="url + 'process/' + process.up_id + '/edit'">Edit</a>
-       <a class="button" @click="todo">Launch</a>
-      </div>
-      <div v-if="process.status === 'WAITING'">
-       <a class="button" :href="url + 'process/' + process.up_id + '/edit'">Edit</a>
-      
-       <a class="button" @click="todo">Launch</a>
-      </div>
-      <div v-if="process.status === 'RUNNING'">
-        <a class="button" @click="todo" disabled>Get Status (en attendant)</a>
-        <a class="button" @click="todo" disabled>STOP</a>
-      </div>
-     
-     </div>
-   </div>
- </div>
- <h2>Parameters</h2>
-  <div v-for="(value, prop) in parameters" style="font-size:0.9rem;">
-    <b>{{prop}}:</b> {{value}}
-  </div>
+ <span class="gdm-process-view" v-if="process">
+ <div style="position:relative;">
+	 <h1>GDM-{{process.serviceId.padStart(2, '0')}}-{{process.id.padStart(5, '0')}}<span v-if="process.name"> - {{process.name }}</span></h1>
+	 <gdm-service-status :name="process.serviceName" :status="process.serviceStatus" :lang="lang" ></gdm-service-status>
+	 <div class="gdm-process-header">
+	   <div class="header-1">
+	     <div style="width:300px;margin:auto;">
+	      <gdm-map :feature-collection="process.feature"></gdm-map>
+	     </div>
+	      <div style="text-align:center;">
+	         {{date2str(process.tempStart, true)}}
+	         <span class="fa fa-long-arrow-right"></span>
+	         {{date2str(process.tempEnd, true)}}
+	     </div>
+	   </div>
+	   <div class="header-2">
+	      <div>Status: {{process.status}}</div>
+	      <div>Progress: {{process.progress}} %</div>
+	      <div>
+	        Dates process: {{date2str(process.processStart)}}
+	        <span class="fa fa-long-arrow-right"></span>
+	        {{date2str(process.processEnd)}}
+	      </div>
+	      <div>Cost: <b>{{process.cost}}</b> / {{process.quota}}</div>
+	   </div>
+	   <div class="header-3">
+	     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" :process="process" 
+	     :lang="lang">
+	     </gdm-process-actions>
+	   </div>
+	 
+		 </div>
+		 <h2>Parameters</h2>
+		  <div v-for="(value, prop) in parameters" style="font-size:0.9rem;">
+		    <b>{{prop}}:</b> {{value}}
+		  </div>
+	</div>
  </span>
 </template>
 <script>
 import GdmMap from './subcomponents/gdm-map.vue'
 import moment from 'moment'
+import GdmProcessActions from './subcomponents/gdm-process-actions.vue'
+import GdmServiceStatus from './subcomponents/gdm-service-status.vue'
 export default {
   name: 'GdmProcessView',
   components: {
-    GdmMap
+    GdmMap,
+    GdmProcessActions,
+    GdmServiceStatus
   },
   props: {
     id: {
@@ -96,8 +85,6 @@ export default {
       default: false
     }
   },
-  computed: {
-  },
   created () {
     this.$i18n.locale = this.lang
     moment.locale(this.lang)
@@ -111,7 +98,7 @@ export default {
     return {
       parameters: {},
       feature: null,
-      process: {}
+      process: null
       
     }
   },
@@ -132,8 +119,8 @@ export default {
       }
     },
     display (response) {
-      this.parameters = response.up_parameters.properties.parameters
-      this.feature = response.up_parameters
+      this.parameters = response.feature.properties.parameters
+      this.feature = response.feature
       this.feature.properties.id = this.id
       this.process = response
     },

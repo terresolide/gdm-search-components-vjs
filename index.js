@@ -6,5 +6,6 @@ import GdmProcessSearch from './src/gdm-process-search.vue'
 import GdmManageStep from './src/gdm-manage-step.vue'
 import GdmPaging from './src/gdm-paging.vue'
 import GdmProcessView from './src/gdm-process-view.vue'
+import GdmServiceStatus from './src/subcomponents/gdm-service-status'
 
-export {GdmProcessSearch, GdmManageStep, GdmPaging, GdmProcessView}
+export {GdmProcessSearch, GdmManageStep, GdmPaging, GdmProcessView, GdmServiceStatus}
