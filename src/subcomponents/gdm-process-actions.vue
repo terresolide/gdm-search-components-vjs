@@ -17,14 +17,14 @@
         <a  class="button" @click="getStatus" :disabled="!serviceOpen">{{$t('refresh')}}</a>
       </div>
       <div v-else-if="process.status === 'EVALUATED'">
-         <a class="button" :href="url + 'process/' + process.up_id + '/edit'">{{$t('edit')}}</a>
+         <a class="button" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
          <a class="button" @click="launch" :disabled="!serviceOpen || !hasCredit">Launch</a>
       </div>
        <div v-else-if="process.status === 'FAILED'">
          <a class="button" @click="todo" disabled>{{$t('purge')}}</a>
       </div>
       <div v-else-if="process.status === 'INVALID'">
-        <a class="button" :href="url + 'process/' + process.up_id + '/edit'">{{$t('edit')}}</a>
+        <a class="button" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
       </div>
       <div v-else-if="process.status === 'KILLED'">
          <a class="button" v-if="isOptic" @click="todo" :disabled="!serviceOpen">{{$t('relaunch')}}</a>
@@ -35,14 +35,12 @@
         <a class="button" @click="dismiss" :disabled="!serviceOpen">{{$t('stop')}}</a>
       </div>
       <div v-else-if="process.status === 'SAVED'">
-         <a class="button"  :href="url + 'process/' + process.up_id + '/edit'">{{$t('edit')}}</a>
+         <a class="button"  :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
         
          <a class="button" @click="evaluate" :disabled="!serviceOpen">{{$t('evaluate')}}</a>
       </div>
-     
-
       <div v-else-if="process.status === 'WAITING'">
-       <a class="button" :href="url + 'process/' + process.up_id + '/edit'">Edit</a>
+       <a class="button" :href="url + 'process/' + process.id + '/edit'">Edit</a>
        <a class="button" v-if="process.format.indexOf('sar') >= 0 " :disabled="!serviceOpen || !hasCredit" @click="launch">{{$t('launch')}}</a>
       </div>
      
