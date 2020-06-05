@@ -11,7 +11,7 @@
  <span class="gdm-process-view" v-if="process">
  <div style="position:relative;">
 	 <h1>GDM-{{process.serviceId.padStart(2, '0')}}-{{process.id.padStart(5, '0')}}<span v-if="process.name"> - {{process.name }}</span></h1>
-	 <gdm-service-status :name="process.serviceName" :status="process.serviceStatus" :lang="lang" ></gdm-service-status>
+	 <gdm-service-status  :name="process.serviceName" :status="process.serviceStatus" :lang="lang" ></gdm-service-status>
 	 <div class="gdm-process-header">
 	   <div class="header-1">
 	     <div style="width:300px;margin:auto;">
@@ -31,7 +31,13 @@
 	        <span class="fa fa-long-arrow-right"></span>
 	        {{date2str(process.processEnd)}}
 	      </div>
-	      <div>Cost: <b>{{process.cost}}</b> / {{process.quota}}</div>
+	      <div v-if="parseInt(process.cost) > 0">
+	        Cost: <b>{{parseInt(process.cost).toLocaleString()}}</b> 
+	        <span v-if="['WAITING', 'EVALUATED'].indexOf(process.status) >= 0">/ {{parseInt(process.quota).toLocaleString()}}</span>
+	      </div>
+	      <div v-if="parseInt(process.cost) <= 0 || ['WAITING', 'EVALUATED'].indexOf(process.status) < 0">
+	      Your quota: {{process.quota}}
+	      </div>
 	   </div>
 	   <div class="header-3">
 	     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" :process="process" 

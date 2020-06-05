@@ -1,19 +1,23 @@
 <i18n>
 {
    "en":{
-     "refresh": "Refresh"    
+     "ENABLED": "Open",
+     "DISABLED": "Closed",
+     "MAINTENANCE":"Under maintenance"    
    },
    "fr":{
-     "refresh": "Actualiser"
+     "ENABLED": "Ouvert",
+     "DISABLED": "Fermé",
+     "MAINTENANCE":"En maintenance"   
    }
 }
 </i18n>
 <template>
- <div style="position:absolute;top:0;right:0;" :title="titleFromStatus(status)">
+ <div style="position:absolute;" :style="{top: top + 'px', right: right + 'px'}" :title="$t(status)">
    <span v-if="name" style="vertical-align:middle;">
       Service {{name.toUpperCase()}}
    </span>
-   <div class="gdm-service-status" :style="{background: colorFromStatus(status)}"></div>
+   <div class="gdm-service-status" :class="size" :style="{background: colorFromStatus(status)}"></div>
  </div>
 </template>
 <script>
@@ -31,6 +35,18 @@ export default {
     lang: {
       type: String,
       default: 'en'
+    },
+    top: {
+      type: Number,
+      default: 0
+    },
+    right: {
+      type: Number,
+      default: 0
+    },
+    size: {
+      type: String,
+      default: 'small'
     }
   },
   data(){
@@ -42,6 +58,7 @@ export default {
   destroyed: function() {
   },
   created: function () {
+    this.$i18n.locale = this.lang
   },
   mounted: function(){
   },
@@ -55,11 +72,7 @@ export default {
       case 'MAINTENANCE':
         return 'radial-gradient(circle at 30%, #FFA500, #FF5733)'
       }
-    },
-    titleFromStatus (status) {
-      
     }
-
   }
 }
 </script>
@@ -71,5 +84,15 @@ export default {
   vertical-align: middle;
   border: 1px solid grey;
   border-radius: 15px;
+  margin:0;
+  padding:0;
+  line-height:15px;
+}
+.gdm-service-status.large {
+   width: 30px;
+  height:30px;
+   border-radius: 30px;
+   line-height:30px;
+   border: 2px solid black;
 }
 </style>

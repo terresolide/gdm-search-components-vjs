@@ -122,7 +122,8 @@
          <b>&rarr;</b>
          {{printDate(feature.properties.temporalExtent[1])}}
          </td>
-         <td>
+         <td >
+           <div style="min-width:360px;width:100%;max-height:100px;">
 	         <div class="infos">
 		         <div v-for="type in ['provider', 'position']" >
 			          <div v-if="feature.properties[type]" >
@@ -143,7 +144,8 @@
                   <div><b>{{camelCased(prop)}}:</b> {{feature.properties.parameters[prop]}}</div>
                 </div>
              </div>
-         </div>
+	         </div>
+	         </div>
          </td>
          </tr>
          </tbody>
