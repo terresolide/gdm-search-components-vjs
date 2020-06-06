@@ -66,7 +66,7 @@ export default {
     },
     url: {
       type: String,
-      default: 'http:localhost:8080/#/'
+      default: ''
     },
     back: {
       type: Boolean,

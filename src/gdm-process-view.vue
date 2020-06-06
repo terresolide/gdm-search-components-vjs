@@ -10,9 +10,12 @@
 <template>
  <span class="gdm-process-view" v-if="process">
  <div style="position:relative;">
-	 <h1 :style="{color:color}">GDM-{{process.serviceId.padStart(2, '0')}}-{{process.id.padStart(5, '0')}}<span v-if="process.name"> - {{process.name }}</span></h1>
-	 <gdm-service-status  :name="process.serviceName" :status="process.serviceStatus" :lang="lang" ></gdm-service-status>
+	
+	 <gdm-service-status  :name="process.serviceName" :status="process.serviceStatus" :top="5" :right="5" :lang="lang" ></gdm-service-status>
 	 <div class="gdm-process-header" :style="{background: $shadeColor(color,0.9)}">
+	   <div class="header-0">
+	    <h1 :style="{color:color}">GDM-{{(process.id + '').padStart(5, '0')}}<span v-if="process.name"> - {{process.name }}</span></h1>
+	   </div>
 	   <div class="header-1">
 	     <div style="width:300px;margin:auto;border:4px solid lightgrey;">
 	      <gdm-map :feature-collection="process.feature"></gdm-map>
@@ -34,9 +37,8 @@
 	      </div>
 	   </div>
 	   <div class="header-2-2">
-	      <div style="background:white;border:2px solid grey;height:40px;width:95%;max-width:400px;">
-	      <div class="gdm-progress-running" style="height:40px;" :style="{width: process.progress + '%'}">Progress: {{process.progress}} %</div>
-	      </div>
+	     <gdm-process-progress :status="process.status" :progress="process.progress" 
+	     :step-id="process.stepId"></gdm-process-progress>
 	  </div>
 	  <div class="header-2-3">
 	      <div>Owner: {{process.email}}</div>
@@ -58,9 +60,17 @@
 	   </div>
 	 
 		 </div>
+		 <div style="display:inline-block; width:4OOpx;">
 		 <h2 :style="{color:color}">Parameters</h2>
-		  <div v-for="(value, prop) in parameters" style="font-size:0.9rem;">
-		    <b>{{prop}}:</b> {{value}}
+		  <div v-for="(value, prop) in parameters" style="font-size:0.9rem;max-width:400px;" v-if="prop !== 'correl_image_input'">
+		    <b >{{prop}}:</b> <div style="vertical-align:top;max-width:350px;display:inline-block;overflow-wrap:anywhere">{{value}}</div>
+		  </div>
+		  </div>
+		  <div style="display:inline-block; width:4OOpx;vertical-align:top;">
+		  <h2 :style="{color:color}">Images</h2>
+		  <div  v-for="image in images" class="gdm-images-child" style="width:630px;">
+        <gdm-image :image="image" :searching="true" :checked="true" mode="view" :lang="lang"></gdm-image>
+       </div>
 		  </div>
 	</div>
  </span>
@@ -71,13 +81,17 @@ import moment from 'moment'
 import GdmProcessActions from './subcomponents/gdm-process-actions.vue'
 import GdmServiceStatus from './subcomponents/gdm-service-status.vue'
 import GdmProcessStatus from './subcomponents/gdm-process-status.vue'
+import GdmProcessProgress from './subcomponents/gdm-process-progress.vue'
+import GdmImage from './subcomponents/gdm-image.vue'
 export default {
   name: 'GdmProcessView',
   components: {
     GdmMap,
     GdmProcessActions,
     GdmServiceStatus,
-    GdmProcessStatus
+    GdmProcessStatus,
+    GdmProcessProgress,
+    GdmImage
   },
   props: {
     id: {
@@ -98,7 +112,7 @@ export default {
     },
     url: {
       type: String,
-      default: 'http:localhost:8080/#/'
+      default: ''
     },
     back: {
       type: Boolean,
@@ -140,7 +154,8 @@ export default {
     return {
       parameters: {},
       feature: null,
-      process: null
+      process: null,
+      images: []
       
     }
   },
@@ -161,13 +176,27 @@ export default {
       }
     },
     display (response) {
-      this.parameters = response.feature.properties.parameters
+      var parameters = response.feature.properties.parameters
+      var keys = Object.keys(parameters)
+      keys.sort()
+      for(var prop in keys) {
+        this.$set(this.parameters, keys[prop],parameters[keys[prop]])
+      }
+      this.getImage(response.images, 0)
       this.feature = response.feature
       this.feature.properties.id = this.id
       this.process = response
     },
-    todo () {
-      alert('TODO')
+    getImage(list, index) {
+      console.log(list)
+      if (list[index] && list[index].url) {
+        this.$http.get(list[index].url).then(function (response) {
+          if (response.body) {
+            this.images.push(response.body.features[0].properties)
+          }
+          this.getImage(list, index + 1)
+        })
+      }
     }
   }
 }
@@ -178,80 +207,46 @@ export default {
   margin:0 auto;
 }
 .gdm-process-view h1 {
-  margin-bottom:0;
+  margin:0;
 }
- .gdm-progress-running {
- position:relative;
-  background-image: linear-gradient(45deg,#09f,#0c0,#09f,#0c0,#09f);
-	/*background-image: linear-gradient(45deg,#99e6ff,#fff,#99e6ff,#fff,#99e6ff);*/
- }
- .gdm-progress-running:after {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; bottom: 0; right: 0;
-  background-image: linear-gradient(
-    45deg, 
-    rgba(255, 255, 255, .2) 25%, 
-    transparent 25%, 
-    transparent 50%, 
-    rgba(255, 255, 255, .2) 50%, 
-    rgba(255, 255, 255, .2) 75%, 
-    transparent 75%, 
-    transparent
-  );
-  z-index: 1;
-  background-size: 50px 50px;
-  animation: move 2s linear infinite;
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
-  border-top-left-radius: 20px;
-  border-bottom-left-radius: 20px;
-  overflow: hidden;
-}
-@keyframes move {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 50px 50px;
-  }
-}
- /* @keyframes mymove {
-  from { background: linear-gradient(45deg,#09f,#0c0,#09f,#0c0,#09f);}
-  to {background: linear-gradient(45deg,#99e6ff,#fff,#99e6ff,#fff,#99e6ff);}
- } */
+ 
 .gdm-process-header {
+  margin-top:0px;
   display:grid;
   grid-template-columns: 310px 2fr 150px 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-rows: 50px 1fr 1fr 1fr;
   background:#f3F3F3;
   padding: 10px 5px;
 }
+.header-0 {
+  grid-column:1/5;
+  grid-row: 1;
+ }
 .header-1 {
   grid-column: 1;
-  grid-row: 1/4;
+  grid-row: 2/5;
 }
 .header-2-1 {
-  grid-column: 2;
-  grid-row: 1;
-  padding: 10px;
-}
-.header-2-2 {
   grid-column: 2;
   grid-row: 2;
   padding: 10px;
 }
-.header-2-3 {
+.header-2-2 {
   grid-column: 2;
   grid-row: 3;
   padding: 10px;
 }
+.header-2-3 {
+  grid-column: 2;
+  grid-row: 4;
+  padding: 10px;
+}
 .header-3 {
   grid-column: 3;
-  grid-row: 1/4;
+  grid-row: 2/5;
 }
 .header-4 {
   grid-column: 4;
-  grid-row: 1/4;
+  grid-row: 2/5;
 }
 </style>

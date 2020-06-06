@@ -38,7 +38,7 @@
 </template>
 <script>
 export default {
-  name: 'GdmProcessActions',
+  name: 'GdmProcessStatus',
   props:{
     status: {
       type: String,

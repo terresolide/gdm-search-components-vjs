@@ -1,28 +1,28 @@
 <i18n>
 {
    "en":{
-     "ENABLED": "Open",
-     "DISABLED": "Closed",
-     "MAINTENANCE":"Under maintenance"    
+     "ENABLED": "Service Open",
+     "DISABLED": "Service Closed",
+     "MAINTENANCE":"Service Under Maintenance"    
    },
    "fr":{
-     "ENABLED": "Ouvert",
-     "DISABLED": "Fermé",
-     "MAINTENANCE":"En maintenance"   
+     "ENABLED": "Service Ouvert",
+     "DISABLED": "Service Fermé",
+     "MAINTENANCE":"Service En maintenance"   
    }
 }
 </i18n>
 <template>
- <div style="position:absolute;" :style="{top: top + 'px', right: right + 'px'}" :title="$t(status)">
+ <div style="position:absolute;cursor:pointer;" :style="{top: top + 'px', right: right + 'px'}" :title="$t(status)">
    <span v-if="name" style="vertical-align:middle;">
-      Service {{name.toUpperCase()}}
+      {{name.toUpperCase()}}
    </span>
    <div class="gdm-service-status" :class="size" :style="{background: colorFromStatus(status)}"></div>
  </div>
 </template>
 <script>
 export default {
-  name: 'GdmProcessActions',
+  name: 'GdmServiceStatus',
   props:{
     name: {
       type: String,
