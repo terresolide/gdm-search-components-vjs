@@ -267,6 +267,7 @@ export default {
 }
 .gdm-process-view h2 {
   padding: 10px 0;
+  font-weight:700;
 }
 .gdm-process-header h1,
 .gdm-process-header h2 {
