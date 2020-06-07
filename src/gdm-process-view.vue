@@ -3,7 +3,7 @@
      "status_informations": "Job status",
      "owner": "Owner",
      "cost": "Cost",
-     "actual_credit": "Actual credit",
+     "owner_credit": "Actual credit",
      "parameters": "Parameters",
      "TERMINATED": "The job ended succefully",
 	    "WAITING": "The job is only record here",
@@ -23,6 +23,7 @@
      "cost": "Coût",
      "actual_credit": "Crédit actuel",
      "parameters": "Paramètres",
+     "owner_credit": "Crédit",
      "TERMINATED": "Le job s'est terminé avec succès",
 	    "WAITING": "Le calcul est juste enregistré ici",
 	    "CANCELED": "Le calcul a été stoppé",
@@ -81,7 +82,7 @@
 	         </span>
 	      </div>
 	      <div v-if="process.cost <= 0 || ['WAITING', 'EVALUATED'].indexOf(process.status) < 0">
-	      <b>{{$t('owner_credit')}}:</b> {{process.quota}}
+	      <b>{{$t('owner_credit')}}:</b> {{process.quota.toLocaleString()}}
 	      </div>
 	   </div>
 	   <div class="header-3">
@@ -236,13 +237,21 @@ export default {
       }
     },
     statusChange (detail) {
-      
+      if (detail.err || detail.error) {
+        console.log(detail.err || detail.error)
+      } else {
+        this.$set(this.process, 'status', detail.status)
+        this.$set(this.process, 'cost', detail.cost)
+        this.$set(this.process, 'quota', detail.quota)
+        this.$set(this.process, 'progress', detail.progress)
+        this.$set(this.process, 'stepId', detail.stepId)   }
     },
     processChange (process) {
-      if (process.error) {
+      if (process.error || process.err) {
         alert(process.error)
       } else {
 	      this.$set(this.process, 'status', process.status)
+	      this.$set(this.process, 'cost', process.cost)
 	      this.$set(this.process, 'quota', process.quota)
 	      this.$set(this.process, 'progress', process.progress)
 	      this.$set(this.process, 'stepId', process.stepId)

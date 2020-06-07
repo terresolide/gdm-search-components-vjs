@@ -31,6 +31,8 @@
         <a  class="button" @click="getStatus" :disabled="!serviceOpen || submitting">{{$t('refresh')}}</a>
       </div>
       <div v-else-if="process.status === 'EVALUATED'">
+      <a  class="button" @click="getStatus" :disabled="!serviceOpen || submitting">{{$t('refresh')}}</a>
+    
          <a class="button" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
          <a class="button" @click="launch" :disabled="!serviceOpen || !hasCredit || submitting">{{$t('launch')}}</a>
       </div>
@@ -148,7 +150,14 @@ export default {
   },
   methods:{
     getStatus () {
-      
+      this.submitting = true
+      this.$http.get(this.api + '/getStatus/' + this.process.id, {credentials: true})
+      .then(function (resp) {
+        this.$emit('statusChange', resp.body)
+        this.submitting = false
+      }, function (e) {
+        this.submitting = false
+      })
     },
     launch () {
      this.submitting = true
@@ -161,7 +170,14 @@ export default {
      })
     },
     evaluate () {
-      
+      this.submitting = true
+      this.$http.get(this.api + '/evaluate/' + this.process.id, {credentials: true})
+      .then(function (resp) {
+        this.$emit('statusChange', resp.body)
+        this.submitting = false
+      }, function (e) {
+        this.submitting = false
+      })
     },
     dismiss () {
       
