@@ -265,8 +265,14 @@ export default {
   width:calc(100% - 30px);
   margin:0 auto;
 }
-.gdm-process-view h1 {
+.gdm-process-view h2 {
+  padding: 10px 0;
+}
+.gdm-process-header h1,
+.gdm-process-header h2 {
   margin:0;
+  padding: 0 0 5px 0;
+  font-weight:700;
 }
  
 .gdm-process-header {
