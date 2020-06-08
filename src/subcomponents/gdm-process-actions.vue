@@ -31,8 +31,6 @@
         <a  class="button" @click="getStatus" :class="{disabled: disabled}" :disabled="disabled">{{$t('refresh')}}</a>
       </div>
       <div v-else-if="process.status === 'EVALUATED'">
-      <a  class="button" @click="getStatus" :class="{disabled: !serviceOpen || submitting}" :disabled="disabled">{{$t('refresh')}}</a>
-    
          <a class="button" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
          <a class="button" @click="launch" :class="{disabled: disabled || !hasCredit}"
          :disabled="disabled || !hasCredit">{{$t('launch')}}</a>
