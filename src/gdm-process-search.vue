@@ -119,7 +119,7 @@
              </div>
              <div v-else>
                 <div v-for="prop in ['correl_split_date', 'correl_input_mode', 'correl_correlator', 'do_analysis', 'do_correction_filtering']" >
-                  <div><b>{{camelCased(prop)}}:</b> {{feature.properties.parameters[prop]}}</div>
+                  <div><b>{{$hypens2camel(prop)}}:</b> {{feature.properties.parameters[prop]}}</div>
                 </div>
              </div>
 	         </div>
@@ -237,10 +237,7 @@ export default {
     this.resize()
   },
   methods: {
-    camelCased (myString) {
-      return myString.replace(/_([a-z])/g, function (g) { return g[1].toUpperCase(); });
-    },
-    search () {
+     search () {
      var url = this.api + '?maxRecords=' + this.pagination.maxRecords + '&index=' + this.pagination.startIndex
      if (this.userId) {
         url += '&userId=' + this.userId

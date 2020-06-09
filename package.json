@@ -26,7 +26,7 @@
     "moment": "^2.26.0",
     "vue": "^2.6.11",
     "vue-custom-element": "^3.2.14",
-    "vue-i18n": "^8.18.1",
+    "vue-i18n": "^8.18.2",
     "vue-resource": "^1.5.1"
   },
   "devDependencies": {

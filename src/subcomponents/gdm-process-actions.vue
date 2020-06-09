@@ -24,14 +24,12 @@
 </i18n>
 <template>
 <span class="gdm-process-actions" v-if="process" >
-     <div v-if="back">
-    </div>
-    <div v-else>
+
        <div v-if="process.status === 'ACCEPTED'">
         <a  class="button" @click="getStatus" :class="{disabled: disabled}" :disabled="disabled">{{$t('refresh')}}</a>
       </div>
       <div v-else-if="process.status === 'EVALUATED'">
-         <a class="button" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
+         <a class="button" v-if="!back" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
          <a class="button" @click="launch" :class="{disabled: disabled || !hasCredit}"
          :disabled="disabled || !hasCredit">{{$t('launch')}}</a>
       </div>
@@ -39,7 +37,7 @@
          <a class="button" @click="purge" disabled>{{$t('purge')}}</a>
       </div>
       <div v-else-if="process.status === 'INVALID'">
-        <a class="button" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
+        <a class="button" v-if="!back"  :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
       </div>
       <div v-else-if="process.status === 'CANCELED'">
          <a class="button" v-if="isOptic" @click="todo" :class="{disabled: disabled}"
@@ -54,20 +52,17 @@
         </a>
       </div>
       <div v-else-if="process.status === 'SAVED'">
-         <a class="button"  :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
+         <a class="button" v-if="!back" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
          <a class="button" @click="evaluate" :class="{disabled: disabled}" 
          :disabled="disabled">{{$t('evaluate')}}</a>
       </div>
       <div v-else-if="process.status === 'WAITING'">
-	       <a class="button" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
+	       <a class="button" v-if="!back" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
 	       <a class="button" v-if="process.format.indexOf('sar') >= 0 " :class="{disabled: disabled || !hasCredit}"
 	       :disabled="disabled || !hasCredit" @click="launch">
 	         {{$t('launch')}}
 	       </a>
       </div>
-     
-     </div>
-
 </span>
 </template>
 <script>
@@ -184,7 +179,7 @@ export default {
       })
     },
     dismiss () {
-      
+      console.log('todo')
     }
   }
 }

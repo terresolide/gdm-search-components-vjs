@@ -42,7 +42,6 @@
 <template>
  <span class="gdm-process-view" v-if="process">
  <div style="position:relative;">
-	
 	 <gdm-service-status  :name="process.serviceName" :status="process.serviceStatus" :top="5" :right="10" :lang="lang" ></gdm-service-status>
 	 <div class="gdm-process-header" :style="{background: $shadeColor(color,0.95)}">
 	   <div class="header-0">
@@ -90,7 +89,7 @@
 	   </div>
 	   <div class="header-4">
 	     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" 
-	     :process="process"  :lang="lang" @processChange="processChange" @statusChange="statusChange">
+	     :process="process"  :lang="lang" @processChange="statusChange" @statusChange="statusChange">
 	     </gdm-process-actions>
 	   </div>
 	 
@@ -239,23 +238,14 @@ export default {
     statusChange (detail) {
       if (detail.err || detail.error) {
         console.log(detail.err || detail.error)
+        alert(detail.err || detail.error)
       } else {
         this.$set(this.process, 'status', detail.status)
         this.$set(this.process, 'cost', detail.cost)
         this.$set(this.process, 'quota', detail.quota)
         this.$set(this.process, 'progress', detail.progress)
-        this.$set(this.process, 'stepId', detail.stepId)   }
-    },
-    processChange (process) {
-      if (process.error || process.err) {
-        alert(process.error)
-      } else {
-	      this.$set(this.process, 'status', process.status)
-	      this.$set(this.process, 'cost', process.cost)
-	      this.$set(this.process, 'quota', process.quota)
-	      this.$set(this.process, 'progress', process.progress)
-	      this.$set(this.process, 'stepId', process.stepId)
-      }
+        this.$set(this.process, 'stepId', detail.stepId) 
+        this.$set(this.process, 'processEnd', detail.processEnd)}
     }
   }
 }
