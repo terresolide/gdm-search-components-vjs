@@ -45,7 +45,7 @@
 	 <gdm-service-status  :name="process.serviceName" :status="process.serviceStatus" :top="5" :right="10" :lang="lang" ></gdm-service-status>
 	 <div class="gdm-process-header" :style="{background: $shadeColor(color,0.95)}">
 	   <div class="header-0">
-	    <h1 :style="{color:color}">GDM-{{(process.id + '').padStart(5, '0')}}<span v-if="process.name"> - {{process.name }}</span></h1>
+	    <h1 :style="{color:color}">{{(process.id + '').padStart(5, '0')}}<span v-if="process.name"> - {{process.name }}</span></h1>
 	   </div>
 	   <div class="header-1">
 	     <div class="gdm-map-container">
@@ -104,12 +104,14 @@
 		  </div>
 		  <div class="gdm-list-images" >
 		  <h2 :style="{color:color}">Images</h2>
-		  <div >
+		  <div v-if="images.length > 0">
 			  <div  v-for="image in images" class="gdm-images-child" >
 	        <gdm-image :image="image" :searching="true" :checked="true" mode="view" :lang="lang"></gdm-image>
 	      </div>
 		  </div>
+		  <div v-else style="text-align:center;padding: 30px;">NO IMAGES SELECTED - TYPE REQUEST</div>
 		  </div>
+		  
 	</div>
  </span>
 </template>
@@ -159,8 +161,8 @@ export default {
   },
   computed: {
     isEnded () {
-      if (process) {
-        switch(process.status) {
+      if (this.process) {
+        switch(this.process.status) {
           case 'RUNNING':
           case 'ACCEPTED':
           case 'SAVED':
@@ -226,12 +228,15 @@ export default {
       this.process = response
     },
     getImage(list, index) {
+      console.log(list)
+      console.log(index)
       if (list[index] && list[index].url) {
         this.$http.get(list[index].url).then(function (response) {
           if (response.body) {
             this.images.push(response.body.features[0].properties)
           }
           this.getImage(list, index + 1)
+          
         })
       }
     },

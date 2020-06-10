@@ -179,7 +179,7 @@ export default {
       })
     },
     dismiss () {
-      console.log('todo')
+      alert('@todo')
     }
   }
 }

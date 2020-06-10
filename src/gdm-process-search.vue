@@ -41,7 +41,7 @@
        <gdm-paging :start-index="pagination.startIndex" :max-records="pagination.maxRecords"  
        :count="pagination.count" :total-results="pagination.totalResults"
        :lang="lang" :color="color" @change="pageChange"></gdm-paging>
-       <table class="gdm-list-process" :style="{height: listHeight + 'px'}">
+       <table class="gdm-list-process" style="width:100%;" :style="{height: listHeight + 'px'}">
          <thead >
          <th :style="{background:$shadeColor(color, 0.8)}">{{$t('identifiers')}}</th>
          <th :style="{background:$shadeColor(color, 0.8)}">Status</th>
@@ -54,7 +54,7 @@
          <tr v-for="feature in featureCollection.features" :class="'row' + feature.properties.id" 
          @mouseenter="highlight(feature.properties.id)" @click="selectProcess(feature.properties.id)">
          <td>
-           <div><b>GDM-{{feature.properties.serviceId.padStart(2, '0')}}-{{feature.properties.id.padStart(5,'0')}}</b></div>
+           <div><b>{{feature.properties.id.padStart(5,'0')}}</b></div>
            <div class="gdm-token" v-if="feature.properties.token">{{feature.properties.token}}</div>
            
            <div class="toSelect" :class="{selectedService: parameters.service}" 
@@ -100,8 +100,8 @@
          <b>&rarr;</b>
          {{printDate(feature.properties.temporalExtent[1])}}
          </td>
-         <td >
-           <div style="min-width:360px;width:100%;max-height:100px;">
+         <td style="min-width:40%;">
+           <div style="width:100%;max-height:100px;">
 	         <div class="infos">
 		         <div v-for="type in ['provider', 'position']" >
 			          <div v-if="feature.properties[type]" >
@@ -518,7 +518,16 @@ table.gdm-list-process td{
   border-left: none;
   border-right: none;
 }
+ table.gdm-list-process td:not(:last-child), 
+ table.gdm-list-process th:not(:last-child) {
+      white-space: nowrap;
+      min-width:15%;
+    }
 
+table.gdm-list-process td:last-child, 
+table.gdm-list-process th:last-child{
+      width: 100%;
+    }
 
 div.toSelect {
  cursor: pointer;
@@ -527,6 +536,8 @@ div.toSelect {
   background: #F0f0f0;
   border: 1px solid #909090;
   border-radius:2px;
+  max-width: 250px;
+  white-space:normal;
 }
 div.toSelect.selectedUser,
 div.toSelect.selectedService{
