@@ -519,15 +519,8 @@ table.gdm-list-process td{
   border-right: none;
    min-width:15%;
 }
- table.gdm-list-process td:not(:last-child), 
- table.gdm-list-process th:not(:last-child) {
-      white-space: nowrap;
-     
-    }
-table.gdm-list-process td:nth-child(4n),
-table.gdm-list-process th:nth-child(4n){
-  white-space: normal;
-}
+
+
 table.gdm-list-process td:last-child, 
 table.gdm-list-process th:last-child{
       width: 100%;
