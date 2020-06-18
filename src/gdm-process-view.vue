@@ -15,6 +15,7 @@
 	    "FAILED": "The job ended in failure",
 	    "PURGED": "All results has been cleared",
 	    "RUNNING": "In progress",
+	    "PRE-RUN": "Launch failed or the status has not yet been updated at service, Refresh or relaunch if necessary",
 	    "ACCEPTED": "The service has accepted the job but has not yet started"
    },
    "fr":{
@@ -34,6 +35,8 @@
 	    "FAILED": "Le job s'est terminé en échec",
 	    "PURGED": "Tous les résultats ont été effacés",
 	    "RUNNING": "Traitement en cours",
+	    "PRE-RUN": "Le lancement a échoué ou le status n'a pas encore été mis à jour au niveau du service. Rafraîchir puis relancer si nécessaire...",
+      
 	    "ACCEPTED": "Le service a accepté le job, mais ce dernier n'a pas encore démarré "  
  
    }
@@ -75,10 +78,13 @@
 	      <div><b>{{$t('owner')}}:</b> {{process.email}}</div>
 	      <div v-if="process.cost > 0" >
 	        <b>{{$t('cost')}}:</b>
-	        <span :style="{color: process.cost > process.quota ? 'red' : 'black' }">
-		        <b>{{process.cost.toLocaleString()}}</b> 
-		        <span v-if="['WAITING', 'EVALUATED'].indexOf(process.status) >= 0">/ {{process.quota.toLocaleString()}}</span>
+	        <span v-if="['WAITING', 'EVALUATED'].indexOf(process.status) >= 0">
+		        <span :style="{color: process.cost > process.quota ? 'red' : 'black' }">
+			        <b>{{process.cost.toLocaleString()}}</b> 
+			        <span >/ {{process.quota.toLocaleString()}}</span>
+		         </span>
 	         </span>
+	         <span v-else><b>{{process.cost.toLocaleString()}}</b></span>
 	      </div>
 	      <div v-if="process.cost <= 0 || ['WAITING', 'EVALUATED'].indexOf(process.status) < 0">
 	      <b>{{$t('owner_credit')}}:</b> {{process.quota.toLocaleString()}}

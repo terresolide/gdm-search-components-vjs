@@ -1,22 +1,28 @@
 <i18n>
 {
   "en": {
+    "created": "Created",
     "consult": "Consult",
+    "end": "End",
     "process_dates": "Process dates",
     "identifiers": "Identifiers",
     "temporal_extent": "Temporal extent",
     "parameters": "Parameters",
     "no_process": "No process",
+    "start": "Start",
     "unauthorized": "Access Unauthorized",
     "forbidden": "Access Forbidden: deconnected?"
   },
   "fr": {
+    "created": "Création",
     "consult": "Consulter",
+    "end": "Fin",
     "process_dates": "Dates du calcul",
     "identifiers": "Identifiants",
     "temporal_extent": "Etendue temporelle",
     "parameters": "Paramètres",
     "no_process": "Aucun calcul",
+    "start": "Début",
     "unauthorized": "Accès non autorisé à cette ressource",
     "forbidden": "Access interdit: deconnecté?"
   }
@@ -87,9 +93,30 @@
             <span class="button" v-if="back &&  ['FAILED', 'TERMINATED', 'KILLED', 'PURGED'].indexOf(feature.properties.status) >= 0" @click="restart(feature.properties.id, $event)" >Restart</span>
           <span class="button" v-if=" feature.properties.hasPurge && ['TERMINATED'].indexOf(feature.properties.status) >= 0" @click="purge(feature.properties.id, $event)" >Purge</span>
        --> 
-         <td style="text-align:left;">
-         <b>Start: </b>{{printDate(feature.properties.processStart,true)}}<br/>
-         <b>End: </b>{{printDate(feature.properties.processEnd, true)}}<br />
+         <td style="text-align:left;font-size:0.9em;">
+         <div >
+           <b>{{$t('created')}}: </b>
+           <span style="white-space:nowrap;">
+             {{printDate(feature.properties.start, true)}}
+           </span>
+         </div>
+         <div v-if="['TERMINATED', 'RUNNING', 'FAILED'].indexOf(feature.properties.status) >=0">
+	         <div>
+		         <b>{{$t('start')}}: </b>
+		         <span style="white-space:nowrap;">
+		         {{printDate(feature.properties.processStart,true)}}
+		         </span>
+	         </div>
+	         <div>
+		         <b>{{$t('end')}}:</b>
+		         <span v-if="feature.properties.processEnd" style="white-space:nowrap;">
+		         {{printDate(feature.properties.processEnd, true)}}
+		         </span>
+		         <span v-else style="color:grey;white-space:nowrap;">
+		         {{printDate(feature.properties.end, true)}}
+		         </span>
+	         </div>
+         </div>
           <span v-if="feature.properties.datePurge" style="font-size:0.9em;color:#333;font-style:italic;"> 
             (<b>Purge: </b>{{printDate(feature.properties.datePurge)}})
          </span>
@@ -196,8 +223,8 @@ export default {
         user: null,
         service: null,
         status: null,
-        processStart: null,
-        processEnd: null,
+        Start: null,
+        End: null,
         tempStart: null,
         tempEnd: null,
         q: null,
@@ -257,10 +284,10 @@ export default {
        url +='&bbox=' + this.parameters.bbox
      }
      var self = this
-     var dateType = ['processStart', 'processEnd', 'tempStart', 'tempEnd']
+     var dateType = ['Start', 'End', 'tempStart', 'tempEnd']
      dateType.forEach(function (name) {
-       if (self.parameters[name]) {
-         url += '&' + name + '=' + self.parameters[name]
+       if (self.parameters[name] && self.parameters[name] != 'Invalid date') {
+         url += '&' + name.charAt(0).toLowerCase() + name.slice(1) + '=' + self.parameters[name]
        }
      })
      this.$http.get(url, {credentials: true})

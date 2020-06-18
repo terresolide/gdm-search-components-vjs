@@ -41,7 +41,7 @@
     </formater-search-box>
      <formater-search-box header-icon-class="fa fa-hourglass-end" open-icon-class="fa fa-caret-right" :title="$t('process_extent')" :deployed="false" type="empty" >
 
-       <formater-temporal-search name="process" lang="fr" :format="format" daymin="2020-03-01" @change="dateChange"></formater-temporal-search>
+       <formater-temporal-search name="" lang="fr" :format="format" daymin="2020-03-01" @change="dateChange"></formater-temporal-search>
     </formater-search-box>
 
     <formater-search-box  header-icon-class="fa fa-filter" open-icon-class="fa fa-caret-right" :title="$t('filters')" :deployed="false" type="empty" >
