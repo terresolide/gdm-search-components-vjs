@@ -17,7 +17,7 @@
  </div>
 </template>
 <script>
-var L require('leaflet')
+var L = require('leaflet')
 require('leaflet-draw')
 
 L.modLat = function( lat ){
