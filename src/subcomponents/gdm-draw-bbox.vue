@@ -17,8 +17,9 @@
  </div>
 </template>
 <script>
-import L from 'leaflet';
+var L require('leaflet')
 require('leaflet-draw')
+
 L.modLat = function( lat ){
      lat = lat%180;
      if( lat > 90 ){
@@ -91,6 +92,9 @@ export default {
     this.mouseupListener = null
     window.removeEventListener('resize', this.resizeListener)
     this.resizeListener = null
+    if (this.map) {
+      this.map.remove()
+    }
   },
   mounted: function () {
     this.$el.querySelector(".mtdt-header").style.color = 'white'

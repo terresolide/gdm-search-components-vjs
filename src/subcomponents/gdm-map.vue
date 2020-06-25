@@ -61,6 +61,9 @@ export default {
     this.highlightListener = null
     document.removeEventListener('gdm:processSelect', this.selectListener)
     this.selectListener = null
+    if (this.map) {
+      this.map.remove()
+    }
   },
   methods: {
    changeHighlightedLayer (event) {
