@@ -3,7 +3,11 @@
      "status_informations": "Job status",
      "owner": "Owner",
      "cost": "Cost",
+     "created": "Created",
+     "edit": "Edit",
+     "last_update": "Updated",
      "owner_credit": "Actual credit",
+     "process_time": "Process time",
      "parameters": "Parameters",
      "TERMINATED": "The job ended succefully",
 	    "WAITING": "The job is only record here",
@@ -22,9 +26,12 @@
       "status_informations": "Etat du calcul",
      "owner": "Propriétaire",
      "cost": "Coût",
-     "actual_credit": "Crédit actuel",
-     "parameters": "Paramètres",
+     "created": "Création",
+     "edit": "Modifier",
+     "last_update": "Maj",
      "owner_credit": "Crédit",
+     "parameters": "Paramètres",
+     "process_time": "Calcul",
      "TERMINATED": "Le job s'est terminé avec succès",
 	    "WAITING": "Le calcul est juste enregistré ici",
 	    "CANCELED": "Le calcul a été stoppé",
@@ -63,11 +70,31 @@
 	   <div class="header-2-1" style="padding: 0 10px;">
 	      <h2 :style="{color:color, margin: 0}">{{$t('status_informations')}}</h2>
 	      <div>
-	       {{date2str(process.processStart)}}
-          <span class="fa fa-long-arrow-right"></span>
-          <span :style="{color: isEnded ? 'black' : 'grey'}">
-            {{date2str(process.processEnd)}}
-          </span>
+	        <div>
+             <b>{{$t('created')}}: </b>
+             <span style="white-space:nowrap;">
+               {{date2str(process.start)}}
+             </span>
+           </div>
+           <div v-if="process.processStart">
+           <b>{{$t('process_time')}}:</b>
+		        <span style="white-space:nowrap;">
+		          {{date2str(process.processStart)}}
+		        </span>
+	          <span class="fa fa-long-arrow-right"></span>
+	          <span v-if="process.processEnd" style="white-space:nowrap;">
+             {{date2str(process.processEnd)}}
+             </span>
+             <span v-else style="color:grey;white-space:nowrap;">
+             {{date2str(process.end)}}
+             </span>
+          </div>
+          <div v-else>
+             <b>{{$t('last_update')}}: </b>
+             <span style="white-space:nowrap;">
+               {{date2str(process.end)}}
+             </span>
+          </div>
 	      </div>
 	   </div>
 	   <div class="header-2-2">
@@ -83,8 +110,12 @@
 			        <b>{{process.cost.toLocaleString()}}</b> 
 			        <span >/ {{process.quota.toLocaleString()}}</span>
 		         </span>
+		         <div v-if="back && process.cost > process.quota">
+                 <a class="button"  :href="url + 'users/view/' + process.userId">{{$t('edit')}}</a>
+             </div>
 	         </span>
 	         <span v-else><b>{{process.cost.toLocaleString()}}</b></span>
+	         
 	      </div>
 	      <div v-if="process.cost <= 0 || ['WAITING', 'EVALUATED'].indexOf(process.status) < 0">
 	      <b>{{$t('owner_credit')}}:</b> {{process.quota.toLocaleString()}}
@@ -166,6 +197,9 @@ export default {
     }
   },
   computed: {
+    /**
+    * unused
+    **/
     isEnded () {
       if (this.process) {
         switch(this.process.status) {
@@ -261,6 +295,42 @@ export default {
   }
 }
 </script>
+<style>
+.gdm-process-view .gdm-process-header a.button{
+   display: inline-block;
+   margin: 0px 7px 3px 0;
+   padding: 3px 12px;
+   height: auto;
+   line-height: 1.43;
+   white-space: normal;
+   text-align: center;
+   background: #ececea;
+   border-width: 1px;
+   border-style: solid;
+   border-radius: 3px;
+   border-color: #ffffff #d4d4cf #d4d4cf;
+   color: #000;
+   text-decoration: none;
+  /* text-shadow: 0 -1px 1px #bcbcb4, 1px 0 1px #d4d4cf, 0 1px 1px #d4d4cf, -1px 0 1px #bcbcb4;*/
+   vertical-align: top;
+   cursor: pointer;
+   pointer-events: auto;
+   box-sizing: border-box;
+   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
+   opacity: 0.8
+  }
+.gdm-process-view .gdm-process-header a.button:hover{
+   background: #f0f0e6;
+   text-decoration: none;
+   opacity: 1
+ }
+
+ .gdm-process-view .gdm-process-header a.button:disabled,
+ .gdm-process-view .gdm-process-header a.button.disabled {
+    color: #999;
+    pointer-events: none;
+  }
+</style>
 <style scoped>
 .gdm-process-view{
   width:calc(100% - 30px);
@@ -276,21 +346,20 @@ export default {
   padding: 0 0 5px 0;
   font-weight:700;
 }
- 
-.gdm-process-header {
-  margin-top:0px;
-  display:grid;
-  grid-template-columns: 310px 2fr 150px 1fr;
-  grid-template-rows: 50px 1fr 1fr 1fr;
-  background:#f3F3F3;
-  padding: 10px 5px;
-  border: 1px solid lightgray;
-  box-shadow: 1px 1px 3px gray;
-}
 .gdm-map-container {
    width:300px;
    margin:auto;
    border:4px solid lightgrey;
+}
+.gdm-process-header {
+  margin-top:0px;
+  display:grid;
+  grid-template-columns: 310px 2fr 150px 1fr;
+  grid-template-rows: 50px 1fr 50px 1fr;
+  background:#f3F3F3;
+  padding: 10px 5px;
+  border: 1px solid lightgray;
+  box-shadow: 1px 1px 3px gray;
 }
 .header-0 {
   grid-column:1/5;

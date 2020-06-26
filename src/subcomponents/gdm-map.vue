@@ -174,6 +174,7 @@ export default {
   }
 }
 </script>
+<style src="formater-commons-components-vjs/src/assets/css/formater-icon.css"></style>
 <style>
 .research-map{
   float:left;

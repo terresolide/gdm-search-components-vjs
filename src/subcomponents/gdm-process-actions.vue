@@ -185,7 +185,7 @@ export default {
 }
 </script>
 <style scoped>
-
+/*
 a.button{
    display: inline-block;
    margin: 0px 7px 3px 0;
@@ -201,7 +201,6 @@ a.button{
    border-color: #ffffff #d4d4cf #d4d4cf;
    color: #000;
    text-decoration: none;
-  /* text-shadow: 0 -1px 1px #bcbcb4, 1px 0 1px #d4d4cf, 0 1px 1px #d4d4cf, -1px 0 1px #bcbcb4;*/
    vertical-align: top;
    cursor: pointer;
    pointer-events: auto;
@@ -219,6 +218,6 @@ a.button{
  a.button.disabled {
     color: #999;
     pointer-events: none;
-  }
+  }*/
 
 </style>
