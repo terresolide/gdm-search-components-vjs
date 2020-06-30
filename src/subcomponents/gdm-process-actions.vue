@@ -34,7 +34,7 @@
          :disabled="disabled || !hasCredit">{{$t('launch')}}</a>
       </div>
        <div v-else-if="process.status === 'FAILED'">
-         <a class="button" @click="purge" disabled>{{$t('purge')}}</a>
+        <a class="button" @click="duplicate" ></a>
       </div>
       <div v-else-if="process.status === 'INVALID'">
         <a class="button" v-if="!back"  :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
@@ -43,7 +43,14 @@
          <a class="button" v-if="isOptic" @click="todo" :class="{disabled: disabled}"
           :disabled="disabled">{{$t('relaunch')}}</a>
       </div>
-      <!--  PURGED NOTHING TO DO -->
+      <!--  PURGED NOTHING TO DO => CREATE NEW PROCESS WITH THIS-->
+      <div v-else-if="process.status === 'PURGED' || process.status === 'TERMINATED'">
+         <a class="button" @click="duplicate" ></a>
+      </div>
+        <div v-else-if="process.status === 'PRE-RUN'">
+        <a class="button" @click="getStatus" :class="{disabled: disabled}" :disabled="disabled">{{$t('refresh')}}</a>
+       
+      </div>
       <div v-else-if="process.status === 'RUNNING'">
         <a class="button" @click="getStatus" :class="{disabled: disabled}" :disabled="disabled">{{$t('refresh')}}</a>
         <a class="button" @click="dismiss" :class="{disabled: disabled}" :disabled="disabled">
@@ -179,6 +186,9 @@ export default {
       })
     },
     dismiss () {
+      alert('@todo')
+    },
+    duplicate () {
       alert('@todo')
     }
   }
