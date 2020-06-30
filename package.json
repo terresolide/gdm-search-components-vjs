@@ -1,6 +1,6 @@
 {
   "name": "gdm-search-components-vjs",
-  "version": "2.9.1",
+  "version": "2.9.2",
   "description": "GDM Search Components",
   "production": {
     "url": "https://cdn.jsdelivr.net/gh/terresolide"

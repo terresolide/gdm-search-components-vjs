@@ -124,7 +124,7 @@ export default {
     },
     hasCredit () {
       if (this.process) {
-        return parseInt(this.process.cost) < parseInt(this.process.quota)
+        return parseInt(this.process.cost) <= parseInt(this.process.quota)
       } else {
         return false
       }
