@@ -127,6 +127,8 @@ export default {
   },
   methods: {
     initPosition () {
+      console.log(this.$el.parentNode.offsetWidth)
+      
       var left = (this.$el.parentNode.offsetWidth - this.$el.offsetWidth) / 2;
       this.$el.parentNode.style.position = 'relative'
       var top = 25;

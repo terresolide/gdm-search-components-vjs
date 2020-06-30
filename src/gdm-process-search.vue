@@ -29,8 +29,8 @@
 }
 </i18n>
 <template>
-  <span class="gdm-process-search">
-    <formater-draw-bbox :lang="lang" :color="color"></formater-draw-bbox>
+  <div class="gdm-process-search">
+    <gdm-draw-bbox :lang="lang" :color="color"></gdm-draw-bbox>
   <div class="wrapper">
    <div class="column-left" >
     <gdm-form-process :lang="lang" :status="statusList" :feature-collection="featureCollection" 
@@ -158,13 +158,13 @@
      </div>
      </div>
    </div>
-  </span>
+  </div>
 </template>
 <script>
 import GdmPaging from './gdm-paging.vue'
 import GdmFormProcess from './subcomponents/gdm-form-process.vue'
 import moment from 'moment'
-import FormaterDrawBbox from './subcomponents/gdm-draw-bbox.vue'
+import GdmDrawBbox from './subcomponents/gdm-draw-bbox.vue'
 import GdmProcessStatus from './subcomponents/gdm-process-status.vue'
 
 export default {
@@ -172,7 +172,7 @@ export default {
   components: {
     GdmPaging,
     GdmFormProcess,
-    FormaterDrawBbox,
+    GdmDrawBbox,
     GdmProcessStatus
   },
   props: {
