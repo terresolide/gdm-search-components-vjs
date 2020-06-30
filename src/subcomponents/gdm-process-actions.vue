@@ -8,7 +8,8 @@
      "stop": "Kill",
      "cancel": "Stop",
      "purge": "To trash",
-     "evaluate": "Evaluate"   
+     "evaluate": "Evaluate",
+     "duplicate": "Duplicate"  
    },
    "fr":{
      "refresh": "Actualiser",
@@ -18,7 +19,8 @@
      "stop": "Détruire",
      "cancel": "Stopper",
      "purge": "Vider",
-     "evaluate": "Evaluer"   
+     "evaluate": "Evaluer",
+     "duplicate": "Dupliquer"   
    }
 }
 </i18n>
@@ -34,7 +36,7 @@
          :disabled="disabled || !hasCredit">{{$t('launch')}}</a>
       </div>
        <div v-else-if="process.status === 'FAILED'">
-        <a class="button" @click="duplicate" ></a>
+        <a class="button" @click="duplicate" >{{$t('duplicate')}}</a>
       </div>
       <div v-else-if="process.status === 'INVALID'">
         <a class="button" v-if="!back"  :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
@@ -45,7 +47,7 @@
       </div>
       <!--  PURGED NOTHING TO DO => CREATE NEW PROCESS WITH THIS-->
       <div v-else-if="process.status === 'PURGED' || process.status === 'TERMINATED'">
-         <a class="button" @click="duplicate" ></a>
+         <a class="button" @click="duplicate" >{{$t('duplicate')}}</a>
       </div>
         <div v-else-if="process.status === 'PRE-RUN'">
         <a class="button" @click="getStatus" :class="{disabled: disabled}" :disabled="disabled">{{$t('refresh')}}</a>
