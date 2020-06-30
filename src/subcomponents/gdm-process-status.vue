@@ -78,7 +78,6 @@ export default {
 	        break
 	      case 'SAVED':
 	      case 'EVALUATED':
-	        return 'ACCEPTED';
 	      case 'WAITING':
 	         return 'SAVED';
 	      case 'CANCELED':
