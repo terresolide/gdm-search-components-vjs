@@ -129,7 +129,11 @@
 	     :process="process"  :lang="lang" @processChange="statusChange" @statusChange="statusChange">
 	     </gdm-process-actions>
 	   </div>
-	 
+	    <div class="header-5">
+       <gdm-process-result v-if="process && process.result && process.status === 'TERMINATED'" :result="process.result"
+         :lang="lang" :color="color" >
+       </gdm-process-result>
+     </div>
 		 </div>
 		 <div class="gdm-list-parameters" >
 			 <h2 :style="{color:color}">{{$t('parameters')}}</h2>
@@ -159,6 +163,7 @@ import GdmProcessActions from './subcomponents/gdm-process-actions.vue'
 import GdmServiceStatus from './subcomponents/gdm-service-status.vue'
 import GdmProcessStatus from './subcomponents/gdm-process-status.vue'
 import GdmProcessProgress from './subcomponents/gdm-process-progress.vue'
+import GdmProcessResult from './subcomponents/gdm-process-result.vue'
 import GdmImage from './subcomponents/gdm-image.vue'
 export default {
   name: 'GdmProcessView',
@@ -168,6 +173,7 @@ export default {
     GdmServiceStatus,
     GdmProcessStatus,
     GdmProcessProgress,
+    GdmProcessResult,
     GdmImage
   },
   props: {
@@ -386,11 +392,15 @@ export default {
 }
 .header-3 {
   grid-column: 3;
-  grid-row: 2/5;
+  grid-row: 2;
 }
 .header-4 {
   grid-column: 4;
-  grid-row: 2/5;
+  grid-row: 2;
+}
+.header-5 {
+  grid-column: 3/5;
+   grid-row: 3/5;
 }
 .gdm-list-parameters {
   display:inline-block; 
