@@ -129,7 +129,8 @@
 	     :process="process"  :lang="lang" @processChange="statusChange" @statusChange="statusChange">
 	     </gdm-process-actions>
 	   </div>
-	    <div class="header-5">
+	    <div class="header-5" :class="{highlight:seeResult}"
+	    :style="{background: seeResult ? $shadeColor(color,0.92): 'none'}">
        <gdm-process-result v-if="process && process.result && process.status === 'TERMINATED'" :result="process.result"
          :lang="lang" :color="color" >
        </gdm-process-result>
@@ -225,6 +226,9 @@ export default {
       } else {
         return false
       }
+    },
+    seeResult () {
+      return this.process.status === 'TERMINATED' && this.process.result
     }
   },
   created () {
@@ -295,8 +299,12 @@ export default {
         this.$set(this.process, 'cost', detail.cost)
         this.$set(this.process, 'quota', detail.quota)
         this.$set(this.process, 'progress', detail.progress)
-        this.$set(this.process, 'stepId', detail.stepId) 
-        this.$set(this.process, 'processEnd', detail.processEnd)}
+        this.$set(this.process, 'stepId', detail.stepId)
+        this.$set(this.process, 'end', detail.end)
+        this.$set(this.process, 'processEnd', detail.processEnd)
+        this.$set(this.process, 'processStart', detail.processStart)
+        this.$set(this.process, 'result', detail.result)
+      }
     }
   }
 }
@@ -399,8 +407,13 @@ export default {
   grid-row: 2;
 }
 .header-5 {
+  padding:10px 5px;
   grid-column: 3/5;
    grid-row: 3/5;
+}
+.header-5.highlight {
+  border: 1px solid #e3e3e3;
+  background-color: #e9e9e9;
 }
 .gdm-list-parameters {
   display:inline-block; 
