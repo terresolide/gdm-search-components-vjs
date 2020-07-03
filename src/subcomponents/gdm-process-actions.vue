@@ -169,8 +169,17 @@ export default {
     },
     launch () {
      this.submitting = true
-     this.$http.get(this.api + '/launch/' + this.process.id, {credentials: true})
-     .then(function (resp) {
+     this.$http.post(
+         this.api + '/launch/' + this.process.id,
+         this.process,
+         {
+           headers: {
+             'Accept': 'application/json',
+             'Content-Type': 'application/json'
+           },
+           credentials: true
+         }
+     ).then(function (resp) {
        this.$emit('processChange', resp.body)
        this.submitting = false
      }, function (e) {
