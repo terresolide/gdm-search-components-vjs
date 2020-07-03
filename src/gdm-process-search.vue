@@ -78,7 +78,7 @@
            <div v-if="feature.properties.processusName">({{feature.properties.processusName}})</div>
          </td>
          <td style="text-align:center;cursor:pointer;">
-            <gdm-process-status :status="feature.properties.status" :lang="lang"></gdm-process-status>
+            <gdm-process-status :status="feature.properties.status" :status-list="statusList" :lang="lang"></gdm-process-status>
             <div>
                <a v-if="url" :href="url + feature.properties.id" class="button">{{$t('consult')}}</a>
             </div>
@@ -214,7 +214,7 @@ export default {
       },
       listHeight: 700,
       height: 700,
-      statusList: [],
+      statusList: {},
       spatialChangeListener: null,
       selectProcessLayerListener: null,
       resizeListener: null,
@@ -283,6 +283,7 @@ export default {
      if (this.parameters.bbox) {
        url +='&bbox=' + this.parameters.bbox
      }
+     url += '&lang=' + this.lang
      var self = this
      var dateType = ['Start', 'End', 'tempStart', 'tempEnd']
      dateType.forEach(function (name) {
@@ -316,7 +317,7 @@ export default {
         maxRecords: pagination.itemsPerPage,
         count: response.body.features.length
       }
-      if (this.statusList.length <= 1) {
+      if (Object.keys(this.statusList).length <= 1) {
         this.statusList = response.body.properties.status
       }
       this.featureCollection = response.body

@@ -37,7 +37,7 @@
          <formater-temporal-search name="temp" lang="fr" :format="format" daymin="2014-04-03" @change="dateChange"></formater-temporal-search>
      </formater-search-box>
      <formater-search-box header-icon-class="fa fa-cog" open-icon-class="fa fa-caret-right" title="Status" :deployed="false" type="empty" >
-      <formater-select  :options="status" :defaut="parameters.status" @input="statusChange" width="228px"></formater-select>
+      <formater-select  :options="statusList" :defaut="parameters.status" @input="statusChange" width="228px"></formater-select>
     </formater-search-box>
      <formater-search-box header-icon-class="fa fa-hourglass-end" open-icon-class="fa fa-caret-right" :title="$t('process_extent')" :deployed="false" type="empty" >
 
@@ -84,8 +84,8 @@ export default {
       default: null
     },
     status: {
-      type: Array,
-      default: null
+      type: Object,
+      default: () => {}
     },
     color: {
       type: String,
@@ -109,7 +109,16 @@ export default {
     }
   },
   computed: {
-    
+    statusList () {
+      var list = []
+      for (var key in this.status) {
+        if (list.indexOf(this.status[key].collection) < 0){
+          list.push(this.status[key].collection)
+        }
+      }
+      list.sort()
+      return list
+    }
   },
   created () {
     this.$i18n.locale = this.lang
@@ -118,6 +127,7 @@ export default {
     } else {
       this.format = 'MM/DD/YYYY'
     }
+    
   },
   mounted () {
   },
