@@ -126,7 +126,8 @@
 	   </div>
 	   <div class="header-4">
 	     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" 
-	     :process="process"  :lang="lang" @processChange="statusChange" @statusChange="statusChange">
+	     :process="process"  :lang="lang" @processChange="statusChange" 
+	     @statusChange="statusChange" @duplicate="duplicate">
 	     </gdm-process-actions>
 	   </div>
 	    <div class="header-5" :class="{highlight:seeResult}"
@@ -250,13 +251,6 @@ export default {
     }
   },
   methods: {
-    load () {
-      var url = this.api + '/getProcess/' + this.id
-      this.$http.get(url, {credentials: true})
-      .then(
-          response => this.display(response.body),
-          response => this.error(response))
-    },
     date2str(  date, small){
       var format = small ? 'll': 'lll'
       if (date === 'now') {
@@ -277,6 +271,17 @@ export default {
       this.feature.properties.id = this.id
       this.process = response
     },
+    duplicate (process) {
+      if (process.error) {
+        alert(process.error)
+        return
+      }
+      if (this.back) {
+        window.location.href = this.url + 'process/' + process.id 
+      } else {
+        window.location.href = this.url + 'process/' + process.id + '/edit'
+      }
+    },
     getImage(list, index) {
       console.log(list)
       console.log(index)
@@ -289,6 +294,13 @@ export default {
           
         })
       }
+    },
+    load () {
+      var url = this.api + '/getProcess/' + this.id
+      this.$http.get(url, {credentials: true})
+      .then(
+          response => this.display(response.body),
+          response => this.error(response))
     },
     statusChange (detail) {
       if (detail.err || detail.error) {

@@ -191,7 +191,25 @@ export default {
       alert('@todo')
     },
     duplicate () {
-      alert('@todo')
+      this.submitting = true
+      this.$http.post(
+          this.api + '/duplicate/' + this.process.id,
+          this.process,
+          {
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              credentials: true
+           }
+      ).then(function (resp) {
+        this.$emit('duplicate', resp.body)
+        this.submitting = false
+      }, function (resp) {
+        console.log('error request ', resp.status)
+        this.submitting = false
+      })
+      
     }
   }
 }
