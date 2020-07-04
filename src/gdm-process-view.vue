@@ -8,19 +8,7 @@
      "last_update": "Updated",
      "owner_credit": "Actual credit",
      "process_time": "Process time",
-     "parameters": "Parameters",
-     "TERMINATED": "The job ended succefully",
-	    "WAITING": "The job is only record here",
-	    "CANCELED": "The job has been stopped by the user",
-	    "SAVED": "The job is record here and by the service.",
-	    "EVALUATED": "The job cost has been evaluated by the service",
-	    "INVALID": "The job was refused by the service because it's invalid",
-	    "KILLED": "The job has been stopped and deleted by the user",
-	    "FAILED": "The job ended in failure",
-	    "PURGED": "All results has been cleared",
-	    "RUNNING": "In progress",
-	    "PRE-RUN": "Launch failed or the status has not yet been updated at service, Refresh or relaunch if necessary",
-	    "ACCEPTED": "The service has accepted the job but has not yet started"
+     "parameters": "Parameters"
    },
    "fr":{
       "status_informations": "Etat du calcul",
@@ -29,23 +17,9 @@
      "created": "Création",
      "edit": "Modifier",
      "last_update": "Maj",
-     "owner_credit": "Crédit",
+     "owner_credit": "Crédit actuel",
      "parameters": "Paramètres",
-     "process_time": "Calcul",
-     "TERMINATED": "Le job s'est terminé avec succès",
-	    "WAITING": "Le calcul est juste enregistré ici",
-	    "CANCELED": "Le calcul a été stoppé",
-	    "SAVED": "Le job a été enregistré auprès du service.",
-	    "EVALUATED": "Le coût du job a été estimé par le service",
-	    "INVALID": "Le job a été refusé par le service, car il est invalide",
-	    "KILLED": "Le job a été supprimé",
-	    "FAILED": "Le job s'est terminé en échec",
-	    "PURGED": "Tous les résultats ont été effacés",
-	    "RUNNING": "Traitement en cours",
-	    "PRE-RUN": "Le lancement a échoué ou le status n'a pas encore été mis à jour au niveau du service. Rafraîchir puis relancer si nécessaire...",
-      
-	    "ACCEPTED": "Le service a accepté le job, mais ce dernier n'a pas encore démarré "  
- 
+     "process_time": "Calcul"
    }
 }
 </i18n>
@@ -122,7 +96,7 @@
 	      </div>
 	   </div>
 	   <div class="header-3">
-        <gdm-process-status :status="process.status" :lang="lang"></gdm-process-status>
+        <gdm-process-status :status="process.status" :status-list="statusList" :lang="lang"></gdm-process-status>
 	   </div>
 	   <div class="header-4">
 	     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" 
@@ -205,29 +179,6 @@ export default {
     }
   },
   computed: {
-    /**
-    * unused
-    **/
-    isEnded () {
-      if (this.process) {
-        switch(this.process.status) {
-          case 'RUNNING':
-          case 'ACCEPTED':
-          case 'SAVED':
-          case 'EVALUATED':
-          case 'WAITING':
-          case 'CANCELED':
-          case 'INVALID':
-            return false
-          case 'FAILED':
-          case 'TERMINATED':
-          case 'PURGED':
-            return true
-        }
-      } else {
-        return false
-      }
-    },
     seeResult () {
       return this.process.status === 'TERMINATED' && this.process.result
     }
@@ -246,8 +197,8 @@ export default {
       parameters: {},
       feature: null,
       process: null,
-      images: []
-      
+      images: [],
+      statusList: []
     }
   },
   methods: {
@@ -301,6 +252,16 @@ export default {
       .then(
           response => this.display(response.body),
           response => this.error(response))
+      var url = this.api + '/getAllStatus/' + this.lang
+      this.$http.get(url, {credentials: true})
+      .then(
+          response => this.setStatusList(response.body),
+          response => this.error(response))
+    },
+    setStatusList (status) {
+      if (!status.error) {
+        this.statusList = status
+      }
     },
     statusChange (detail) {
       if (detail.err || detail.error) {
