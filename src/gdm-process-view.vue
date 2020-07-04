@@ -69,6 +69,13 @@
                {{date2str(process.end)}}
              </span>
           </div>
+          <div v-if="process.status === 'TERMINATED' && process.datePurge"
+          style="font-size:0.9em;font-style:italic;">
+           (<b>Purge: </b>
+             <span style="white-space:nowrap;">
+               {{date2str(process.datePurge)}}
+             </span>)
+          </div>
 	      </div>
 	   </div>
 	   <div class="header-2-2">
