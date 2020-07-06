@@ -132,7 +132,7 @@
 	         <div class="infos">
 		         <div v-for="type in ['provider', 'position']" >
 			          <div v-if="feature.properties[type]" >
-	                <div v-for="(value, prop) in feature.properties[type]" >
+	                <div v-for="(value, prop) in feature.properties[type]" v-if="prop !== 'bbox'">
 	                  <div><b>{{prop}}:</b> {{value}}</div>
 	                </div>
 			         </div>
