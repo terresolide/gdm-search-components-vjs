@@ -103,7 +103,7 @@
 	      </div>
 	   </div>
 	   <div class="header-3">
-        <gdm-process-status :status="process.status" :status-list="statusList" :lang="lang"></gdm-process-status>
+        <gdm-process-status v-if="statusList" :status="process.status" :status-list="statusList" :lang="lang"></gdm-process-status>
 	   </div>
 	   <div class="header-4">
 	     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" 
@@ -205,7 +205,7 @@ export default {
       feature: null,
       process: null,
       images: [],
-      statusList: []
+      statusList: null
     }
   },
   methods: {
@@ -241,8 +241,6 @@ export default {
       }
     },
     getImage(list, index) {
-      console.log(list)
-      console.log(index)
       if (list[index] && list[index].url) {
         this.$http.get(list[index].url).then(function (response) {
           if (response.body) {
@@ -252,6 +250,9 @@ export default {
           
         })
       }
+    },
+    error (response) {
+      alert('error server code = ' + response.status)
     },
     load () {
       var url = this.api + '/getProcess/' + this.id
