@@ -19,7 +19,7 @@ DRAW SVG
 <span v-else> -->
 <span class="gdm-process-progress">
   <div style="">
-        <div :class="statusToClass(status)"  :style="{width: progress + '%'}">
+        <div :class="classes"  :style="{width: progress + '%'}">
         <div><span v-if="progress >= 50" style="line-height:25px;">{{progress}} %</span></div>
          </div>
         <div v-if="progress < 50" style="line-height:25px;height:25px;display:inline-block;vertical-align:top;">{{progress}} %</div>
@@ -57,36 +57,40 @@ export default {
     }
   },
   computed: {
-  },
-  destroyed: function() {
+    classes () {
+      var classname = ''
+        switch(this.status) {
+          case 'RUNNING':
+            classname = 'gdm-progress-running'
+            break;
+          case 'CANCELED':
+          case 'WAITING':
+          case 'ACCEPTED':
+          case 'SAVED':
+          case 'EVALUATED':
+          case 'CANCELED':
+            classname = 'gdm-progress-waiting'
+            break;
+          case 'TERMINATED':
+          case 'PURGED':
+            classname = 'gdm-progress-terminated'
+            break
+          case 'KILLED':
+          case 'FAILED':
+          case 'INVALID':
+            classname = 'gdm-progress-failed'
+            break
+        }
+        if (this.progress > 90) {
+          classname += ' gdm-completed'
+        }
+        return classname
+    }
   },
   created: function () {
     this.$i18n.locale = this.lang
   },
-  mounted: function(){
-  },
   methods:{
-    statusToClass (status) {
-      switch(status) {
-        case 'RUNNING':
-
-          return 'gdm-progress-running'
-        case 'CANCELED':
-        case 'WAITING':
-        case 'ACCEPTED':
-        case 'SAVED':
-        case 'EVALUATED':
-        case 'CANCELED':
-          return 'gdm-progress-waiting'
-        case 'TERMINATED':
-        case 'PURGED':
-          return 'gdm-progress-terminated'
-        case 'KILLED':
-        case 'FAILED':
-        case 'INVALID':
-           return 'gdm-progress-failed'
-      }
-    }
   }
 }
 </script>
@@ -114,7 +118,7 @@ export default {
 .gdm-progress-terminated {
  background:  #13c200;
  border-radius: 10px;
- text-align:center;
+
 }
 .gdm-progress-waiting {
   border-radius:10px 0 0 10px;
@@ -129,6 +133,10 @@ export default {
 .gdm-progress-running {
  background:  #28a428;
  border-radius:10px 0 0 10px;
+}
+.gdm-completed {
+  border-radius: 10px;
+  text-align:center;
 }
  @keyframes running {
   0% {
