@@ -293,6 +293,7 @@ export default {
 <style>
 .gdm-process-view .gdm-process-header a.button{
    display: inline-block;
+
    margin: 0px 7px 3px 0;
    padding: 3px 12px;
    height: auto;
@@ -312,7 +313,8 @@ export default {
    pointer-events: auto;
    box-sizing: border-box;
    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
-   opacity: 0.8
+   opacity: 0.8;
+
   }
 .gdm-process-view .gdm-process-header a.button:hover{
    background: #f0f0e6;
@@ -347,6 +349,7 @@ export default {
    border:4px solid lightgrey;
 }
 .gdm-process-header {
+   position: relative;
   margin-top:0px;
   display:grid;
   grid-template-columns: 310px 2fr 150px 1fr;
@@ -355,6 +358,7 @@ export default {
   padding: 10px 5px;
   border: 1px solid lightgray;
   box-shadow: 1px 1px 3px gray;
+     z-index: 0;
 }
 .header-0 {
   grid-column:1/5;

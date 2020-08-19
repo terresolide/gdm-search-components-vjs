@@ -13,7 +13,7 @@
 }
 </i18n>
 <template>
- <div style="position:absolute;cursor:pointer;" :style="{top: top + 'px', right: right + 'px'}" :title="$t(status)">
+ <div style="position:absolute;cursor:pointer;z-index:1;" :style="{top: top + 'px', right: right + 'px'}" :title="$t(status)">
    <span v-if="name" style="vertical-align:middle;">
       {{name.toUpperCase()}}
    </span>

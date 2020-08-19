@@ -17,13 +17,27 @@
 DRAW SVG
 </span>
 <span v-else> -->
-<span class="gdm-process-progress">
-  <div style="">
+ 
+<span >
+ <div v-if="stepId" style="z-index:0;">
+ <ul id="progressbar">
+    <li class="active" :style="{width: 100/6 + '%'}">Account Setup</li>
+    <li class="active" :style="{width: 100/6 + '%'}">Social Profiles</li>
+    <li :style="{width: 100/6 + '%'}">Personal Details</li>
+    <li :style="{width: 100/6 + '%'}">Personal Details</li>
+    <li :style="{width: 100/6 + '%'}">Personal Details</li>
+    <li :style="{width: 100/6 + '%'}">Personal Details</li>
+  </ul>
+  </div>
+  <div v-else >
+     <span class="gdm-process-progress">
+     <div>
         <div :class="classes"  :style="{width: progress + '%'}">
         <div><span v-if="progress >= 50" style="line-height:25px;">{{progress}} %</span></div>
          </div>
         <div v-if="progress < 50" style="line-height:25px;height:25px;display:inline-block;vertical-align:top;">{{progress}} %</div>
-      
+      </div>
+      </span>
   </div>
 </span>
 </template>
@@ -54,6 +68,7 @@ export default {
   },
   data(){
     return {
+      step: true
     }
   },
   computed: {
@@ -157,6 +172,60 @@ export default {
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
   overflow: hidden;
+}
+/*progressbar*/
+#progressbar {
+  margin-bottom: 30px;
+  overflow: hidden;
+  /*CSS counters to number the steps*/
+  counter-reset: step;
+  padding:0;
+  margin: 0;
+}
+#progressbar li {
+  list-style-type: none;
+  color: white;
+  text-transform: uppercase;
+  font-size: 9px;
+  width: 33.33%;
+  float: left;
+  position: relative;
+  text-align:center;
+  color:black;
+}
+#progressbar li:before {
+  content: counter(step);
+  counter-increment: step;
+  width: 20px;
+  line-height: 20px;
+  display: block;
+  font-size: 10px;
+  color: #333;
+  background: white;
+  border-radius: 3px;
+  margin: 0 auto 5px auto;
+}
+/*progressbar connectors*/
+#progressbar li:after {
+  content: '';
+  width: 100%;
+  height: 4px;
+  background: white;
+  position: absolute;
+  left: -50%;
+  top: 7px;
+  z-index: -1; /*put it behind the numbers*/
+}
+#progressbar li:first-child:after {
+  /*connector not needed before the first step*/
+  content: none; 
+}
+/*marking active/completed steps green*/
+/*The number of the step and the connector before it = green*/
+#progressbar li.active:before,  
+#progressbar li.active:after{
+  background:#28a428;
+  color: white;
 }
 
 </style>
