@@ -376,7 +376,6 @@ export default {
 .header-2-2 {
   grid-column: 2;
   grid-row: 3;
-  padding: 10px;
 }
 .header-2-3 {
   grid-column: 2;

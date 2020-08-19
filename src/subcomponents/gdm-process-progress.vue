@@ -13,19 +13,14 @@
 }
 </i18n>
 <template>
-<!--  <span v-if="stepId">
-DRAW SVG
-</span>
-<span v-else> -->
- 
 <span >
- <div v-if="stepId && findStep" style="z-index:0;">
+ <div v-if="stepId && findStep" class="gdm-steps" >
  <ul class="gdm-progress-step">
     <li v-for="(step, index) in steps" :class="{done: step.stp_id < stepId, active: step.stp_id === stepId}"
     :style="{width: 100/steps.length + '%'}" :title="step.stp_description">{{step.stp_name}}</li>
   </ul>
   </div>
-  <div v-else >
+  <div v-else  class="gdm-progressbar" >
      <span class="gdm-process-progress">
      <div>
         <div :class="classes"  :style="{width: progress + '%'}">
@@ -119,6 +114,12 @@ export default {
 }
 </script>
 <style scoped>
+.gdm-progressbar {
+  margin: 10px 0 5px 10px;
+}
+.gdm-steps {
+ z-index:0;
+}
 .gdm-process-progress > div {
  background:#eef1f3;
  border:2px solid lightgrey;
