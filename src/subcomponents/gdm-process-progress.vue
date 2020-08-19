@@ -19,14 +19,10 @@ DRAW SVG
 <span v-else> -->
  
 <span >
- <div v-if="stepId" style="z-index:0;">
- <ul id="progressbar">
-    <li class="active" :style="{width: 100/6 + '%'}">Account Setup</li>
-    <li class="active" :style="{width: 100/6 + '%'}">Social Profiles</li>
-    <li :style="{width: 100/6 + '%'}">Personal Details</li>
-    <li :style="{width: 100/6 + '%'}">Personal Details</li>
-    <li :style="{width: 100/6 + '%'}">Personal Details</li>
-    <li :style="{width: 100/6 + '%'}">Personal Details</li>
+ <div v-if="stepId && findStep" style="z-index:0;">
+ <ul class="gdm-progress-step">
+    <li v-for="(step, index) in steps" :class="{done: step.stp_id < stepId, active: step.stp_id === stepId}"
+    :style="{width: 100/steps.length + '%'}" :title="step.stp_description">{{step.stp_name}}</li>
   </ul>
   </div>
   <div v-else >
@@ -53,6 +49,10 @@ export default {
       type: Number,
       default: null
     },
+    steps: {
+      type: Array,
+      default: () => []
+    },
     progress: {
       type: Number,
       default: 0
@@ -72,6 +72,15 @@ export default {
     }
   },
   computed: {
+    findStep () {
+      var _this = this
+      var step = this.steps.find(obj => obj.stp_id === _this.stepId )
+      if (step) {
+        return true
+      } else {
+        return false
+      }
+    },
     classes () {
       var classname = ''
         switch(this.status) {
@@ -174,7 +183,7 @@ export default {
   overflow: hidden;
 }
 /*progressbar*/
-#progressbar {
+.gdm-progress-step {
   margin-bottom: 30px;
   overflow: hidden;
   /*CSS counters to number the steps*/
@@ -182,7 +191,7 @@ export default {
   padding:0;
   margin: 0;
 }
-#progressbar li {
+.gdm-progress-step li {
   list-style-type: none;
   color: white;
   text-transform: uppercase;
@@ -193,39 +202,51 @@ export default {
   text-align:center;
   color:black;
 }
-#progressbar li:before {
+.gdm-progress-step li:before {
   content: counter(step);
   counter-increment: step;
   width: 20px;
   line-height: 20px;
   display: block;
   font-size: 10px;
+  font-weight:800;
   color: #333;
   background: white;
   border-radius: 3px;
-  margin: 0 auto 5px auto;
+  margin: 3px auto 5px auto;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
 }
 /*progressbar connectors*/
-#progressbar li:after {
+.gdm-progress-step li:after {
   content: '';
   width: 100%;
   height: 4px;
   background: white;
   position: absolute;
   left: -50%;
-  top: 7px;
+  top: 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
   z-index: -1; /*put it behind the numbers*/
 }
-#progressbar li:first-child:after {
+.gdm-progress-step li:first-child:after {
   /*connector not needed before the first step*/
   content: none; 
 }
-/*marking active/completed steps green*/
+/*marking done/completed steps green*/
 /*The number of the step and the connector before it = green*/
-#progressbar li.active:before,  
-#progressbar li.active:after{
+.gdm-progress-step li.done:before,  
+.gdm-progress-step li.done:after,
+.gdm-progress-step li.active:after{
   background:#28a428;
   color: white;
+}
+.gdm-progress-step li.active:before{
+background-image: linear-gradient(-45deg,#16e000,#28a428,#16e000,#28a428,#16e000);
+  color: white;
+   animation: running 10s linear infinite;
+  overflow:hidden;
+  font-size:11px;
+  text-shadow: 1px 1px black;
 }
 
 </style>
