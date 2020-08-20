@@ -3,14 +3,16 @@
  <div v-for="(step, index) in steps" class="gdm-step">
    <span v-if="!steps[index].edit">{{step.stp_name}}</span>
    <div v-else>
+     <form :id="'form_' + index">
       <label>Nom</label>
-      <input type="text" name="" v-model="step.stp_name" pattern="\w{3,20}" title="Chaîne alphanumérique  entre 3 et 20 caractères">
+      <input type="text"  v-model="step.stp_name" pattern="[a-zA-Z0-9_-]{3,30}" title="Chaîne alphanumérique  entre 3 et 20 caractères">
       <label>Description</label>
       <textarea v-model="step.stp_description"></textarea>
       <div class="gdm-button-serie" >
       <span class="gdm-button" @click="reset(index)">Annuler</span>
-      <span class="gdm-button" @click="save(index)">Enregistrer</span>
+      <span  class="gdm-button" @click="save(index)">Enregistrer</span>
       </div>
+    </form>
    </div>
    <div style="float:right;" v-if="!steps[index].edit">
 	   <span class="fa fa-pencil gdm-button" @click="edit(index)"></span>
@@ -24,14 +26,16 @@
 	    <span class="gdm-button"  @click="displayForm" >Ajouter</span>
 	 </div>
 	 <div v-else class="gdm-step">
+	   <form id="form_new">
 	     <label>Nom</label>
-	    <input type="text" name="" v-model="newStep.stp_name" pattern="\w{3,20}" title="Chaîne alphanumérique  entre 3 et 20 caractères">
+	     <input type="text" name="" v-model="newStep.stp_name" pattern="[a-zA-Z0-9_-]{3,30}" title="Chaîne alphanumérique  entre 3 et 20 caractères">
 	      <label>Description</label>
 	      <textarea v-model="newStep.stp_description"></textarea>
 	      <div class="gdm-button-serie">
 		      <span class="gdm-button" @click="reset(null)">Annuler</span>
 		      <span class="gdm-button" @click="add()">Enregistrer</span>
         </div>
+     </form>
    </div>
  </div>
  </span>
@@ -76,6 +80,10 @@ export default {
   },
   methods: {
     add () {
+      var nodes = this.$el.querySelectorAll('#form_new input:invalid')
+      if (nodes.length > 0) {
+        return
+      }
       if (this.api && this.serviceId) {
         this.$http.post(
             this.api + '/add/' + this.serviceId, 
@@ -169,6 +177,10 @@ export default {
     },
     save (index) {
       var step = this.steps[index]
+      var nodes = this.$el.querySelectorAll('#form_' + index + ' input:invalid')
+      if (nodes.length > 0) {
+        return
+      }
       delete step.edit
       if (this.api && this.serviceId) {
         this.$http.post(
@@ -215,7 +227,14 @@ export default {
 .gdm-step .gdm-button-serie {
    margin: 10px 0 10px 125px;
 }
-.gdm-manage-step span.gdm-button {
+.gdm-manage-step input[type="submit"].gdm-button {
+  font-family:inherit;
+  opacity:1;
+  font-size: inherit;
+  }
+.gdm-manage-step span.gdm-button,
+.gdm-manage-step input.gdm-button {
+  
   cursor: pointer;
   border: 1px solid grey;
   border-radius: 3px;

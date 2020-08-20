@@ -16,8 +16,8 @@
 <span >
  <div v-if="stepId && findStep" class="gdm-steps" >
  <ul class="gdm-progress-step">
-    <li v-for="(step, index) in steps" :class="{done: step.stp_id < stepId, active: step.stp_id === stepId}"
-    :style="{width: 100/steps.length + '%'}" :title="step.stp_description">{{step.stp_name}}</li>
+    <li v-for="(step, index) in steps" :class="stepClass(index)"
+    :style="{width: 100/steps.length + '%'}" :title="step.stp_description">{{step.stp_name.replace(/_/g, ' ')}}</li>
   </ul>
   </div>
   <div v-else  class="gdm-progressbar" >
@@ -70,11 +70,7 @@ export default {
     findStep () {
       var _this = this
       var step = this.steps.find(obj => obj.stp_id === _this.stepId )
-      if (step) {
-        return true
-      } else {
-        return false
-      }
+      return step
     },
     classes () {
       var classname = ''
@@ -110,6 +106,13 @@ export default {
     this.$i18n.locale = this.lang
   },
   methods:{
+    stepClass (index) {
+      if (this.steps[index].stp_order < this.findStep.stp_order) {
+        return 'done'
+      } else if (this.steps[index].stp_order === this.findStep.stp_order){
+        return this.classes
+      }     
+    }
   }
 }
 </script>
@@ -128,10 +131,10 @@ export default {
  width:95%;
  max-width:400px;
 }
-.gdm-progress-terminated,
-.gdm-progress-failed,
-.gdm-progress-waiting,
-.gdm-progress-running {
+div.gdm-progress-terminated,
+div.gdm-progress-failed,
+div.gdm-progress-waiting,
+div.gdm-progress-running {
   position: relative;
   display:inline-block;
   height:25px;
@@ -140,26 +143,26 @@ export default {
   padding-right: 3px;
   text-shadow: 1px 1px 3px black;
 }
-.gdm-progress-terminated {
+div.gdm-progress-terminated {
  background:  #13c200;
  border-radius: 10px;
 
 }
-.gdm-progress-waiting {
+div.gdm-progress-waiting {
   border-radius:10px 0 0 10px;
   background:  #13c200;
 }
-.gdm-progress-failed {
+div.gdm-progress-failed {
   background:#e00000;
   border-radius:10px 0 0 10px;
   text-shadow: 1px 1px 3px black;
   text-align:right;
 }
-.gdm-progress-running {
+div.gdm-progress-running {
  background:  #28a428;
  border-radius:10px 0 0 10px;
 }
-.gdm-completed {
+div.gdm-completed {
   border-radius: 10px;
   text-align:center;
 }
@@ -171,7 +174,7 @@ export default {
     background-position: 100px 50px;
   }
 }
-.gdm-progress-running > div {
+div.gdm-progress-running > div {
   position: absolute;
   color:white;
   top: 0; left: 0; bottom: 0; right: 0;
@@ -237,17 +240,29 @@ export default {
 /*The number of the step and the connector before it = green*/
 .gdm-progress-step li.done:before,  
 .gdm-progress-step li.done:after,
-.gdm-progress-step li.active:after{
+.gdm-progress-step li.gdm-progress-running:after,
+.gdm-progress-step li.gdm-progress-failed:after{
   background:#28a428;
   color: white;
 }
-.gdm-progress-step li.active:before{
+.gdm-progress-step li.gdm-progress-running:before{
 background-image: linear-gradient(-45deg,#16e000,#28a428,#16e000,#28a428,#16e000);
   color: white;
    animation: running 10s linear infinite;
   overflow:hidden;
   font-size:11px;
   text-shadow: 1px 1px black;
+}
+.gdm-progress-step li.gdm-progress-terminated:before,
+.gdm-progress-step li.gdm-progress-waiting:before{
+   background:#28a428;
+    color:white;
+    font-size:11px;
+}
+.gdm-progress-step li.gdm-progress-failed:before{
+    background:#e00000;
+    color:white;
+    font-size:11px;
 }
 
 </style>
