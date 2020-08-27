@@ -31,7 +31,7 @@
 <template>
   <div class="gdm-process-search">
     <gdm-draw-bbox :lang="lang" :color="color"></gdm-draw-bbox>
-  <div class="wrapper">
+  <div class="gdm-wrapper">
    <div class="column-left" >
     <gdm-form-process :lang="lang" :status="statusList" :feature-collection="featureCollection" 
     :color="color" :user="parameters.user" :service="parameters.service" :height="height"
@@ -484,7 +484,7 @@ table.gdm-list-process {
   overflow:auto;
   margin-bottom:5px;
 }
-.gdm-process-search div.wrapper {
+.gdm-process-search div.gdm-wrapper {
 
   margin:auto;
 }
