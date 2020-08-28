@@ -57,7 +57,7 @@
      <div><label>{{$t('processing_level')}} : </label>{{image.processingLevel}}</div>
 	</div>
 	<div v-else class="gdm-image-3 gdm-fields"></div>
-	<div v-if="image.productIdentifier && mode !== 'view'" class="gdm-image-4 gdm-fields" >
+	<div v-if="image.productIdentifier && mode === 'S2ST-STACK'" class="gdm-image-4 gdm-fields" >
 	  <div v-if="!searching && order > 0" >
 	     <span :style="{color: temporal.start ? '#555': 'black'}">{{$t('select_first_date')}}</span>
 	     <span class="fa" :class="{'fa-square-o': !startChecked, 'fa-check-square-o': startChecked}" @click="selectFirstDate($event)"></span>
