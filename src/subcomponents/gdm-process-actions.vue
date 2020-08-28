@@ -26,7 +26,7 @@
 </i18n>
 <template>
 <span class="gdm-process-actions" v-if="process" >
-
+      <div  v-if="submitting" class="gdm-searching"><i class="fa fa-circle-o-notch animated"></i></div>
        <div v-if="process.status === 'ACCEPTED'">
         <a  class="button" @click="getStatus" :class="{disabled: disabled}" :disabled="disabled">{{$t('refresh')}}</a>
       </div>
@@ -42,7 +42,7 @@
         <a class="button" v-if="!back"  :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
       </div>
       <div v-else-if="process.status === 'CANCELED'">
-         <a class="button" v-if="isOptic" @click="todo" :class="{disabled: disabled}"
+         <a  style="display:none;" class="button" v-if="isOptic" @click="todo" :class="{disabled: disabled}"
           :disabled="disabled">{{$t('relaunch')}}</a>
       </div>
       <!--  PURGED NOTHING TO DO => CREATE NEW PROCESS WITH THIS-->
@@ -224,6 +224,29 @@ export default {
 }
 </script>
 <style scoped>
+.gdm-process-actions .gdm-searching {
+  position:fixed;
+  color: white;
+  text-shadow: 0 0 1em black;
+  top:20%;
+  left:50%;
+  z-index:30;
+}
+.gdm-searching i {
+  font-size:3rem;
+}
+@keyframes spin { 
+  from { 
+      transform: rotate(0deg); 
+  } to { 
+      transform: rotate(360deg); 
+  }
+}
+.fa-spinner.animated,
+.fa-circle-o-notch.animated{
+  -webkit-animation: spin 1.5s linear infinite;
+  animation: spin 1.5s linear infinite;
+}
 /*
 a.button{
    display: inline-block;

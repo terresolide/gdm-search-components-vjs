@@ -272,9 +272,12 @@ export default {
       }
     },
     statusChange (detail) {
-      if (detail.err || detail.error) {
-        console.log(detail.err || detail.error)
-        alert(detail.err || detail.error)
+      if (detail.hasOwnProperty('err') || detail.hasOwnProperty('error')) {
+        if (detail.err || detail.error) {
+          alert( 'REQUEST FAILED - '  + (detail.err || detail.error))
+        } else {
+          alert('REQUEST FAILED - UNKNOWN ERROR')
+        }
       } else {
         this.$set(this.process, 'status', detail.status)
         this.$set(this.process, 'cost', detail.cost)
