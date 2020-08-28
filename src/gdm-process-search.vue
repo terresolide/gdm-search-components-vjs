@@ -521,6 +521,7 @@ table.gdm-list-process th {
   vertical-align:top;
   background:   #E8E8E8;
   text-align:left;
+  border:none;
   border-bottom: 2px solid #CCC;
   z-index:200;
 }
