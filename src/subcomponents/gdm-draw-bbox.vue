@@ -376,6 +376,9 @@ export default {
   margin:0;
   border-radius: 6px 6px 0px 0px;
 }
+.mtdt-draw-bbox div.mtdt-header h3 {
+  color: inherit;
+}
 div[id="fmtDraw"]{
   border-radius: 0px 0px 6px 6px;
   height:350px;

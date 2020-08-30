@@ -25,6 +25,7 @@
 </i18n>
 <template>
  <span class="gdm-process-view" v-if="process">
+ <div id="fmtLargeMap" style="width:calc(100% - 8px);margin-bottom:4px;" ></div>
  <div style="position:relative;">
 	 <gdm-service-status  :name="process.serviceName" :status="process.serviceStatus" :top="5" :right="10" :lang="lang" ></gdm-service-status>
 	 <div class="gdm-process-header" :style="{background: $shadeColor(color,0.95)}">
@@ -33,7 +34,8 @@
 	   </div>
 	   <div class="header-1">
 	     <div class="gdm-map-container">
-	      <gdm-map :feature-collection="process.feature"></gdm-map>
+	      <gdm-map ref="map" :bbox="process.feature" :images="imageLayers"
+	      fullscreen="fmtLargeMap" :remove-height="headerHeight" @imageAdded="imageAdded" @imageRemoved="imageRemoved"></gdm-map>
 	     </div>
 	      <div style="text-align:center;margin-top:10px;">
 	         {{date2str(process.tempStart, true)}}
@@ -113,8 +115,8 @@
 	   </div>
 	    <div class="header-5" :class="{highlight:seeResult}"
 	    :style="{background: seeResult ? $shadeColor(color,0.92): 'none'}">
-       <gdm-process-result v-if="process && process.result && process.status === 'TERMINATED'" :result="process.result"
-         :lang="lang" :color="color" >
+       <gdm-process-result v-if="process && process.result && process.status === 'TERMINATED'" :result="process.result" 
+        :lang="lang" :color="color" :images="imageLayers" @toggleImage="toggleImage" >
        </gdm-process-result>
      </div>
 		 </div>
@@ -196,6 +198,9 @@ export default {
     this.load()
   },
   mounted () {
+    if (this.$el && this.$el.querySelector) {
+      this.headerHeight = this.$el.querySelector('.gdm-process-header').clientHeight
+    }
   },
   destroyed () {
   },
@@ -205,10 +210,28 @@ export default {
       feature: null,
       process: null,
       images: [],
-      statusList: null
+      statusList: null,
+      headerHeight: null,
+      imageLayers: null
     }
   },
   methods: {
+    toggleImage (e) {
+      var image = this.imageLayers[e]
+      image.checked = !image.checked
+      this.$set(this.imageLayers, e, image)
+      this.$refs.map.toggleImageLayer(e, image.checked)
+    },
+    imageAdded (index) {
+      var image = this.imageLayers[index]
+      image.checked = true
+      this.$set(this.imageLayers, index, image)
+    },
+    imageRemoved (index) {
+      var image = this.imageLayers[index]
+      image.checked = false
+      this.$set(this.imageLayers, index, image)
+    },
     date2str(  date, small){
       var format = small ? 'll': 'lll'
       if (date === 'now') {
@@ -228,6 +251,15 @@ export default {
       this.feature = response.feature
       this.feature.properties.id = this.id
       this.process = response
+      if (this.process.result && this.process.result.images) {
+        this.imageLayers = this.process.result.images
+        this.imageLayers.forEach(function (image) {
+          image.checked = false
+        })
+      }
+      if (this.$el && this.$el.querySelector) {
+        this.headerHeight = this.$el.querySelector('.gdm-process-header').clientHeight
+      }
     },
     duplicate (process) {
       if (process.error) {
@@ -270,6 +302,10 @@ export default {
       if (!status.error) {
         this.statusList = status
       }
+      if (this.$el && this.$el.querySelector) {
+        this.headerHeight = this.$el.querySelector('.gdm-process-header').clientHeight
+        console.log(this.headerHeight)
+      }
     },
     statusChange (detail) {
       if (detail.hasOwnProperty('err') || detail.hasOwnProperty('error')) {
@@ -294,6 +330,7 @@ export default {
 }
 </script>
 <style>
+
 .gdm-process-view .gdm-process-header a.button{
    display: inline-block;
 
@@ -330,6 +367,9 @@ export default {
     color: #999;
     pointer-events: none;
   }
+  .gdm-process-view #fmtMap {
+border: 4px solid lightgrey;
+}
 </style>
 <style scoped>
 .gdm-process-view{
@@ -349,7 +389,6 @@ export default {
 .gdm-map-container {
    width:300px;
    margin:auto;
-   border:4px solid lightgrey;
 }
 .gdm-process-header {
    position: relative;

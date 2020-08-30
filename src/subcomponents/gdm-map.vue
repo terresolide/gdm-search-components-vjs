@@ -5,8 +5,8 @@
 </template>
 <script>
 var L = require("leaflet");
-L.Control.Fmtlayer = require('formater-metadata-vjs/src/leaflet.control.fmtlayer.js')
-L.Control.Fullscreen = require('formater-metadata-vjs/src/leaflet.control.fullscreen.js')
+L.Control.Fmtlayer = require('formater-metadata-vjs/src/modules/leaflet.control.fmtlayer.js')
+L.Control.Fullscreen = require('formater-metadata-vjs/src/modules/leaflet.control.fullscreen.js')
 export default {
   name: 'GdmMap',
   components: {
@@ -16,8 +16,20 @@ export default {
       type: Object,
       default:null
     },
+    bbox: {
+      type: Object,
+      default: null
+    },
     fullscreen: {
       type: String,
+      default: null
+    },
+    removeHeight: {
+      type: Number,
+      default: null
+    },
+    images: {
+      type: Array,
       default: null
     }
   },
@@ -26,6 +38,7 @@ export default {
       map: null,
       controlLayer: null,
       featureGroup: null,
+      bboxLayer: null,
       defaultRectangleOptions: {
         interactive: false,
         fillColor:'orange', 
@@ -38,13 +51,20 @@ export default {
       highlightListener: null,
       highlightedLayer: null,
       // selected layer
-      selectedLayer: null
+      selectedLayer: null,
+      fullscreenLayer: null,
+      imageLayers: []
     }
   },
   watch: {
     featureCollection(newCollections) {
       console.log(newCollections)
        this.initFeatureCollection()
+    },
+    removeHeight (newValue) {
+      if (this.fullscreenLayer) {
+        this.fullscreenLayer.setRemoveHeight(newValue)
+      }
     }
   },
   created () {
@@ -66,6 +86,15 @@ export default {
     }
   },
   methods: {
+   toggleImageLayer (index, checked) {
+     if (checked) {
+       this.imageLayers[index].addTo(this.map)
+     } else {
+       this.imageLayers[index].remove()
+     }
+     console.log(this.controlLayer)
+     console.log('add layer dans map ', index)
+   },
    changeHighlightedLayer (event) {
       var id = event.detail.id
       this.unHighlightLayer()
@@ -78,11 +107,38 @@ export default {
       this.controlLayer.tiles.arcgisTopo.layer.addTo(this.map)
       this.controlLayer.addTo(this.map)
       if (this.fullscreen) {
-	      var fullscreen = new L.Control.Fullscreen(this.fullscreen, this.$i18n.locale)
-	      fullscreen.addTo(this.map)
+        this.fullscreenLayer = new L.Control.Fullscreen(this.fullscreen, {lang: this.$i18n.locale, removeHeight: this.removeHeight})
+        this.fullscreenLayer.addTo(this.map)
       }
       this.map.getPane('overlayPane').style.pointerEvents = 'auto'
+      this.initBbox()
       this.initFeatureCollection()
+      this.initImageLayers()
+    },
+    initBbox () {
+      if (this.bboxLayer) {
+        this.bboxLayer.clearLayers()
+        this.bboxLayer = null
+      }
+      if (this.map && this.bbox) {
+        this.bboxLayer = L.geoJSON(this.bbox, {
+          style: function (feature) {
+            return {
+              interactive: false,
+              fillColor:'red', 
+              fillOpacity:0.05, 
+              stroke: true, 
+              weight:1, 
+              color: 'red'
+            }
+          }
+        }).addTo(this.map)
+        this.controlLayer.addOverlay(this.bboxLayer, 'bbox')
+      }
+      if (this.bboxLayer) {
+        this.map.fitBounds(this.bboxLayer.getBounds())
+	    } 
+        
     },
     initFeatureCollection () {
       if (this.featureGroup) {
@@ -126,6 +182,41 @@ export default {
           this.map.fitBounds([[-60,-120],[75,130]])
         }
       }
+    },
+    initImageLayers () {
+      if (this.images && this.images.length > 0) {
+        
+        var _this = this
+        this.images.forEach(function (image, index) {
+          _this.initImageLayer(image, index)
+        })
+        
+      }
+    },
+    initImageLayer (image, index) {
+      var bounds = this.bboxLayer.getBounds()
+      var ext = image.src.match(/\.[0-9a-z]+$/i)
+      console.log(ext)
+      if (ext[0] === '.mp4') {
+        var layer = L.videoOverlay(image.src, bounds, {interactive: true, opacity:0.7})
+        
+      } else {
+        var layer = L.imageOverlay(image.src, bounds, {opacity: 0.7})
+      }
+      var _this = this
+      layer.on('add', function () {
+        if (ext[0] === '.mp4') {
+	        layer.getElement().currentTime = 0
+	        layer.getElement().play()
+        }
+        _this.$emit('imageAdded', index)
+      })
+      layer.on('remove', function () {
+        _this.$emit('imageRemoved', index)
+      })
+      this.imageLayers.push(layer)
+      // layer.addTo(_this.map)
+      this.controlLayer.addOverlay(layer, image.name)
     },
     highlightLayer (id)
     {
@@ -289,5 +380,8 @@ div[id="fmtMap"].mtdt-small .leaflet-control a{
  }
  div[id="fmtMap"] .leaflet-pane > svg path {
   pointer-events: auto;
+ }
+ div[id="fmtMap"] h3 {
+   color: inherit;
  }
 </style>
