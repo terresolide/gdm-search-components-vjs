@@ -242,6 +242,7 @@ export default {
     },
     display (response) {
       var parameters = response.feature.properties.parameters
+      console.log(parameters)
       var keys = Object.keys(parameters)
       keys.sort()
       for(var prop in keys) {
