@@ -33,9 +33,9 @@
     <gdm-draw-bbox :lang="lang" :color="color"></gdm-draw-bbox>
   <div class="gdm-wrapper">
    <div class="column-left" >
-    <gdm-form-process :lang="lang" :status="statusList" :feature-collection="featureCollection" 
+    <gdm-form-process :lang="lang" :status="statusList" :groups="groups" :feature-collection="featureCollection" 
     :color="color" :user="parameters.user" :service="parameters.service" :height="height"
-     @remove="removeSelected" @dateChange="dateChange" @statusChange="statusChange" 
+     @remove="removeSelected" @dateChange="dateChange" @statusChange="statusChange" @groupChange="groupChange"
      @textChange="textChange" @reset="reset"></gdm-form-process> 
    </div>
    <div class="column-right" >
@@ -189,6 +189,10 @@ export default {
       type: String,
       default: 'fr'
     },
+    group: {
+      type: String,
+      default: null
+    },
     userId: {
       type: Number,
       default: null
@@ -215,6 +219,7 @@ export default {
       listHeight: 700,
       height: 700,
       statusList: {},
+      groups: [],
       spatialChangeListener: null,
       selectProcessLayerListener: null,
       resizeListener: null,
@@ -228,12 +233,16 @@ export default {
         tempStart: null,
         tempEnd: null,
         q: null,
-        bbox: null
+        bbox: null,
+        group: null
       }
     }
   },
   created () {
    // launch url debug
+   if (!this.group) {
+     this.searchGroups()
+   }
    this.spatialChangeListener = this.spatialChange.bind(this)
    document.addEventListener('fmt:spatialChangeEvent', this.spatialChangeListener)
    this.selectProcessLayerListener = this.selectedLayerChange.bind(this)
@@ -265,38 +274,50 @@ export default {
   },
   methods: {
      search () {
-     var url = this.api + '?maxRecords=' + this.pagination.maxRecords + '&index=' + this.pagination.startIndex
-     if (this.userId) {
-        url += '&userId=' + this.userId
-     } else if (this.parameters.user) {
-       url += '&userId=' + this.parameters.user.id
-     }
-     if (this.parameters.service) {
-       url += '&serviceId=' + this.parameters.service.id
-     }
-     if (this.parameters.status) {
-       url += '&status=' + this.parameters.status
-     }
-     if (this.parameters.any) {
-       url += '&any=' + this.parameters.any
-     }
-     if (this.parameters.bbox) {
-       url +='&bbox=' + this.parameters.bbox
-     }
-     url += '&lang=' + this.lang
-     var self = this
-     var dateType = ['Start', 'End', 'tempStart', 'tempEnd']
-     dateType.forEach(function (name) {
-       if (self.parameters[name] && self.parameters[name] != 'Invalid date') {
-         url += '&' + name.charAt(0).toLowerCase() + name.slice(1) + '=' + self.parameters[name]
+       var headers = {}
+       if (this.group) {
+         headers.groupKey = this.group
        }
-     })
-     this.$http.get(url, {credentials: true})
-      .then(
-          response => this.display(response),
-          response => this.error(response))
+	     var url = this.api + 'getProcess?maxRecords=' + this.pagination.maxRecords + '&index=' + this.pagination.startIndex
+	     if (this.userId) {
+	        url += '&userId=' + this.userId
+	     } else if (this.parameters.user) {
+	       url += '&userId=' + this.parameters.user.id
+	     }
+	     if (this.parameters.service) {
+	       url += '&serviceId=' + this.parameters.service.id
+	     }
+	     if (this.parameters.status) {
+	       url += '&status=' + this.parameters.status
+	     }
+	     if (this.parameters.any) {
+	       url += '&any=' + this.parameters.any
+	     }
+	     if (this.parameters.bbox) {
+	       url +='&bbox=' + this.parameters.bbox
+	     }
+	     if (this.parameters.group) {
+	       url +='&group=' + this.parameters.group
+	     }
+	     url += '&lang=' + this.lang
+	     var self = this
+	     var dateType = ['Start', 'End', 'tempStart', 'tempEnd']
+	     dateType.forEach(function (name) {
+	       if (self.parameters[name] && self.parameters[name] != 'Invalid date') {
+	         url += '&' + name.charAt(0).toLowerCase() + name.slice(1) + '=' + self.parameters[name]
+	       }
+	     })
+	     this.$http.get(url, {credentials: true, headers: headers})
+	      .then(
+	          response => this.display(response),
+	          response => this.error(response))
     },
-   
+    searchGroups () {
+      this.$http.get(this.api + 'getGroups', {credentials: true})
+      .then(
+          response => this.groups = response.body,
+          response => console.log('error getGroups'))
+    },
     dateChange (e) {
       var change = {'from': 'Start', 'to': 'End'}
       var name = e.name.replace('from','Start').replace('to', 'End')
@@ -445,6 +466,10 @@ export default {
       }
       this.search()
       event.stopPropagation()
+    },
+    groupChange(e) {
+      this.parameters.group = e
+      this.search()
     },
     spatialChange(e) {
       var event = new CustomEvent('aerisSearchEvent', {detail: {}})

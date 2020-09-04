@@ -6,7 +6,8 @@
      "filters": "Filters",
      "no_filter": "No filter",
      "reset": "Reset",
-     "search": "Search"
+     "search": "Search",
+     "service_group": "Service group"
    },
    "fr":{
      "process_extent": "Dates du calcul",
@@ -15,7 +16,8 @@
      "filters": "Filtres",
      "no_filter": "Aucun filtre",
      "reset": "Intialiser",
-     "search": "Rechercher"
+     "search": "Rechercher",
+     "service_group": "Groupe de services"
     }
 }
 </i18n>
@@ -36,6 +38,9 @@
      <formater-search-box header-icon-class="fa fa-calendar" open-icon-class="fa fa-caret-right" :title="$t('temporal_extent')" :deployed="false" type="empty" >
          <formater-temporal-search name="temp" lang="fr" :format="format" daymin="2014-04-03" @change="dateChange"></formater-temporal-search>
      </formater-search-box>
+     <formater-search-box v-if="groups.length > 0" header-icon-class="fa fa-object-group" open-icon-class="fa fa-caret-right" :title="$t('service_group')" :deployed="false" type="empty" >
+      <formater-select  :options="groups" :defaut="null" @input="groupChange" width="228px"></formater-select>
+    </formater-search-box>
      <formater-search-box header-icon-class="fa fa-cog" open-icon-class="fa fa-caret-right" title="Status" :deployed="false" type="empty" >
       <formater-select  :options="statusList" :defaut="parameters.status" @input="statusChange" width="228px"></formater-select>
     </formater-search-box>
@@ -86,6 +91,10 @@ export default {
     status: {
       type: Object,
       default: () => {}
+    },
+    groups: {
+      type: Array,
+      default: () => []
     },
     color: {
       type: String,
@@ -174,6 +183,12 @@ export default {
     },
     dateChange(e) {
       this.$emit('dateChange', e)
+    },
+    groupChange(e) {
+      if (e === '---') {
+        e = null
+      }
+      this.$emit('groupChange', e)
     },
     statusChange(e) {
       if (e === '---') {
