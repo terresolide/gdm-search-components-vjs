@@ -193,6 +193,10 @@ export default {
       type: String,
       default: null
     },
+    what: {
+      type: String,
+      default: 'getProcess'
+    },
     userId: {
       type: Number,
       default: null
@@ -278,7 +282,7 @@ export default {
        if (this.group) {
          headers.groupKey = this.group
        }
-	     var url = this.api + 'getProcess?maxRecords=' + this.pagination.maxRecords + '&index=' + this.pagination.startIndex
+	     var url = this.api + this.what + '?maxRecords=' + this.pagination.maxRecords + '&index=' + this.pagination.startIndex
 	     if (this.userId) {
 	        url += '&userId=' + this.userId
 	     } else if (this.parameters.user) {
