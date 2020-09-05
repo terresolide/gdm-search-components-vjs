@@ -2,7 +2,10 @@
    "en":{
      "results": "Results: {from} to {to} among {notExactly}{count}",
      "title": "Title",
-     "per_page": "per page"
+     "relevance": "Relevance",
+     "per_page": "per page",
+     "changeDate": "Update",
+     "sortBy": "Sort by"
    },
    "fr":{
      "results":  "Résultats: <strong>{from}</strong> à <strong>{to}</strong> sur {notExactly}{count}",
