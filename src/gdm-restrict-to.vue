@@ -5,8 +5,9 @@
      <option></option>
      <option v-for="role in roles" :value="role.index" :selected="role.index===current">{{role.value}}</option>
    </select>
-   <span v-if="mode === 'add'">
-	   <input  type="text" style="width:80px;" placeholder="ROLE" v-model="newRole" pattern="[A-Z]{3,10}"/>
+   <div v-if="mode === 'add'" class="gdm-add-role">
+     Nouveau 
+	   <input  type="text"  placeholder="ROLE" v-model="newRole" pattern="[A-Z]{3,10}"/>
 	   <span v-if="userProviders.length > 0" title="Seuls les responsables de ce fournisseur pourront donner ce rôle à un utilisateur">
 	     associé à 
 		   <select v-model="selectedProvider">
@@ -15,7 +16,7 @@
 	   </span>
 	   <input type="button" value="Ajouter"@click="addRole"/>
 	   <input type="button" value="Annuler" @click="cancel"/>
-   </span>   
+   </div>   
    <input v-if="mode !== 'add' && userProviders.length > 0" type="button" value="Nouveau Rôle" @click="mode='add'"/>
    <span style="color:darkred;font-style:italic;">{{msg}}</span>
  </span>
@@ -129,3 +130,38 @@ export default {
   }
 }
 </script>
+<style>
+.gdm-add-role {
+ font-size: 0.9rem;
+}
+.gdm-add-role input[type="text"]{
+  min-width:80px;
+  width:80px;
+  max-width:80px;
+}
+.gdm-add-role input[type="text"],
+.gdm-add-role select{
+  line-height:1;
+  border-radius: 0;
+   height: 19px;
+   border-style:inset;
+   padding: 1px 3px;
+   box-sizing: border-box;
+
+    margin: 0em;
+    /*font: 400 13.3333px Arial;*/
+    border-width: 1px;
+    border-style: inset;
+    border-color: -internal-light-dark-color(rgb(118, 118, 118), rgb(195, 195, 195));
+  
+}
+.gdm-add-role input[type="button"],
+.gdm-add-role select {
+
+  padding: 0 2px;
+}
+.gdm-add-role input[type="button"] {
+line-height:1;
+vertical-align:baseline;
+}
+</style>
