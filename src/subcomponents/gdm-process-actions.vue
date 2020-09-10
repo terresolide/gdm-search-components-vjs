@@ -28,7 +28,7 @@
 <span class="gdm-process-actions" v-if="process" >
       <div  v-if="submitting" class="gdm-searching"><i class="fa fa-circle-o-notch animated"></i></div>
        <div v-if="process.status === 'ACCEPTED'">
-        <a  class="button" @click="getStatus" :class="{disabled: disabled}" :disabled="disabled">{{$t('refresh')}}</a>
+        <a  class="button" @click="clickGetStatus" :class="{disabled: disabled}" :disabled="disabled">{{$t('refresh')}}</a>
       </div>
       <div v-else-if="process.status === 'EVALUATED'">
          <a class="button" v-if="!back && url" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
@@ -54,7 +54,7 @@
        
       </div>
       <div v-else-if="process.status === 'RUNNING'">
-        <a class="button" @click="getStatus" :class="{disabled: disabled}" :disabled="disabled">{{$t('refresh')}}</a>
+        <a class="button" @click="clickGetStatus" :class="{disabled: disabled}" :disabled="disabled">{{$t('refresh')}}</a>
         <a class="button" style="display:none;" @click="dismiss" :class="{disabled: disabled}" :disabled="disabled">
            <span v-if="process.format.indexOf('sar') >= 0">{{$t('stop')}}</span>
            <span v-else >{{$t('cancel')}}</span>
@@ -105,7 +105,9 @@ export default {
   },
   data(){
     return {
-      submitting: false
+      submitting: false,
+      status: null,
+      timer: null
     }
   },
   computed: {
@@ -149,20 +151,40 @@ export default {
       return  (!this.serviceOpen || this.submitting)
     }
   },
-  destroyed: function() {
+  destroyed () {
+    if (this.timer) {
+      clearInterval(this.timer)
+    }
   },
   created: function () {
-     this.$i18n.locale = this.lang
+    this.status = this.process.status
+    this.$i18n.locale = this.lang
   },
-  mounted: function(){
+  mounted () {
+    this.launchTimer()
   },
   methods:{
-    getStatus () {
+    launchTimer () {
+      if (!this.timer && ['ACCEPTED', 'PRE-RUN', 'RUNNING'].indexOf(this.status) >=0) {
+        var func = this.getStatus
+        this.timer = setInterval(func, 60000)
+      }
+      if (this.timer && ['ACCEPTED', 'PRE-RUN', 'RUNNING'].indexOf(this.status) < 0) {
+        clearInterval(this.timer)
+        this.timer = null
+      }
+    },
+    clickGetStatus() {
       this.submitting = true
+      this.getStatus()
+    },
+    getStatus () {
       this.$http.get(this.api + '/getStatus/' + this.process.id, {credentials: true})
       .then(function (resp) {
         this.$emit('statusChange', resp.body)
         this.submitting = false
+        this.status = resp.body.status
+        this.launchTimer()
       }, function (e) {
         this.submitting = false
       })

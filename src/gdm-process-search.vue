@@ -239,7 +239,8 @@ export default {
         q: null,
         bbox: null,
         group: null
-      }
+      },
+      timer: null
     }
   },
   created () {
@@ -263,9 +264,15 @@ export default {
    } else {
      this.dateFormatDisplay = 'DD/MM/YYYY'
    }
+   var search = this.search
+   this.timer = setInterval(search, 300000)
    this.search()
   },
   destroyed () {
+    if (this.timer) {
+      clearInterval(this.timer)
+      this.timer = null
+    }
     document.removeEventListener('fmt:spatialChangeEvent', this.spatialChangeListener)
     this.spatialChangeListener = null
     document.removeEventListener('gdm:selectProcessLayer', this.selectProcessLayerListener) 
