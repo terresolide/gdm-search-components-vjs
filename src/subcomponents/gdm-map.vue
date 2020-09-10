@@ -20,6 +20,10 @@ export default {
       type: Object,
       default: null
     },
+    tile: {
+      type: Array,
+      default: null
+    },
     fullscreen: {
       type: String,
       default: null
@@ -39,6 +43,7 @@ export default {
       controlLayer: null,
       featureGroup: null,
       bboxLayer: null,
+      bboxTile: null,
       defaultRectangleOptions: {
         interactive: false,
         fillColor:'orange', 
@@ -58,7 +63,6 @@ export default {
   },
   watch: {
     featureCollection(newCollections) {
-      console.log(newCollections)
        this.initFeatureCollection()
     },
     removeHeight (newValue) {
@@ -68,6 +72,12 @@ export default {
     }
   },
   created () {
+    if (this.tile) {
+      this.bboxTile = [
+        [this.tile[1], this.tile[0]],
+        [this.tile[3], this.tile[2]]
+      ]
+    }
     this.highlightListener = this.changeHighlightedLayer.bind(this)
     document.addEventListener('gdm:processHighlight', this.highlightListener)
      this.selectListener = this.selectLayer.bind(this)
@@ -92,8 +102,6 @@ export default {
      } else {
        this.imageLayers[index].remove()
      }
-     console.log(this.controlLayer)
-     console.log('add layer dans map ', index)
    },
    changeHighlightedLayer (event) {
       var id = event.detail.id
@@ -194,7 +202,11 @@ export default {
       }
     },
     initImageLayer (image, index) {
-      var bounds = this.bboxLayer.getBounds()
+      if (this.bboxTile) {
+        var bounds = this.bboxTile
+      } else {
+        var bounds = this.bboxLayer.getBounds()
+      }
       var ext = image.src.match(/\.[0-9a-z]+$/i)
       console.log(ext)
       if (ext[0] === '.mp4') {

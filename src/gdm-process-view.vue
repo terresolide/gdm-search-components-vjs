@@ -34,7 +34,7 @@
 	   </div>
 	   <div class="header-1">
 	     <div class="gdm-map-container">
-	      <gdm-map ref="map" :bbox="process.feature" :images="imageLayers"
+	      <gdm-map ref="map" :bbox="process.feature" :images="imageLayers" :tile="feature.properties.bboxTile"
 	      fullscreen="fmtLargeMap" :remove-height="headerHeight" @imageAdded="imageAdded" @imageRemoved="imageRemoved"></gdm-map>
 	     </div>
 	      <div style="text-align:center;margin-top:10px;">
