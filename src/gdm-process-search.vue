@@ -82,6 +82,7 @@
             <div>
                <a v-if="url" :href="url + feature.properties.id" class="button">{{$t('consult')}}</a>
             </div>
+            <i v-if="back && feature.properties.log" class="fa fa-question-circle" style="font-size:20px;margin-top:5px;" :title="feature.properties.log" ></i>
           <!--   <a v-if="back  && feature.properties.status === 'WAITING'"  :href="launchUrl + 'process/launch/' + feature.properties.id" class="button">Test Curl</a>
             <span v-if="!back && feature.properties.status === 'WAITING'"  @click="launch(feature.properties.id, $event)" class="button">{{$t('launch')}}</span>
             

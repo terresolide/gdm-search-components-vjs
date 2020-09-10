@@ -80,9 +80,9 @@
           </div>
 	      </div>
 	   </div>
-	   <div class="header-2-2">
+	   <div class="header-2-2" :title="log">
 	     <gdm-process-progress :status="process.status" :progress="process.progress" 
-	     :step-id="process.stepId" :steps="process.serviceSteps"></gdm-process-progress>
+	     :step-id="process.stepId" :steps="process.serviceSteps" ></gdm-process-progress>
 	  </div>
 	  <div class="header-2-3">
 	      <div><b>{{$t('owner')}}:</b> {{process.email}}</div>
@@ -216,7 +216,8 @@ export default {
       images: [],
       statusList: null,
       headerHeight: null,
-      imageLayers: null
+      imageLayers: null,
+      log: null
     }
   },
   methods: {
@@ -322,7 +323,12 @@ export default {
       } else {
         this.$set(this.process, 'status', detail.status)
         this.$set(this.process, 'cost', detail.cost)
-        this.$set(this.process, 'quota', detail.quota)
+        if (detail.hasOwnProperty('quota')) {
+          this.$set(this.process, 'quota', detail.quota)
+        }
+        if (this.back) {
+          this.log = detail.log
+        }
         this.$set(this.process, 'progress', detail.progress)
         this.$set(this.process, 'stepId', detail.stepId)
         this.$set(this.process, 'end', detail.end)
