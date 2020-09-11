@@ -13,7 +13,7 @@
 }
 </i18n>
 <template>
-<span >
+<div class="gdm-progress" >
  <div v-if="stepId && findStep" class="gdm-steps" >
  <ul class="gdm-progress-step">
     <li v-for="(step, index) in steps" :class="stepClass(index)"
@@ -30,7 +30,8 @@
       </div>
       </span>
   </div>
-</span>
+  <div class="gdm-tooltip" v-if="log && (status === 'RUNNING' || status === 'FAILED')">{{this.log}}</div>
+</div>
 </template>
 <script>
 export default {
@@ -51,6 +52,10 @@ export default {
     progress: {
       type: Number,
       default: 0
+    },
+    log: {
+      type: String,
+      default: null
     },
     lang: {
       type: String,
@@ -117,11 +122,38 @@ export default {
 }
 </script>
 <style scoped>
+.gdm-progress {
+  position:relative;
+}
 .gdm-progressbar {
   margin: 10px 0 5px 10px;
+  position:relative;
 }
 .gdm-steps {
  z-index:0;
+}
+
+div.gdm-tooltip {
+  position:absolute;
+  background-color:#fafafa;
+  border: 1px solid #a3a3a3;
+  font-size: smaller;
+  margin-top: -3px;
+  margin-left:5%;
+  cursor:pointer;
+  padding:4px;
+  width: 90%;
+  display:none;
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 0px 2px 5px 2px rgba(0, 0, 0, 0.4);
+  z-index:100;
+}
+div.gdm-progressbar:hover + div.gdm-tooltip {
+ display:block;
+}
+div.gdm-tooltip:hover {
+ display:block;
 }
 .gdm-process-progress > div {
  background:#eef1f3;

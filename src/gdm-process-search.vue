@@ -77,12 +77,16 @@
           
            <div v-if="feature.properties.processusName">({{feature.properties.processusName}})</div>
          </td>
-         <td style="text-align:center;cursor:pointer;">
+         <td style="position:relative;text-align:center;cursor:pointer;">
             <gdm-process-status :status="feature.properties.status" :status-list="statusList" :lang="lang"></gdm-process-status>
             <div>
                <a v-if="url" :href="url + feature.properties.id" class="button">{{$t('consult')}}</a>
             </div>
-            <i v-if="back && feature.properties.log" class="fa fa-question-circle" style="font-size:20px;margin-top:5px;" :title="feature.properties.log" ></i>
+            <i v-if="feature.properties.status === 'RUNNING' || feature.properties.log" class="gdm-log fa fa-question-circle"  ></i>
+            <div  class="gdm-tooltip">
+              <span>{{feature.properties.progress}} %</span>
+              <div v-if="feature.properties.log">{{feature.properties.log}}</div>
+              </div>
           <!--   <a v-if="back  && feature.properties.status === 'WAITING'"  :href="launchUrl + 'process/launch/' + feature.properties.id" class="button">Test Curl</a>
             <span v-if="!back && feature.properties.status === 'WAITING'"  @click="launch(feature.properties.id, $event)" class="button">{{$t('launch')}}</span>
             
@@ -266,7 +270,7 @@ export default {
      this.dateFormatDisplay = 'DD/MM/YYYY'
    }
    var search = this.search
-   this.timer = setInterval(search, 300000)
+   this.timer = setInterval(search, 60000)
    this.search()
   },
   destroyed () {
@@ -514,7 +518,38 @@ export default {
 .gdm-process-search{
 font-size: 0.9rem;
 }
-
+.gdm-process-search i.gdm-log {
+	font-size:20px;
+	margin-top:5px;
+	color:grey;
+}
+.gdm-process-search div.gdm-tooltip {
+  position:absolute;
+  background-color:#fafafa;
+  border: 1px solid #a3a3a3;
+  font-size: smaller;
+  margin-left:50px;
+  padding:4px;
+  width: 160px;
+  display:none;
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 0px 2px 5px 2px rgba(0, 0, 0, 0.4);
+  z-index:100;
+}
+gdm-process-search div.gdm-tooltip:hover {
+  display:block;
+}
+.gdm-process-search tr:last-child div.gdm-tooltip{
+  margin-left:70px;
+  margin-top:-80px;
+}
+.gdm-process-search i.gdm-log:hover + div.gdm-tooltip {
+  display:block;
+}
+.gdm-process-search i.gdm-log:hover + div.gdm-tooltip {
+  display:block;
+}
 table.gdm-list-process {
   display:block;
   height: 600px;
@@ -584,6 +619,7 @@ table.gdm-list-process td{
   border-left: none;
   border-right: none;
    min-width:15%;
+   width:15%;
 }
 
 

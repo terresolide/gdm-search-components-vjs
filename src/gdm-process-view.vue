@@ -80,9 +80,9 @@
           </div>
 	      </div>
 	   </div>
-	   <div class="header-2-2" :title="log">
+	   <div class="header-2-2" >
 	     <gdm-process-progress :status="process.status" :progress="process.progress" 
-	     :step-id="process.stepId" :steps="process.serviceSteps" ></gdm-process-progress>
+	     :step-id="process.stepId" :log="log" :steps="process.serviceSteps" ></gdm-process-progress>
 	  </div>
 	  <div class="header-2-3">
 	      <div><b>{{$t('owner')}}:</b> {{process.email}}</div>
@@ -257,6 +257,7 @@ export default {
       this.feature = response.feature
       this.feature.properties.id = this.id
       this.process = response
+      this.log = this.process.log
       if (this.process.result && this.process.result.images) {
         this.imageLayers = this.process.result.images
         this.imageLayers.forEach(function (image) {
