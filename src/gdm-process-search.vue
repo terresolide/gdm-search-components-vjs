@@ -77,7 +77,7 @@
           
            <div v-if="feature.properties.processusName">({{feature.properties.processusName}})</div>
          </td>
-         <td style="position:relative;text-align:center;cursor:pointer;">
+         <td style="text-align:center;">
             <gdm-process-status :status="feature.properties.status" :status-list="statusList" :lang="lang"></gdm-process-status>
             <div>
                <a v-if="url" :href="url + feature.properties.id" class="button">{{$t('consult')}}</a>
@@ -550,11 +550,29 @@ gdm-process-search div.gdm-tooltip:hover {
 .gdm-process-search i.gdm-log:hover + div.gdm-tooltip {
   display:block;
 }
+.gdm-process-search div.column-right{
+ width: calc(100% - 295px);
+ display: block;
+ margin-left: 285px;
+}
+div.message {
+  font-size: 0.9rem;
+  margin: auto;
+  padding: 40px 0;
+  text-align: center;
+  font-style: italic;
+}
 table.gdm-list-process {
+  position:relative;
   display:block;
+  width:100%;
   height: 600px;
   overflow:auto;
   margin-bottom:5px;
+  border: 1px solid #ccc;
+  border-collapse: collapse;
+  box-shadow: 1px 1px 1px 2px rgba(0, 0, 0, 0.1);
+  z-index:0;
 }
 .gdm-process-search div.gdm-wrapper {
 
@@ -566,26 +584,8 @@ table.gdm-list-process {
   margin-left:5px;
   float:left;
 }
-.gdm-process-search div.column-right{
- width: calc(100% - 295px);
-display: block;
-margin-left: 285px;
-}
-div.message {
-  font-size: 0.9rem;
-  margin: auto;
-  padding: 40px 0;
-  text-align: center;
-  font-style: italic;
-}
-table{
- width:100%;
-  display:block;
- border: 1px solid #ccc;
- border-collapse: collapse;
- box-shadow: 1px 1px 1px 2px rgba(0, 0, 0, 0.1);
 
-}
+
 table.gdm-list-process th {
   position: sticky; 
   top: 0;
@@ -595,7 +595,7 @@ table.gdm-list-process th {
   text-align:left;
   border:none;
   border-bottom: 2px solid #CCC;
-  z-index:200;
+  z-index:1;
 }
 .gdm-process-search tr{
    min-height:100px;
