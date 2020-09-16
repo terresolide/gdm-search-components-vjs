@@ -7,6 +7,9 @@
 var L = require("leaflet");
 L.Control.Fmtlayer = require('formater-metadata-vjs/src/modules/leaflet.control.fmtlayer.js')
 L.Control.Fullscreen = require('formater-metadata-vjs/src/modules/leaflet.control.fullscreen.js')
+L.Control.Legend = require('formater-metadata-vjs/src/modules/leaflet.control.legend.js')
+L.Control.Legend = require('../modules/leaflet.control.opacity.js')
+
 export default {
   name: 'GdmMap',
   components: {
@@ -41,6 +44,8 @@ export default {
     return {
       map: null,
       controlLayer: null,
+      controlLegend:null,
+      controlOpacity: null,
       featureGroup: null,
       bboxLayer: null,
       bboxTile: null,
@@ -66,8 +71,9 @@ export default {
        this.initFeatureCollection()
     },
     removeHeight (newValue) {
+   
       if (this.fullscreenLayer) {
-        this.fullscreenLayer.setRemoveHeight(newValue)
+        this.fullscreenLayer.setRemoveHeight(20)
       }
     }
   },
@@ -99,8 +105,10 @@ export default {
    toggleImageLayer (index, checked) {
      if (checked) {
        this.imageLayers[index].addTo(this.map)
+      // this.controlLegend.addLegend(0, index, this.images[index].legend)
      } else {
        this.imageLayers[index].remove()
+      // this.controlLegend.removeLegend(index)
      }
    },
    changeHighlightedLayer (event) {
@@ -118,6 +126,10 @@ export default {
         this.fullscreenLayer = new L.Control.Fullscreen(this.fullscreen, {lang: this.$i18n.locale, removeHeight: this.removeHeight})
         this.fullscreenLayer.addTo(this.map)
       }
+      this.controlLegend = new L.Control.Legend(this.$i18n.locale, function (uuid) { return 'i' + uuid;})
+      this.controlLegend.addTo(this.map)
+      this.controlOpacity = new L.Control.Opacity(this.$i18n.locale)
+      this.controlOpacity.addTo(this.map)
       this.map.getPane('overlayPane').style.pointerEvents = 'auto'
       this.initBbox()
       this.initFeatureCollection()
@@ -198,7 +210,7 @@ export default {
         this.images.forEach(function (image, index) {
           _this.initImageLayer(image, index)
         })
-        
+        this.controlOpacity.setLayers(this.imageLayers)
       }
     },
     initImageLayer (image, index) {
@@ -207,28 +219,34 @@ export default {
       } else {
         var bounds = this.bboxLayer.getBounds()
       }
-      var ext = image.src.match(/\.[0-9a-z]+$/i)
-      console.log(ext)
-      if (ext[0] === '.mp4') {
-        var layer = L.videoOverlay(image.src, bounds, {interactive: true, opacity:0.7})
+//       var ext = image.src.match(/\.[0-9a-z]+$/i)
+//       console.log(ext)
+      if (image.mp4) {
+        var layer = L.videoOverlay(image.mp4, bounds, {interactive: true, opacity:this.controlOpacity.getValue()})
         
-      } else {
-        var layer = L.imageOverlay(image.src, bounds, {opacity: 0.7})
+      } else if (image.png) {
+        var layer = L.imageOverlay(image.png, bounds, {opacity: this.controlOpacity.getValue()})
       }
       var _this = this
       layer.on('add', function () {
-        if (ext[0] === '.mp4') {
+        if (image.mp4) {
 	        layer.getElement().currentTime = 0
 	        layer.getElement().play()
+        }
+        if (_this.images[index].legend) {
+          _this.controlLegend.addLegend(0, index, _this.images[index].legend)
         }
         _this.$emit('imageAdded', index)
       })
       layer.on('remove', function () {
+        if (_this.images[index].legend) {
+          _this.controlLegend.removeLegend(index)
+        }
         _this.$emit('imageRemoved', index)
       })
       this.imageLayers.push(layer)
       // layer.addTo(_this.map)
-      this.controlLayer.addOverlay(layer, image.name)
+      this.controlLayer.addOverlay(layer, image.title)
     },
     highlightLayer (id)
     {
@@ -277,6 +295,8 @@ export default {
   }
 }
 </script>
+<style src="formater-metadata-vjs/src/assets/css/fontello.css"></style>
+
 <style src="formater-commons-components-vjs/src/assets/css/formater-icon.css"></style>
 <style>
 .research-map{
@@ -308,6 +328,74 @@ div[id="fmtMap"].mtdt-small .leaflet-control a{
  width: 15px;
  height:15px;
  line-height:15px;
+ }
+  div[id="fmtMap"] .lfh-control-legend {
+   cursor: pointer;
+   background: white;
+   display:none;
+ }
+ div[id="fmtMap"] .lfh-control-opacity {
+  background:white;
+  
+ }
+ div[id="fmtMap"] .lfh-control-opacity.expand {
+  padding:5px;
+ }
+ div[id="fmtMap"] .lfh-control-opacity a.icon-progress{
+   background-image: url("../assets/images/progress2.png");
+   background-size: cover;
+   pointer-events:auto;
+   display:block;
+ }
+ div[id="fmtMap"] .lfh-control-opacity.expand a.icon-progress{
+   display:none;
+ }
+ div[id="fmtMap"] .lfh-control-opacity div{
+   display:none;
+ }
+ div[id="fmtMap"] .lfh-control-opacity strong{
+   display:block;
+   text-align:right;
+ }
+ div[id="fmtMap"] .lfh-control-opacity input{
+   pointer-events:auto;
+ }
+  div[id="fmtMap"] .lfh-control-opacity.expand div {
+    display:block;
+  }
+  div[id="fmtMap"] .lfh-control-legend img{
+    display:block;
+    max-height:250px;
+    max-width: 300px;
+  }
+   div[id="fmtMap"]  div.lfh-control-legend{
+    display:block;
+  }
+    div[id="fmtMap"]  div.lfh-control-legend.hidden,
+    div[id="fmtMap"]  div.lfh-control-legend.opacity{
+    display:none;
+  }
+ 
+ div[id="fmtMap"].mtdt-small .lfh-control-legend img{
+   max-width:120px;
+   max-height:100px;
+ }
+ div[id="fmtMap"] .lfh-control-legend img{
+    display: none;
+  }
+/*  div[id="fmtMap"] .lfh-control-legend a{
+   display:block;
+ } */
+  div[id="fmtMap"] .lfh-control-legend.expand img{;
+   display:block;
+   margin-left:5px;
+ }
+   div[id="fmtMap"] .lfh-control-legend.expand img:first-child{
+    margin-left:0px;
+   }
+  div[id="fmtMap"] .lfh-control-legend.expand a{
+   display:none;
+ 
  }
  div[id="fmtMap"].mtdt-fullscreen{
    min-height:400px;

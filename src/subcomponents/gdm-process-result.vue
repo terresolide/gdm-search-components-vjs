@@ -16,14 +16,16 @@ DRAW SVG
 </span>
 <span v-else> -->
 <div class="gdm-process-result" style="padding:0 10px;">
-   <h3 :style="{color:color}">{{$t('results')}}</h3>
-    <div v-if="images" style="width:50%;">
-	    <div class="gdm-image-layer" v-if="images" v-for="(image, index) in images" @click="toggleImage(index)">
-	      <i class="fa" :class="image.checked ?'fa-check-square-o':'fa-square-o'"></i> {{image.name}}
-	    </div>
+     <div >
+      <h3 :style="{color:color}">{{$t('results')}}</h3>
+  
+      <a v-if="result.results" :href="result.results" class="button" ><i class="fa fa-download"></i> {{$t('download')}}</a>
     </div>
-    <div >
-      <a v-if="result.url" :href="result.url" class="button" target="_blank">{{$t('download')}}</a>
+    <div v-if="images" style="min-width:50%;max-width:calc(100% - 165px);max-height:120px;overflow-y:scroll;font-size:0.9rem;">
+	    <div class="gdm-image-layer" v-if="images" v-for="(image, index) in images" @click="toggleImage(index)">
+	      <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'"></i> 
+	      <div style="display:inline-block;margin:0;max-width:calc(100% - 20px);">{{image.title}}</div>
+	    </div>
     </div>
 
 </div>
@@ -80,7 +82,7 @@ export default {
 }
 .gdm-process-result > div {
   display:inline-block;
-  padding-left:15px;
+  padding-left:0px;
   vertical-align:top;
 }
 .gdm-process-result h3 {

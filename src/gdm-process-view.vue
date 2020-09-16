@@ -258,8 +258,8 @@ export default {
       this.feature.properties.id = this.id
       this.process = response
       this.log = this.process.log
-      if (this.process.result && this.process.result.images) {
-        this.imageLayers = this.process.result.images
+      if (this.process.result && this.process.result.thumbnails) {
+        this.imageLayers = this.process.result.thumbnails
         this.imageLayers.forEach(function (image) {
           image.checked = false
         })
@@ -445,7 +445,7 @@ border: 4px solid lightgrey;
   grid-row: 2;
 }
 .header-5 {
-  padding:10px 5px;
+  padding:10px 3px 3px 3px;
   grid-column: 3/5;
    grid-row: 3/5;
 }
