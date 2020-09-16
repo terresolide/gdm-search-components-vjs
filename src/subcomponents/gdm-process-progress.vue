@@ -142,7 +142,7 @@ div.gdm-tooltip {
   margin-left:5%;
   cursor:pointer;
   padding:4px;
-  width: 90%;
+  max-width: 90%;
   display:none;
   box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
   -moz-box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
