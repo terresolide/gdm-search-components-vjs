@@ -2,11 +2,13 @@
 {
    "en":{
      "download": "Download",
-     "results": "Results"   
+     "results": "Results" ,
+     "preview": "Preview"  
    },
    "fr":{
      "download": "Télécharger",
-     "results": "Résultats"   
+     "results": "Résultats",
+     "preview": "Visualisation"   
    }
 }
 </i18n>
@@ -15,16 +17,21 @@
 DRAW SVG
 </span>
 <span v-else> -->
-<div class="gdm-process-result" style="padding:0 10px;">
+<div class="gdm-process-result">
      <div >
-      <h3 :style="{color:color}">{{$t('results')}}</h3>
+      <h3 :style="{color:color}" style="margin-bottom:10px;">{{$t('results')}}</h3>
   
-      <a v-if="result.results" :href="result.results" class="button" ><i class="fa fa-download"></i> {{$t('download')}}</a>
+      <a v-if="result.results" :href="result.results" class="button" >
+       <i class="fa fa-download"></i> {{$t('download')}}
+      </a>
     </div>
-    <div v-if="images" style="min-width:50%;max-width:calc(100% - 165px);max-height:120px;overflow-y:scroll;font-size:0.9rem;">
-	    <div class="gdm-image-layer" v-if="images" v-for="(image, index) in images" @click="toggleImage(index)">
-	      <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'"></i> 
-	      <div style="display:inline-block;margin:0;max-width:calc(100% - 20px);">{{image.title}}</div>
+    <div v-if="images" style="margin-left:10px;margin-top:5px;min-width:50%;max-width:calc(100% - 170px);">
+      <h4 :style="{color:color}" style="margin:0;">{{$t('preview')}}</h4>
+      <div style="max-height:120px;overflow-y:scroll;font-size:0.9rem;">
+		    <div class="gdm-image-layer" v-if="images" v-for="(image, index) in images" @click="toggleImage(index)">
+		      <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'"></i> 
+		      <div style="display:inline-block;margin:0;max-width:calc(100% - 20px);">{{image.title}}</div>
+		    </div>
 	    </div>
     </div>
 
@@ -79,6 +86,9 @@ export default {
 <style scoped>
 .gdm-image-layer {
   cursor: pointer;
+}
+.gdm-process-result {
+  padding: 0 0 0 5px;
 }
 .gdm-process-result > div {
   display:inline-block;

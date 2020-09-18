@@ -33,7 +33,14 @@
     },
     setLayers (layers) {
       this._layers = layers
-      this._container.classList.remove('hidden')
+      
+    },
+    setVisible (visible) {
+      if (visible) {
+        this._container.classList.remove('hidden')
+      } else {
+        this._container.classList.add('hidden')
+      }
     },
     setBbox (bbox) {
       this._bbox = bbox

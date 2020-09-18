@@ -63,7 +63,8 @@ export default {
       // selected layer
       selectedLayer: null,
       fullscreenLayer: null,
-      imageLayers: []
+      imageLayers: [],
+      countImages: 0
     }
   },
   watch: {
@@ -103,12 +104,20 @@ export default {
   },
   methods: {
    toggleImageLayer (index, checked) {
+    
      if (checked) {
        this.imageLayers[index].addTo(this.map)
+       this.countImages = this.countImages + 1
       // this.controlLegend.addLegend(0, index, this.images[index].legend)
      } else {
        this.imageLayers[index].remove()
+       this.countImages = this.countImages - 1
       // this.controlLegend.removeLegend(index)
+     }
+     if (this.countImages > 0) {
+       this.controlOpacity.setVisible(true)
+     } else {
+       this.controlOpacity.setVisible(false)
      }
    },
    changeHighlightedLayer (event) {
@@ -154,7 +163,7 @@ export default {
           }
         }).addTo(this.map)
         this.controlLayer.addOverlay(this.bboxLayer, 'bbox')
-        this.controlOpacity.setBbox(this.bboxLayer)
+        // this.controlOpacity.setBbox(this.bboxLayer)
       }
       if (this.bboxLayer) {
         this.map.fitBounds(this.bboxLayer.getBounds())
