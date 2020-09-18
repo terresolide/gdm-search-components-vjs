@@ -104,20 +104,10 @@ export default {
   },
   methods: {
    toggleImageLayer (index, checked) {
-    
      if (checked) {
        this.imageLayers[index].addTo(this.map)
-       this.countImages = this.countImages + 1
-      // this.controlLegend.addLegend(0, index, this.images[index].legend)
      } else {
        this.imageLayers[index].remove()
-       this.countImages = this.countImages - 1
-      // this.controlLegend.removeLegend(index)
-     }
-     if (this.countImages > 0) {
-       this.controlOpacity.setVisible(true)
-     } else {
-       this.controlOpacity.setVisible(false)
      }
    },
    changeHighlightedLayer (event) {
@@ -246,11 +236,23 @@ export default {
         if (_this.images[index].legend) {
           _this.controlLegend.addLegend(0, index, _this.images[index].legend)
         }
+        _this.countImages = _this.countImages + 1
+        if (_this.countImages > 0) {
+          _this.controlOpacity.setVisible(true)
+        } else {
+          _this.controlOpacity.setVisible(false)
+        }
         _this.$emit('imageAdded', index)
       })
       layer.on('remove', function () {
         if (_this.images[index].legend) {
           _this.controlLegend.removeLegend(index)
+        }
+        _this.countImages = _this.countImages -1
+        if (_this.countImages > 0) {
+          _this.controlOpacity.setVisible(true)
+        } else {
+          _this.controlOpacity.setVisible(false)
         }
         _this.$emit('imageRemoved', index)
       })
