@@ -25,7 +25,7 @@
 </i18n>
 <template>
  <span class="gdm-process-view" v-if="process">
- <div id="fmtLargeMap" style="width:calc(100% - 8px);margin-bottom:4px;" ></div>
+ <div id="fmtLargeMap" style="width:calc(100% - 8px);margin-bottom:0px;position:fixed;z-index:3000;" ></div>
  <div style="position:relative;">
 	 <gdm-service-status  :name="process.serviceName" :status="process.serviceStatus" :top="5" :right="10" :lang="lang" ></gdm-service-status>
 	 <div class="gdm-process-header" :style="{background: $shadeColor(color,0.95)}">
@@ -35,7 +35,7 @@
 	   <div class="header-1">
 	     <div class="gdm-map-container">
 	      <gdm-map ref="map" :bbox="process.feature" :images="imageLayers" :tile="feature.properties.bboxTile"
-	      fullscreen="fmtLargeMap" :remove-height="headerHeight" @imageAdded="imageAdded" @imageRemoved="imageRemoved"></gdm-map>
+	      fullscreen="fmtLargeMap" :remove-height="20" @imageAdded="imageAdded" @imageRemoved="imageRemoved"></gdm-map>
 	     </div>
 	      <div style="text-align:center;margin-top:10px;">
 	         {{date2str(process.tempStart, true)}}

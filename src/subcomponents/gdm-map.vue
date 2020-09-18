@@ -73,7 +73,7 @@ export default {
     removeHeight (newValue) {
    
       if (this.fullscreenLayer) {
-        this.fullscreenLayer.setRemoveHeight(20)
+        this.fullscreenLayer.setRemoveHeight(newvalue)
       }
     }
   },
@@ -154,6 +154,7 @@ export default {
           }
         }).addTo(this.map)
         this.controlLayer.addOverlay(this.bboxLayer, 'bbox')
+        this.controlOpacity.setBbox(this.bboxLayer)
       }
       if (this.bboxLayer) {
         this.map.fitBounds(this.bboxLayer.getBounds())
@@ -329,6 +330,9 @@ div[id="fmtMap"].mtdt-small .leaflet-control a{
  height:15px;
  line-height:15px;
  }
+ div[id="fmtMap"] .lfh-control-fullscreen {
+   cursor:pointer;
+   }
   div[id="fmtMap"] .lfh-control-legend {
    cursor: pointer;
    background: white;
@@ -336,6 +340,10 @@ div[id="fmtMap"].mtdt-small .leaflet-control a{
  }
  div[id="fmtMap"] .lfh-control-opacity {
   background:white;
+  display:block;
+ }
+ div[id="fmtMap"] .lfh-control-opacity.hidden {
+  display:none;
   
  }
  div[id="fmtMap"] .lfh-control-opacity.expand {
@@ -345,6 +353,7 @@ div[id="fmtMap"].mtdt-small .leaflet-control a{
    background-image: url("../assets/images/progress2.png");
    background-size: cover;
    pointer-events:auto;
+   cursor:pointer;
    display:block;
  }
  div[id="fmtMap"] .lfh-control-opacity.expand a.icon-progress{
@@ -356,6 +365,7 @@ div[id="fmtMap"].mtdt-small .leaflet-control a{
  div[id="fmtMap"] .lfh-control-opacity strong{
    display:block;
    text-align:right;
+   cursor:pointer;
  }
  div[id="fmtMap"] .lfh-control-opacity input{
    pointer-events:auto;
