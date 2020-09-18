@@ -25,7 +25,7 @@ DRAW SVG
        <i class="fa fa-download"></i> {{$t('download')}}
       </a>
     </div>
-    <div v-if="images" style="margin-left:10px;margin-top:5px;min-width:50%;max-width:calc(100% - 170px);">
+    <div v-if="images && images.length > 0" style="margin-left:10px;margin-top:5px;min-width:50%;max-width:calc(100% - 170px);">
       <h4 :style="{color:color}" style="margin:0;">{{$t('preview')}}</h4>
       <div style="max-height:120px;overflow-y:scroll;font-size:0.9rem;">
 		    <div class="gdm-image-layer" v-if="images" v-for="(image, index) in images" @click="toggleImage(index)">
