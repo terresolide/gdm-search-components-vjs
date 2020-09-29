@@ -176,10 +176,21 @@ export default {
     },
     clickGetStatus() {
       this.submitting = true
-      this.getStatus()
+      this.getStatusInDepth()
     },
     getStatus () {
       this.$http.get(this.api + '/getStatus/' + this.process.id, {credentials: true})
+      .then(function (resp) {
+        this.$emit('statusChange', resp.body)
+        this.submitting = false
+        this.status = resp.body.status
+        this.launchTimer()
+      }, function (e) {
+        this.submitting = false
+      })
+    },
+    getStatusInDepth () {
+      this.$http.get(this.api + '/getStatusInDepth/' + this.process.id, {credentials: true})
       .then(function (resp) {
         this.$emit('statusChange', resp.body)
         this.submitting = false
