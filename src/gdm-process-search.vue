@@ -1,6 +1,7 @@
 <i18n>
 {
   "en": {
+    "clear_data": "All results will be deleted on this date",
     "created": "Created",
     "consult": "Consult",
     "end": "End",
@@ -14,6 +15,7 @@
     "forbidden": "Access Forbidden: deconnected?"
   },
   "fr": {
+    "clear_data": "Tous les résultats seront effacés à cette date",
     "created": "Création",
     "consult": "Consulter",
     "end": "Fin",
@@ -122,9 +124,11 @@
 		         </span>
 	         </div>
          </div>
-          <span v-if="feature.properties.datePurge" style="font-size:0.9em;color:#333;font-style:italic;"> 
-            (<b>Purge: </b>{{printDate(feature.properties.datePurge)}})
+          <span v-if="feature.properties.datePurge" class="date-purge"> 
+            <i class="fa fa-exclamation-triangle"></i>
+            <b>Purge: </b>{{printDate(feature.properties.datePurge)}}
          </span>
+         <div class="gdm-tooltip">{{$t('clear_data')}}</div>
          </td>
          
          <td style="text-align:center;">
@@ -523,6 +527,12 @@ font-size: 0.9rem;
 	margin-top:5px;
 	color:grey;
 }
+.gdm-process-search span.date-purge {
+  font-size:0.9em;
+  color:#333;
+  font-style:italic;
+  cursor:pointer;
+}
 .gdm-process-search div.gdm-tooltip {
   position:absolute;
   background-color:#fafafa;
@@ -544,7 +554,7 @@ gdm-process-search div.gdm-tooltip:hover {
   margin-left:70px;
   margin-top:-80px;
 }
-.gdm-process-search i.gdm-log:hover + div.gdm-tooltip {
+.gdm-process-search span.date-purge:hover + div.gdm-tooltip {
   display:block;
 }
 .gdm-process-search i.gdm-log:hover + div.gdm-tooltip {

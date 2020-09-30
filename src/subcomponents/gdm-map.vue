@@ -214,7 +214,7 @@ export default {
       }
     },
     initImageLayer (image, index) {
-      if (this.bboxTile) {
+      if (this.bboxTile && image.title.charAt(0) === 'T') {
         var bounds = this.bboxTile
       } else {
         var bounds = this.bboxLayer.getBounds()

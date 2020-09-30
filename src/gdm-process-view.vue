@@ -1,6 +1,7 @@
 <i18n>{
    "en":{
      "status_informations": "Job status",
+     "clear_data": "All results will be deleted on this date",
      "owner": "Owner",
      "cost": "Cost",
      "created": "Created",
@@ -12,6 +13,7 @@
    },
    "fr":{
       "status_informations": "Etat du calcul",
+      "clear_data": "Tous les résultats seront effacés à cette date",
      "owner": "Propriétaire",
      "cost": "Coût",
      "created": "Création",
@@ -72,11 +74,13 @@
              </span>
           </div>
           <div v-if="process.status === 'TERMINATED' && process.datePurge"
-          style="font-size:0.9em;font-style:italic;">
-           (<b>Purge: </b>
+          style="font-size:0.9em;color:darkred;cursor:pointer;" :title="$t('clear_data')">
+           <i class="fa fa-exclamation-triangle"> 
+           </i>
+           <b>Purge: </b>
              <span style="white-space:nowrap;">
                {{date2str(process.datePurge)}}
-             </span>)
+             </span>
           </div>
 	      </div>
 	   </div>
