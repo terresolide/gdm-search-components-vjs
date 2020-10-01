@@ -124,7 +124,7 @@
 		         </span>
 	         </div>
          </div>
-          <span v-if="feature.properties.datePurge" class="date-purge"> 
+          <span v-if="feature.properties.datePurge && feature.properties.status === 'TERMINATED'" class="date-purge"> 
             <i class="fa fa-exclamation-triangle"></i>
             <b>Purge: </b>{{printDate(feature.properties.datePurge)}}
          </span>
