@@ -10,7 +10,7 @@
      "owner_credit": "Actual credit",
      "process_time": "Process time",
      "parameters": "Parameters",
-     "second_core": "second x core"
+     "seconds": "seconds"
    },
    "fr":{
       "status_informations": "Etat du calcul",
@@ -23,7 +23,7 @@
      "owner_credit": "Crédit actuel",
      "parameters": "Paramètres",
      "process_time": "Calcul",
-      "second_core": "seconde x coeur"
+      "seconds": "secondes"
    }
 }
 </i18n>
@@ -96,18 +96,18 @@
 	        <b>{{$t('cost')}}:</b>
 	        <span v-if="['WAITING', 'EVALUATED'].indexOf(process.status) >= 0">
 		        <span :style="{color: process.cost > process.quota ? 'red' : 'black' }">
-			        <b>{{process.cost.toLocaleString()}}<span class="gdm-information" :title="$t('second_core')">&nbsp;s.c</span></b> 
+			        <b>{{process.cost.toLocaleString()}}&nbsp;CPU&nbsp;{{$t('seconds')}}</b> 
 			        <span >/ {{process.quota.toLocaleString()}}</span>
 		         </span>
 		         <div v-if="back && process.cost > process.quota">
                  <a class="button"  :href="url + 'users/view/' + process.userId">{{$t('edit')}}</a>
              </div>
 	         </span>
-	         <span v-else><b>{{process.cost.toLocaleString()}}<span class="gdm-information" :title="$t('second_core')">&nbsp;s.c</span></b></span>
+	         <span v-else><b>{{process.cost.toLocaleString()}}</b>&nbsp;CPU&nbsp;{{$t('seconds')}}</span>
 	         
 	      </div>
 	      <div v-if="process.cost <= 0 || ['WAITING', 'EVALUATED'].indexOf(process.status) < 0">
-	      <b>{{$t('owner_credit')}}:</b> {{process.quota.toLocaleString()}}<span class="gdm-information" :title="$t('second_core')">&nbsp;s.c</span>
+	      <b>{{$t('owner_credit')}}:</b> {{process.quota.toLocaleString()}}&nbsp;CPU&nbsp;{{$t('seconds')}}
 	      </div>
 	   </div>
 	   <div class="header-3">
