@@ -9,7 +9,8 @@
      "last_update": "Updated",
      "owner_credit": "Actual credit",
      "process_time": "Process time",
-     "parameters": "Parameters"
+     "parameters": "Parameters",
+     "second_core": "second x core"
    },
    "fr":{
       "status_informations": "Etat du calcul",
@@ -21,7 +22,8 @@
      "last_update": "Maj",
      "owner_credit": "Crédit actuel",
      "parameters": "Paramètres",
-     "process_time": "Calcul"
+     "process_time": "Calcul",
+      "second_core": "seconde x coeur"
    }
 }
 </i18n>
@@ -94,18 +96,18 @@
 	        <b>{{$t('cost')}}:</b>
 	        <span v-if="['WAITING', 'EVALUATED'].indexOf(process.status) >= 0">
 		        <span :style="{color: process.cost > process.quota ? 'red' : 'black' }">
-			        <b>{{process.cost.toLocaleString()}}</b> 
+			        <b>{{process.cost.toLocaleString()}}<span class="gdm-information" :title="$t('second_core')">&nbsp;s.c</span></b> 
 			        <span >/ {{process.quota.toLocaleString()}}</span>
 		         </span>
 		         <div v-if="back && process.cost > process.quota">
                  <a class="button"  :href="url + 'users/view/' + process.userId">{{$t('edit')}}</a>
              </div>
 	         </span>
-	         <span v-else><b>{{process.cost.toLocaleString()}}</b></span>
+	         <span v-else><b>{{process.cost.toLocaleString()}}<span class="gdm-information" :title="$t('second_core')">&nbsp;s.c</span></b></span>
 	         
 	      </div>
 	      <div v-if="process.cost <= 0 || ['WAITING', 'EVALUATED'].indexOf(process.status) < 0">
-	      <b>{{$t('owner_credit')}}:</b> {{process.quota.toLocaleString()}}
+	      <b>{{$t('owner_credit')}}:</b> {{process.quota.toLocaleString()}}<span class="gdm-information" :title="$t('second_core')">&nbsp;s.c</span>
 	      </div>
 	   </div>
 	   <div class="header-3">
@@ -127,7 +129,8 @@
 		 <div class="gdm-list-parameters" >
 			 <h2 :style="{color:color}">{{$t('parameters')}}</h2>
 			 <div>
-			  <div v-for="(value, prop) in parameters" style="font-size:0.9rem;max-width:400px;" v-if="prop !== 'correl_image_input'">
+			  <div v-for="(value, prop) in parameters" style="font-size:0.9rem;max-width:400px;"
+			   v-if="['correl_image_input', 't2_token','t2_user', 'wf_id'].indexOf(prop) < 0 ">
 			    <b >{{prop}}:</b> <div style="vertical-align:top;max-width:350px;display:inline-block;overflow-wrap:anywhere">{{value}}</div>
 			  </div>
 			  </div>
@@ -331,15 +334,23 @@ export default {
         if (detail.hasOwnProperty('quota')) {
           this.$set(this.process, 'quota', detail.quota)
         }
-        if (this.back) {
+        // if (this.back) {
           this.log = detail.log
-        }
+        // }
         this.$set(this.process, 'progress', detail.progress)
         this.$set(this.process, 'stepId', detail.stepId)
         this.$set(this.process, 'end', detail.end)
         this.$set(this.process, 'processEnd', detail.processEnd)
         this.$set(this.process, 'processStart', detail.processStart)
+        if (!this.process.result && detail.result) {
         this.$set(this.process, 'result', detail.result)
+	        if (this.process.result && this.process.result.thumbnails) {
+		        this.imageLayers = this.process.result.thumbnails
+		        this.imageLayers.forEach(function (image) {
+		          image.checked = false
+		        })
+	        }
+        }
       }
     }
   }
@@ -424,6 +435,9 @@ border: 4px solid lightgrey;
   border: 1px solid lightgray;
   box-shadow: 1px 1px 3px gray;
      z-index: 0;
+}
+span.gdm-information {
+  cursor:pointer;
 }
 .header-0 {
   grid-column:1/5;

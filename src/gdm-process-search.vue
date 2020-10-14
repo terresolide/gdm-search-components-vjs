@@ -4,13 +4,13 @@
     "clear_data": "All results will be deleted on this date",
     "created": "Created",
     "consult": "Consult",
-    "end": "End",
-    "process_dates": "Process dates",
+    "end": "Job end",
+    "process_dates": "Job information",
     "identifiers": "Identifiers",
     "temporal_extent": "Temporal extent",
     "parameters": "Parameters",
     "no_process": "No process",
-    "start": "Start",
+    "start": "Job start",
     "unauthorized": "Access Unauthorized",
     "forbidden": "Access Forbidden: deconnected?"
   },
@@ -19,7 +19,7 @@
     "created": "Création",
     "consult": "Consulter",
     "end": "Fin",
-    "process_dates": "Dates du calcul",
+    "process_dates": "Job information",
     "identifiers": "Identifiants",
     "temporal_extent": "Etendue temporelle",
     "parameters": "Paramètres",
@@ -107,7 +107,7 @@
              {{printDate(feature.properties.start, true)}}
            </span>
          </div>
-         <div v-if="['TERMINATED', 'RUNNING', 'FAILED'].indexOf(feature.properties.status) >=0">
+         <div v-if="['TERMINATED', 'RUNNING', 'FAILED', 'PURGED'].indexOf(feature.properties.status) >=0">
 	         <div>
 		         <b>{{$t('start')}}: </b>
 		         <span style="white-space:nowrap;">
@@ -141,7 +141,7 @@
 	         <div class="infos">
 		         <div v-for="type in ['provider', 'position']" >
 			          <div v-if="feature.properties[type]" >
-	                <div v-for="(value, prop) in feature.properties[type]" v-if="prop !== 'bbox'">
+	                <div v-for="(value, prop) in feature.properties[type]" v-if="prop !== 'bbox' && prop !== 'providerName'">
 	                  <div><b>{{prop}}:</b> {{value}}</div>
 	                </div>
 			         </div>
@@ -585,7 +585,7 @@ table.gdm-list-process {
   z-index:0;
 }
 .gdm-process-search div.gdm-wrapper {
-
+  max-width:1950px;
   margin:auto;
 }
 
