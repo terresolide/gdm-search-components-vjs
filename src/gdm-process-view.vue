@@ -130,7 +130,7 @@
 			 <h2 :style="{color:color}">{{$t('parameters')}}</h2>
 			 <div>
 			  <div v-for="(value, prop) in parameters" style="font-size:0.9rem;max-width:400px;"
-			   v-if="['correl_image_input', 't2_token','t2_user', 'wf_id'].indexOf(prop) < 0 ">
+			   v-if="['correl_image_input', 't2_app_name', 't2_token','t2_user', 'wf_id'].indexOf(prop) < 0 ">
 			    <b >{{prop}}:</b> <div style="vertical-align:top;max-width:350px;display:inline-block;overflow-wrap:anywhere">{{value}}</div>
 			  </div>
 			  </div>
