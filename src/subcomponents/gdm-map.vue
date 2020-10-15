@@ -76,7 +76,10 @@ export default {
       if (this.fullscreenLayer) {
         this.fullscreenLayer.setRemoveHeight(newvalue)
       }
-    }
+    },
+    images (newImages) {
+      
+    },
   },
   created () {
     if (this.tile) {
@@ -132,7 +135,7 @@ export default {
       this.map.getPane('overlayPane').style.pointerEvents = 'auto'
       this.initBbox()
       this.initFeatureCollection()
-      this.initImageLayers()
+      this.initImageLayers(this.images)
     },
     initBbox () {
       if (this.bboxLayer) {
@@ -203,11 +206,11 @@ export default {
         }
       }
     },
-    initImageLayers () {
-      if (this.images && this.images.length > 0) {
+    initImageLayers (images) {
+      if (images && images.length > 0) {
         
         var _this = this
-        this.images.forEach(function (image, index) {
+        images.forEach(function (image, index) {
           _this.initImageLayer(image, index)
         })
         this.controlOpacity.setLayers(this.imageLayers)
