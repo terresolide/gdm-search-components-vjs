@@ -13,7 +13,9 @@
 }
 </i18n>
 <template>
- <div style="position:absolute;cursor:pointer;z-index:1;" :style="{top: top + 'px', right: right + 'px'}" :title="$t(status)">
+ <div style="position:absolute;cursor:pointer;z-index:1;"
+  :style="{top: top + 'px', right: right + 'px'}" 
+  :title="$t(status)" @click="stopPropagation">
    <span v-if="name" style="vertical-align:middle;">
       {{name.toUpperCase()}}
    </span>
@@ -72,6 +74,10 @@ export default {
       case 'MAINTENANCE':
         return 'radial-gradient(circle at 30%, #FFA500, #FF5733)'
       }
+    },
+    stopPropagation (event) {
+      event.preventDefault()
+      event.stopPropagation()
     }
   }
 }
