@@ -287,7 +287,10 @@ export default {
       }
     },
     getImage(list, index) {
-      if (list[index] && list[index].url) {
+      if (list[index] && list[index].feature) {
+        this.images.push(list[index].feature.properties)
+        this.getImage(list, index + 1)
+      } else if (list[index] && list[index].url) {
         this.$http.get(list[index].url).then(function (response) {
           if (response.body) {
             this.images.push(response.body.features[0].properties)

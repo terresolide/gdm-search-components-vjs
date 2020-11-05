@@ -1,30 +1,46 @@
 <i18n>
 {
   "en": {
+    "cloud_cover": "Cloud cover",
+    "nb_bands": "Nb bands",
+    "nb_cols": "Nb cols",
+    "nb_rows": "Nb rows",
     "no_image": "NO IMAGE FOR THIS DATE",
     "platform": "Platform",
+    "producer": "Producer",
     "product_type": "Product Type",
+    "processing_center": "Processing Center",
     "processing_level": "Processing Level",
-    "cloud_cover": "Cloud cover",
     "relative_orbit": "Relative Orbit",
     "select_first_date": "Start date",
     "select_image": "Select image",
     "select_last_date": "Last date",
     "snow_cover": "Snow cover",
-    "unselect_image": "Unselect image"
+    "size": "Size",
+    "unselect_image": "Unselect image",
+    "zoom_out": "Zoom out",
+    "zoom_to": "Zoom to the footprint"
   },
   "fr": {
+     "cloud_cover": "Couverture nuageuse",
+     "nb_bands": "Nb bandes",
+     "nb_cols": "Nb cols",
+     "nb_rows": "Nb lignes",
      "no_image": "AUCUNE IMAGE POUR CETTE DATE",
      "platform": "Plateforme",
+     "producer": "Producteur",
      "product_type": "Type de Produit",
+     "processing_center": "Centre de traitement",
      "processing_level": "Niveau de traitement",
-     "cloud_cover": "Couverture nuageuse",
      "relative_orbit": "Orbite relative",
      "select_first_date": "Date de début",
      "select_image": "Selectionner cette image",
      "select_last_date": "Date de fin",
      "snow_cover": "Couverture neigeuse",
-     "unselect_image": "Désélectionner cette image"
+     "size": "Taille",
+     "unselect_image": "Désélectionner cette image",
+     "zoom_out": "Dézoomer",
+     "zoom_to": "Zoomer sur l'emprise"
     }
 }
 </i18n>
@@ -43,20 +59,32 @@
 	   <div><label>Date : </label><span :style="{color: 'black'}">{{printDate(image.startDate)}}</span></div>
 	   <div v-if="image.productIdentifier">
 	     <div><label>{{$t('product_type')}} : </label>{{image.productType}}</div>
-	     <div><label>{{$t('platform')}} : </label>{{image.platform}}</div>
-	     <div><label>{{$t('relative_orbit')}} : </label> {{image.relativeOrbitNumber}}</div>
-	   </div>
+	     <div v-if="type === 'PEPS'">        
+         <div><label>{{$t('platform')}} : </label>{{image.platform}}</div>
+         <div><label>{{$t('relative_orbit')}} : </label> {{image.relativeOrbitNumber}}</div>
+       </div>
+       <div v-else-if="type === 'PLEIADES'">
+          <div><label>{{$t('producer')}} : </label>{{image.producer}}</div>
+          <div><label>{{$t('platform')}} : </label>{{image.platform}}</div>
+       </div>
+    </div>
 	</div>
 	<div v-if="image.productIdentifier" class="gdm-image-3 gdm-fields">
-	   <div><label>{{$t('cloud_cover')}} : </label>
-	     <span v-if="image.cloudCover !== null" :style="{color: 'black'}">{{image.cloudCover}}</span>
-	     <span v-else>---</span>
-	   </div>
-     <div><label>{{$t('snow_cover')}} : </label>{{image.snowCover !== null ? image.snowCover : '--'}}</div>
-     <div><label>{{$t('product_type')}} : </label>{{image.productType}}</div>
-     <div><label>{{$t('processing_level')}} : </label>{{image.processingLevel}}</div>
-	</div>
-	<div v-else class="gdm-image-3 gdm-fields"></div>
+	   <div v-if="type === 'PEPS'">
+       <div><label>{{$t('cloud_cover')}} : </label>
+         <span v-if="image.cloudCover !== null" :style="{color: 'black'}">{{image.cloudCover}}</span>
+         <span v-else>---</span>
+       </div>
+       <div><label>{{$t('snow_cover')}} : </label>{{image.snowCover !== null ? image.snowCover : '--'}}</div>
+       <div><label>{{$t('processing_level')}} : </label>{{image.processingLevel}}</div>
+    </div>
+    <div v-else-if="type === 'PLEIADES'">
+      <div><label>{{$t('nb_cols')}} : </label>{{image.dimensions.cols}}</div>
+      <div><label>{{$t('nb_rows')}} : </label> {{image.dimensions.rows}}</div>
+      <div><label>{{$t('nb_bands')}} : </label> {{image.dimensions.bands}}</div>
+      <div><label>Format : </label>{{image.format}}</div>
+    </div>
+  </div>
 	<div v-if="image.productIdentifier && mode === 'S2ST-STACK'" class="gdm-image-4 gdm-fields" >
 	  <div v-if="!searching && order > 0" >
 	     <span :style="{color: temporal.start ? '#555': 'black'}">{{$t('select_first_date')}}</span>
@@ -73,6 +101,22 @@
        <span class="fa" :class="{'fa-square-o': !startChecked, 'fa-check-square-o': startChecked}" @click="selectFirstDate($event)"></span>
     </div>
 	</div>
+	<div v-if="image.productIdentifier && type === 'PLEIADES' & mode !== 'view'" class="gdm-image-4 gdm-fields" 
+  style="color:black;">
+    <div>
+       <span style="cursor:pointer;" @click="zoomTo">
+         <span style="width:80px;">{{$t('zoom_to')}}</span>
+         <i class="fa fa-search-plus" style="font-size:1.2em;"></i>
+       </span>
+    </div>
+    <div>
+      <span style="cursor:pointer;" @click="zoomOut">
+        <span style="width:80px;">{{$t('zoom_out')}}</span>
+        <i class="fa fa-search-minus" style="font-size:1.2em;"></i>
+      </span>
+    </div>
+
+  </div>
   <div v-if="mode !== 'view'" class="gdm-image-5 gdm-fields">
      <div v-if="!searching" style="color:black;text-align:center;">
         <span v-if="checked">{{$t('unselect_image')}}</span>
@@ -113,6 +157,10 @@ export default {
       type: String,
       default: ''
     },
+    type: {
+      type: String,
+      default: 'PEPS'
+    },
     lang: {
       type: String,
       default: 'en'
@@ -147,7 +195,11 @@ export default {
   },
   methods: {
     printDate (date) {
-      return moment(date).format('ll')
+      if (this.type === 'PLEIADES') {
+        return moment(date).format('lll')
+      } else {
+        return moment(date).format('ll')
+      }
     },
     selectFirstDate () {
       var value = this.image.startDate
@@ -162,6 +214,9 @@ export default {
     selectImage () {
       event.stopPropagation()
       var value = this.image.productIdentifier
+      if (this.type === 'PLEIADES') {
+        value = this.image.id
+      }
       this.$emit('selectImage', value)
     },
     selectLastDate (event) {
@@ -171,7 +226,14 @@ export default {
         value = null
       }
       this.$emit('lastDate', value)
+    },
+    zoomOut () {
+      this.$emit('zoomOut')
+    },
+    zoomTo () {
+      this.$emit('zoomTo', this.image.id)
     }
+
   }
 }
 
