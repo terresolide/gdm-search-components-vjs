@@ -45,7 +45,7 @@
 }
 </i18n>
 <template>
-<div class="gdm-image" :class="{'gdm-no-image': !image.productIdentifier, 'gdm-image-view': mode === 'view'}">
+<div class="gdm-image" :class="{'gdm-no-image': !image.productIdentifier, 'gdm-image-view': mode === 'view', 'gdm-pleiade': type === 'PLEIADES'}">
 	<div class="gdm-image-1">
 	<img v-if="image.quicklook" :src="image.quicklook" height="85" style="max-height:85px;margin: 3px 5px;padding:3px;border: 1px solid grey;"/>
 	<img v-else src="../assets/images/no_image.png" width="85" style="margin: 3px 5px;padding:3px;border: 1px solid grey;"/>
@@ -247,6 +247,10 @@ export default {
   /*grid-auto-rows: minmax(100px, auto);*/
   font-size:0.8em;
   border-bottom:1px solid lightgrey;
+}
+.gdm-image.gdm-pleiade {
+   grid-template-columns: 100px minmax(150px,1fr) 125px minmax(150px,1fr)  minmax(150px,1fr);
+ 
 }
 .gdm-image.gdm-no-image {
   background: linear-gradient(-45deg, #EEE 12.5%, #fff 12.5%, #fff 37.5%, #EEE 37.5%, #EEE 62.5%, #fff 62.5%, #fff 87.5%, #EEE 87.5%);
