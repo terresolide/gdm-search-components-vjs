@@ -77,8 +77,8 @@ export default {
         this.fullscreenLayer.setRemoveHeight(newvalue)
       }
     },
-    images (newImages) {
-      
+    images (newImages, old) {
+       this.initImageLayers(newImages)
     },
   },
   created () {
@@ -207,6 +207,11 @@ export default {
       }
     },
     initImageLayers (images) {
+      // see if done
+      if (this.imageLayers.length > 0) {
+        return
+      }
+    
       if (images && images.length > 0) {
         
         var _this = this

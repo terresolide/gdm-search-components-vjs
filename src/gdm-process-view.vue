@@ -111,20 +111,25 @@
 	      </div>
 	   </div>
 	   <div class="header-3">
+	  <div style="max-width:130px;display:inline-block;">
         <gdm-process-status v-if="statusList" :status="process.status" :status-list="statusList" :lang="lang"></gdm-process-status>
-	   </div>
-	   <div class="header-4">
+     </div>
+	  <!--  </div>
+	   <div class="header-4">--> 
+	   <div class="process-actions">
 	     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" 
 	     :process="process"  :lang="lang" @processChange="statusChange" 
 	     @statusChange="statusChange" @duplicate="duplicate">
 	     </gdm-process-actions>
 	   </div>
-	    <div class="header-5" :class="{highlight:seeResult}"
+	    
+	    <div  :class="{highlight:seeResult}"
 	    :style="{background: seeResult ? $shadeColor(color,0.92): 'none'}">
        <gdm-process-result v-if="process && process.result && process.status === 'TERMINATED'" :result="process.result" 
         :lang="lang" :color="color" :images="imageLayers" @toggleImage="toggleImage" >
        </gdm-process-result>
-     </div>
+       </div>
+		 </div>
 		 </div>
 		 <div class="gdm-list-parameters" >
 			 <h2 :style="{color:color}">{{$t('parameters')}}</h2>
@@ -252,6 +257,15 @@ export default {
         return moment(date).format(format)
       }
     },
+    addResult (result) {
+      if (result && result.thumbnails) {
+        var imageLayers = result.thumbnails
+        imageLayers.forEach(function (image) {
+          image.checked = false
+        })
+        this.imageLayers = imageLayers
+      }
+    },
     display (response) {
       var parameters = response.feature.properties.parameters
       console.log(parameters)
@@ -265,12 +279,7 @@ export default {
       this.feature.properties.id = this.id
       this.process = response
       this.log = this.process.log
-      if (this.process.result && this.process.result.thumbnails) {
-        this.imageLayers = this.process.result.thumbnails
-        this.imageLayers.forEach(function (image) {
-          image.checked = false
-        })
-      }
+      this.addResult(this.process.result)
       if (this.$el && this.$el.querySelector) {
         this.headerHeight = this.$el.querySelector('.gdm-process-header').clientHeight
       }
@@ -346,14 +355,9 @@ export default {
         this.$set(this.process, 'processEnd', detail.processEnd)
         this.$set(this.process, 'processStart', detail.processStart)
         if (!this.process.result && detail.result) {
-        this.$set(this.process, 'result', detail.result)
-	        if (this.process.result && this.process.result.thumbnails) {
-		        this.imageLayers = this.process.result.thumbnails
-		        this.imageLayers.forEach(function (image) {
-		          image.checked = false
-		        })
-	        }
-        }
+	        this.$set(this.process, 'result', detail.result)
+		      this.addResult(detail.result)  
+	      }
       }
     }
   }
@@ -431,7 +435,7 @@ border: 4px solid lightgrey;
    position: relative;
   margin-top:0px;
   display:grid;
-  grid-template-columns: 310px 2fr 150px 1fr;
+  grid-template-columns: 310px 2fr 2fr;
   grid-template-rows: 50px 1fr 50px 1fr;
   background:#f3F3F3;
   padding: 10px 5px;
@@ -466,18 +470,24 @@ span.gdm-information {
 }
 .header-3 {
   grid-column: 3;
-  grid-row: 2;
+  grid-row: 2/5;
+}
+.process-actions {
+  display: inline-block;
+  vertical-align: top;
+  width: calc(100% - 130px);
+  text-align: center;
 }
 .header-4 {
-  grid-column: 4;
-  grid-row: 2;
+  grid-column: 3/5;
+  grid-row: 2/5;
 }
 .header-5 {
   padding:10px 3px 3px 3px;
   grid-column: 3/5;
    grid-row: 3/5;
 }
-.header-5.highlight {
+.highlight {
   border: 1px solid #e3e3e3;
   background-color: #e9e9e9;
 }

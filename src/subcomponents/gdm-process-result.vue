@@ -25,9 +25,9 @@ DRAW SVG
        <i class="fa fa-download"></i> {{$t('download')}}
       </a>
     </div>
-    <div v-if="images && images.length > 0" style="margin-left:10px;margin-top:5px;min-width:50%;max-width:calc(100% - 170px);">
-      <h4 :style="{color:color}" style="margin:0;">{{$t('preview')}}</h4>
-      <div style="max-height:120px;overflow-y:scroll;font-size:0.9rem;">
+    <div v-if="images && images.length > 0" >
+      <h4 :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h4>
+      <div style="font-size:0.9rem;">
 		    <div class="gdm-image-layer" v-if="images" v-for="(image, index) in images" @click="toggleImage(index)">
 		      <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'"></i> 
 		      <div style="display:inline-block;margin:0;max-width:calc(100% - 20px);">{{image.title}}</div>
@@ -92,7 +92,7 @@ export default {
 }
 .gdm-process-result > div {
   display:inline-block;
-  padding-left:0px;
+  padding-left:5px;
   vertical-align:top;
 }
 .gdm-process-result h3 {
