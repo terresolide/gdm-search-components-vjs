@@ -155,7 +155,10 @@
              </div>
              <div v-else>
                 <div v-for="prop in ['correl_split_date', 'correl_input_mode', 'correl_correlator', 'do_analysis', 'do_correction_filtering']" >
-                  <div><b>{{$hypens2camel(prop)}}:</b> {{feature.properties.parameters[prop]}}</div>
+                  <div v-if="feature.properties.parameters.hasOwnProperty(prop)"><b>{{$hypens2camel(prop)}}:</b> {{feature.properties.parameters[prop]}}</div>
+                </div>
+                <div v-for="prop in ['dsmopt_ortho', 'dsmopt_default_correlation', 'dsmopt_export_l93', 'dsmopt_use_roi', 'dsmopt_roi_sizex', 'dsmopt_roi_sizey']" >
+                  <div v-if="feature.properties.parameters.hasOwnProperty(prop)"><b>{{$hypens2camel(prop.replace('dsmopt_', ''))}}:</b> {{feature.properties.parameters[prop]}}</div>
                 </div>
              </div>
 	         </div>

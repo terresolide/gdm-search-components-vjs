@@ -135,7 +135,7 @@
 			 <h2 :style="{color:color}">{{$t('parameters')}}</h2>
 			 <div>
 			  <div v-for="(value, prop) in parameters" style="font-size:0.9rem;max-width:400px;"
-			   v-if="['correl_image_input', 't2_app_name', 't2_token','t2_user', 'wf_id'].indexOf(prop) < 0 ">
+			   v-if="['dsmopt_image_input', 'correl_image_input', 't2_app_name', 't2_token','t2_user', 'wf_id'].indexOf(prop) < 0 ">
 			    <b >{{prop}}:</b> <div style="vertical-align:top;max-width:350px;display:inline-block;overflow-wrap:anywhere">{{value}}</div>
 			  </div>
 			  </div>
@@ -144,7 +144,7 @@
 		  <h2 :style="{color:color}">Images</h2>
 		  <div v-if="images.length > 0">
 			  <div  v-for="image in images" class="gdm-images-child" >
-	        <gdm-image :image="image" :searching="true" :checked="true" mode="view" :lang="lang"></gdm-image>
+	        <gdm-image :image="image" :type="type" :searching="true" :checked="true" mode="view" :lang="lang"></gdm-image>
 	      </div>
 		  </div>
 		  <div v-else style="text-align:center;padding: 30px;">NO IMAGES SELECTED - TYPE REQUEST</div>
@@ -207,6 +207,7 @@ export default {
   created () {
     this.$i18n.locale = this.lang
     moment.locale(this.lang)
+    this.getToken()
     this.load()
   },
   mounted () {
@@ -225,14 +226,25 @@ export default {
       parameters: {},
       feature: null,
       process: null,
+      // INPUT IMAGES
       images: [],
       statusList: null,
       headerHeight: null,
+      // RESULT
       imageLayers: null,
-      log: null
+      log: null,
+      token: null,
+      type: 'PEPS'
     }
   },
   methods: {
+    getToken () {
+      this.$http.get(this.api + '/getToken', {credentials: true})
+      .then(
+         (resp) => { this.token = resp.body.token },
+         (resp) => { console.log('ERROR GET TOKEN') }
+      )
+    },
     toggleImage (e) {
       var image = this.imageLayers[e]
       image.checked = !image.checked
@@ -274,6 +286,10 @@ export default {
       for(var prop in keys) {
         this.$set(this.parameters, keys[prop],parameters[keys[prop]])
       }
+      if (response.images && response.images[0] &&
+          response.images[0].collection === 'PLEIADES') {
+        this.type = 'PLEIADES'
+      }
       this.getImage(response.images, 0)
       this.feature = response.feature
       this.feature.properties.id = this.id
@@ -297,6 +313,11 @@ export default {
     },
     getImage(list, index) {
       if (list[index] && list[index].feature) {
+        if (this.type === 'PLEIADES') {
+          // specific case pleiades
+          var urlImg = this.api.replace('/api', '/pleiades/getImage') + '?img=' + encodeURIComponent(list[index].feature.properties.icon) + '&_bearer=' + this.token
+          list[index].feature.properties.quicklook = urlImg
+        }
         this.images.push(list[index].feature.properties)
         this.getImage(list, index + 1)
       } else if (list[index] && list[index].url) {
