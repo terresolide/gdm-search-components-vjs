@@ -291,7 +291,7 @@ export default {
         }
       }
       if (this.selectedLayer) {
-        this.map.fitBounds(this.selectedLayer.getBounds(), {paddingTopLeft: [ 30, 120], maxZoom: 10})
+        this.map.fitBounds(this.selectedLayer.getBounds(), {maxZoom: 10})
       } else {
         this.map.fitBounds(this.featureGroup.getBounds())
       }

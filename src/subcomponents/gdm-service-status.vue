@@ -3,12 +3,12 @@
    "en":{
      "ENABLED": "Service Open",
      "DISABLED": "Service Closed",
-     "MAINTENANCE":"Service Under Maintenance (You can only edit and save your job)"    
+     "MAINTENANCE":"Service Under Maintenance\n(You can only edit and save your job)"    
    },
    "fr":{
      "ENABLED": "Service Ouvert",
      "DISABLED": "Service Fermé",
-     "MAINTENANCE":"Service En maintenance (Vous pouvez uniquement éditer et sauvegarder vos jobs)"   
+     "MAINTENANCE":"Service En maintenance\n(Vous pouvez uniquement éditer et sauvegarder vos jobs)"   
    }
 }
 </i18n>
