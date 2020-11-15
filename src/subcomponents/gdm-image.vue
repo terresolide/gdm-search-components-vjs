@@ -266,19 +266,19 @@ export default {
   grid-row: 1;
 }
 .gdm-image-2 {
-  grid-colum: 2;
+  grid-column: 2;
   grid-row: 2;
 }
 .gdm-image-3 {
-  grid-colum: 3;
+  grid-column: 3;
   grid-row: 2;
 }
 .gdm-image-4 {
-  grid-colum: 4;
+  grid-column: 4;
   grid-row: 2;
 }
 .gdm-image-5 {
-  grid-colum: 4;
+  grid-column: 4;
   grid-row: 2;
 }
 .gdm-fields {
