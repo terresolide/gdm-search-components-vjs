@@ -278,7 +278,7 @@ export default {
   grid-row: 2;
 }
 .gdm-image-5 {
-  grid-column: 4;
+  grid-column: 5;
   grid-row: 2;
 }
 .gdm-fields {
