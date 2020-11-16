@@ -196,9 +196,14 @@ export default {
   methods: {
     printDate (date) {
       if (this.type === 'PLEIADES') {
-        return moment(date).format('lll')
+        if (this.lang === 'fr') {
+          return moment.utc(date).format('D MMM YYYY HH:mm:ss')
+        } else {
+          return moment.utc(date).format('MMM Do, YYYY HH:mm:ss')
+        }
+        
       } else {
-        return moment(date).format('ll')
+        return moment.utc(date).format('ll')
       }
     },
     selectFirstDate () {
