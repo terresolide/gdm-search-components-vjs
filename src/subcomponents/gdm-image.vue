@@ -47,7 +47,7 @@
 <template>
 <div class="gdm-image" :class="{'gdm-no-image': !image.productIdentifier, 'gdm-image-view': mode === 'view', 'gdm-pleiade': type === 'PLEIADES'}">
 	<div class="gdm-image-1">
-	<img v-if="image.quicklook" :src="image.quicklook" height="85" style="max-height:85px;max-width:85px;margin: 3px 5px;padding:3px;border: 1px solid grey;"/>
+	<img v-if="image.quicklook" :src="image.quicklook" style="max-height:85px;max-width:85px;margin: 3px 5px;padding:3px;border: 1px solid grey;"/>
 	<img v-else src="../assets/images/no_image.png" width="85" style="margin: 3px 5px;padding:3px;border: 1px solid grey;"/>
   
 	</div>
