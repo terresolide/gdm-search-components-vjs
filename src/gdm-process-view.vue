@@ -112,7 +112,7 @@
 	   </div>
 	   <div class="header-3">
 	  <div style="max-width:130px;display:inline-block;">
-        <gdm-process-status v-if="statusList" :status="process.status" :status-list="statusList" :lang="lang"></gdm-process-status>
+        <gdm-process-status v-if="statusList" :status="process.status" :progress="process.progress" :status-list="statusList" :lang="lang"></gdm-process-status>
      </div>
 	  <!--  </div>
 	   <div class="header-4">--> 
