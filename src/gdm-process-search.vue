@@ -85,7 +85,7 @@
             <div>
                <a v-if="url" :href="url + feature.properties.id" class="button">{{$t('consult')}}</a>
             </div>
-            <i v-if="back && feature.properties.status === 'RUNNING'" class="gdm-log fa fa-question-circle"  ></i>
+            <i v-if="back && (feature.properties.status === 'RUNNING' || feature.properties.status === 'FAILED')" class="gdm-log fa fa-question-circle"  ></i>
             <div  class="gdm-tooltip">
               <span>{{feature.properties.progress}} %</span>
               <div v-if="feature.properties.log">{{feature.properties.log}}</div>
