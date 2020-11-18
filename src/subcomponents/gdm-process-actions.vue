@@ -1,6 +1,8 @@
 <i18n>
 {
    "en":{
+     "abort": "Abort",
+     "confirm_abort": "This action is final.\nAre you sure you want to continue?",
      "refresh": "Refresh",
      "edit": "Edit",
      "launch": "Launch",
@@ -12,6 +14,8 @@
      "duplicate": "Duplicate"  
    },
    "fr":{
+     "abort": "Abandonner",
+     "confirm_abort": "Cette action est définitive.\nVoulez-vous continuer?",
      "refresh": "Actualiser",
      "edit": "Editer",
      "launch": "Lancer",
@@ -46,7 +50,7 @@
           :disabled="disabled">{{$t('relaunch')}}</a>
       </div>
       <!--  PURGED NOTHING TO DO => CREATE NEW PROCESS WITH THIS-->
-      <div v-else-if="process.status === 'PURGED' || process.status === 'TERMINATED'">
+      <div v-else-if="process.status === 'PURGED' || process.status === 'ABORTED' || process.status === 'TERMINATED'">
          <a class="button" @click="duplicate" >{{$t('duplicate')}}</a>
       </div>
         <div v-else-if="process.status === 'PRE-RUN'">
@@ -55,9 +59,8 @@
       </div>
       <div v-else-if="process.status === 'RUNNING'">
         <a class="button" @click="clickGetStatus" :class="{disabled: disabled}" :disabled="disabled">{{$t('refresh')}}</a>
-        <a class="button" style="display:none;" @click="dismiss" :class="{disabled: disabled}" :disabled="disabled">
-           <span v-if="process.format.indexOf('sar') >= 0">{{$t('stop')}}</span>
-           <span v-else >{{$t('cancel')}}</span>
+        <a class="button"  @click="dismiss" :class="{disabled: disabled}" :disabled="disabled">
+           <span>{{$t('abort')}}</span>
         </a>
       </div>
       <div v-else-if="process.status === 'SAVED'">
@@ -230,7 +233,17 @@ export default {
       })
     },
     dismiss () {
-      alert('@todo')
+      if (!window.confirm(this.$i18n.t('confirm_abort'))) {
+        return
+      }
+      this.submitting = true
+      this.$http.get(this.api + '/dismiss/' + this.process.id, {credentials: true})
+      .then(function (resp) {
+        this.$emit('statusChange', resp.body)
+        this.submitting = false
+      }, function (e) {
+        this.submitting = false
+      })
     },
     duplicate () {
       this.submitting = true

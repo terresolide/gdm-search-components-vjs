@@ -88,7 +88,7 @@
 	   </div>
 	   <div class="header-2-2" >
 	     <gdm-process-progress :status="process.status" :progress="process.progress" 
-	     :step-id="process.stepId" :log="log" :steps="process.serviceSteps" ></gdm-process-progress>
+	     :step-id="process.stepId" :log="log" :back="back" :steps="process.serviceSteps" ></gdm-process-progress>
 	  </div>
 	  <div class="header-2-3">
 	      <div><b>{{$t('owner')}}:</b> {{process.email}}</div>

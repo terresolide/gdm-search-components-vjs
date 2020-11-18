@@ -9,7 +9,7 @@
 }
 </i18n>
 <template>
-<div style="text-align:center;cursor:pointer;" :title="statusList[status].description">
+<div style="text-align:center;cursor:pointer;" :title="title">
  <span :class="statusList[status].icon" ></span>
    <div style="font-style:italic;font-size:0.9rem;color:grey;margin-bottom:5px;">
      {{statusList[status].collection}}
@@ -32,6 +32,10 @@ export default {
       type: String,
       default: 'en'
     },
+    progress: {
+      type: Number,
+      default: 0
+    },
     size: {
       type: String,
       default: 'small'
@@ -42,6 +46,13 @@ export default {
     }
   },
   computed: {
+    title () {
+      if (this.status === 'RUNNING') {
+        return this.progress + '%'
+      } else {
+        return this.statusList[this.status].description
+      }
+    }
   },
   destroyed: function() {
   },

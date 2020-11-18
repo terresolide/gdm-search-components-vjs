@@ -80,11 +80,12 @@
            <div v-if="feature.properties.processusName">({{feature.properties.processusName}})</div>
          </td>
          <td style="text-align:center;">
-            <gdm-process-status :status="feature.properties.status" :status-list="statusList" :lang="lang"></gdm-process-status>
+            <gdm-process-status :status="feature.properties.status" :status-list="statusList" 
+            :progress="feature.properties.progress" :lang="lang"></gdm-process-status>
             <div>
                <a v-if="url" :href="url + feature.properties.id" class="button">{{$t('consult')}}</a>
             </div>
-            <i v-if="feature.properties.status === 'RUNNING' || feature.properties.log" class="gdm-log fa fa-question-circle"  ></i>
+            <i v-if="back && feature.properties.status === 'RUNNING'" class="gdm-log fa fa-question-circle"  ></i>
             <div  class="gdm-tooltip">
               <span>{{feature.properties.progress}} %</span>
               <div v-if="feature.properties.log">{{feature.properties.log}}</div>
@@ -107,7 +108,7 @@
              {{printDate(feature.properties.start, true)}}
            </span>
          </div>
-         <div v-if="['TERMINATED', 'RUNNING', 'FAILED', 'PURGED'].indexOf(feature.properties.status) >=0">
+         <div v-if="['TERMINATED', 'RUNNING', 'FAILED', 'ABORTED', 'PURGED'].indexOf(feature.properties.status) >=0">
 	         <div>
 		         <b>{{$t('start')}}: </b>
 		         <span style="white-space:nowrap;">

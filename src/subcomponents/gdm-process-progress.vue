@@ -30,7 +30,7 @@
       </div>
       </span>
   </div>
-  <div class="gdm-tooltip" v-if="log && (status === 'RUNNING' || status === 'FAILED')">{{this.log}}</div>
+  <div class="gdm-tooltip" v-if="back && log && (status === 'RUNNING' || status === 'FAILED')">{{this.log}}</div>
 </div>
 </template>
 <script>
@@ -64,6 +64,10 @@ export default {
     color: {
       type: String,
       default: null
+    }, 
+    back: {
+      type: Boolean,
+      default: false
     }
   },
   data(){
@@ -98,6 +102,7 @@ export default {
           case 'KILLED':
           case 'FAILED':
           case 'INVALID':
+          case 'ABORTED':
             classname = 'gdm-progress-failed'
             break
         }
