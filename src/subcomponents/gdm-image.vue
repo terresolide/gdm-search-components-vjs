@@ -127,8 +127,8 @@
      </div>
   </div>
    <div v-if="image.productIdentifier && type === 'PLEIADES' & mode !== 'view'" class="gdm-image-6 gdm-fields">
-     <div  v-if="!image.removed && !checked" class="gdm-image-remove">
-        <span class="fa fa-close" @click="removeImage()" :title="$t('remove_image')"></span>
+     <div  v-if="!image.removed && !checked" class="gdm-image-remove" @click="removeImage()">
+        <span class="fa fa-close"  :title="$t('remove_image')"></span>
      </div>
   </div>
 </div>
