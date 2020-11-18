@@ -57,7 +57,7 @@
         <a class="button" @click="getStatus" :class="{disabled: disabled}" :disabled="disabled">{{$t('refresh')}}</a>
        
       </div>
-      <div v-else-if="process.status === 'RUNNING' || process.status === 'PRE-RUN'">
+      <div v-else-if="process.status === 'RUNNING' || process.status === 'PRE-RUN' || process.status === 'ACCEPTED'">
         <a class="button" @click="clickGetStatus" :class="{disabled: disabled}" :disabled="disabled">{{$t('refresh')}}</a>
         <a class="button"  @click="dismiss" :class="{disabled: disabled}" :disabled="disabled">
            <span>{{$t('abort')}}</span>
