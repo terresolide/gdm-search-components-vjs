@@ -33,7 +33,7 @@ export default {
       default: 'en'
     },
     progress: {
-      type: Number,
+      type: String|Number,
       default: 0
     },
     size: {

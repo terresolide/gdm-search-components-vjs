@@ -118,7 +118,7 @@
 	   <div class="header-4">--> 
 	   <div class="process-actions">
 	     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" 
-	     :process="process"  :lang="lang" @processChange="statusChange" 
+	     :process="process" :can-edit="!pleiadeRemoved" :lang="lang" @processChange="statusChange" 
 	     @statusChange="statusChange" @duplicate="duplicate">
 	     </gdm-process-actions>
 	   </div>
@@ -228,6 +228,7 @@ export default {
       process: null,
       // INPUT IMAGES
       images: [],
+      pleiadeRemoved: false,
       statusList: null,
       headerHeight: null,
       // RESULT
@@ -315,6 +316,12 @@ export default {
       if (list[index] && list[index].feature) {
         if (this.type === 'PLEIADES') {
           // specific case pleiades
+          if (list[index].removed || !list[index].owner) {
+            this.pleiadeRemoved = true
+            list[index].feature.properties.removed = true
+          } else {
+            list[index].feature.properties.removed = false
+          }
           var urlImg = this.api.replace('/api', '/pleiades/getImage') + '?img=' + encodeURIComponent(list[index].feature.properties.icon) + '&_bearer=' + this.token
           list[index].feature.properties.quicklook = urlImg
         }

@@ -31,19 +31,17 @@
 <template>
 <span class="gdm-process-actions" v-if="process" >
       <div  v-if="submitting" class="gdm-searching"><i class="fa fa-circle-o-notch animated"></i></div>
-       <div v-if="process.status === 'ACCEPTED'">
-        <a  class="button" @click="clickGetStatus" :class="{disabled: disabled}" :disabled="disabled">{{$t('refresh')}}</a>
-      </div>
-      <div v-else-if="process.status === 'EVALUATED'">
+
+      <div v-if="process.status === 'EVALUATED'">
          <a class="button" v-if="!back && url" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
-         <a class="button" @click="launch" :class="{disabled: disabled || !hasCredit}"
+         <a class="button" @click="launch" :class="{disabled: disabled || !hasCredit || !canEdit}"
          :disabled="disabled || !hasCredit">{{$t('launch')}}</a>
       </div>
        <div v-else-if="process.status === 'FAILED'">
-        <a class="button" @click="duplicate" >{{$t('duplicate')}}</a>
+        <a class="button" @click="duplicate" :class="{disabled: !canEdit}">{{$t('duplicate')}}</a>
       </div>
       <div v-else-if="process.status === 'INVALID'">
-        <a class="button" v-if="!back && url"  :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
+        <a class="button" v-if="!back && url"  :href="url + 'process/' + process.id + '/edit'" :class="{disabled: !canEdit}">{{$t('edit')}}</a>
       </div>
       <div v-else-if="process.status === 'CANCELED'">
          <a  style="display:none;" class="button" v-if="isOptic" @click="todo" :class="{disabled: disabled}"
@@ -51,11 +49,7 @@
       </div>
       <!--  PURGED NOTHING TO DO => CREATE NEW PROCESS WITH THIS-->
       <div v-else-if="process.status === 'PURGED' || process.status === 'ABORTED' || process.status === 'TERMINATED'">
-         <a class="button" @click="duplicate" >{{$t('duplicate')}}</a>
-      </div>
-        <div v-else-if="process.status === 'PRE-RUN'">
-        <a class="button" @click="getStatus" :class="{disabled: disabled}" :disabled="disabled">{{$t('refresh')}}</a>
-       
+         <a class="button" @click="duplicate"  :class="{disabled: !canEdit}">{{$t('duplicate')}}</a>
       </div>
       <div v-else-if="process.status === 'RUNNING' || process.status === 'PRE-RUN' || process.status === 'ACCEPTED'">
         <a class="button" @click="clickGetStatus" :class="{disabled: disabled}" :disabled="disabled">{{$t('refresh')}}</a>
@@ -66,12 +60,12 @@
       <div v-else-if="process.status === 'SAVED'">
          <a class="button" v-if="!back && url" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
          <a class="button" @click="evaluate" :class="{disabled: disabled}" 
-         :disabled="disabled">{{$t('evaluate')}}</a>
+         :disabled="disabled || !canEdit">{{$t('evaluate')}}</a>
       </div>
       <div v-else-if="process.status === 'WAITING'">
 	       <a class="button" v-if="!back && url" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
 	       <a class="button" v-if="process.format.indexOf('sar') >= 0 " :class="{disabled: disabled || !hasCredit}"
-	       :disabled="disabled || !hasCredit" @click="launch">
+	       :disabled="disabled || !hasCredit || !canEdit" @click="launch">
 	         {{$t('launch')}}
 	       </a>
       </div>
@@ -104,6 +98,10 @@ export default {
     process: {
       type: Object,
       default: null
+    },
+    canEdit: {
+      type: Boolean,
+      default: true
     }
   },
   data(){

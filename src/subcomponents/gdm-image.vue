@@ -12,6 +12,7 @@
     "processing_center": "Processing Center",
     "processing_level": "Processing Level",
     "relative_orbit": "Relative Orbit",
+    "remove_image": "Remove the image\nfrom your library",
     "select_first_date": "Start date",
     "select_image": "Select image",
     "select_last_date": "Last date",
@@ -33,6 +34,7 @@
      "processing_center": "Centre de traitement",
      "processing_level": "Niveau de traitement",
      "relative_orbit": "Orbite relative",
+     "remove_image": "Supprimer l'image\nde votre bibliothèque",
      "select_first_date": "Date de début",
      "select_image": "Selectionner cette image",
      "select_last_date": "Date de fin",
@@ -45,7 +47,7 @@
 }
 </i18n>
 <template>
-<div class="gdm-image" :class="{'gdm-no-image': !image.productIdentifier, 'gdm-image-view': mode === 'view', 'gdm-pleiade': type === 'PLEIADES'}">
+<div class="gdm-image" :class="{'gdm-no-image': !image.productIdentifier, 'gdm-image-view': mode === 'view', 'gdm-pleiade': type === 'PLEIADES', 'gdm-removed': image.removed}">
 	<div class="gdm-image-1">
 	<img v-if="image.quicklook" :src="image.quicklook" style="max-height:85px;max-width:85px;margin: 3px 5px;padding:3px;border: 1px solid grey;"/>
 	<img v-else src="../assets/images/no_image.png" width="85" style="margin: 3px 5px;padding:3px;border: 1px solid grey;"/>
@@ -122,6 +124,11 @@
         <span v-if="checked">{{$t('unselect_image')}}</span>
         <span v-else >{{$t('select_image')}}</span>
         <span class="fa" :class="{'fa-square-o': !checked, 'fa-check-square-o': checked}" @click="selectImage($event)"></span>
+     </div>
+  </div>
+   <div v-if="image.productIdentifier && type === 'PLEIADES' & mode !== 'view'" class="gdm-image-6 gdm-fields">
+     <div  v-if="!image.removed && !checked" class="gdm-image-remove">
+        <span class="fa fa-close" @click="removeImage()" :title="$t('remove_image')"></span>
      </div>
   </div>
 </div>
@@ -206,6 +213,9 @@ export default {
         return moment.utc(date).format('ll')
       }
     },
+    removeImage () {
+      this.$emit('removeImage', this.image.id )
+    },
     selectFirstDate () {
       var value = this.image.startDate
       if (this.startChecked) {
@@ -254,7 +264,7 @@ export default {
   border-bottom:1px solid lightgrey;
 }
 .gdm-image.gdm-pleiade {
-   grid-template-columns: 100px minmax(150px,1fr) 125px minmax(150px,1fr)  minmax(150px,1fr);
+   grid-template-columns: 100px minmax(150px,1fr) 125px minmax(150px,1fr)  minmax(150px,1fr) 60px;
  
 }
 .gdm-image.gdm-no-image {
@@ -286,6 +296,10 @@ export default {
   grid-column: 5;
   grid-row: 2;
 }
+.gdm-image-6{
+  grid-column: 6;
+  grid-row: 2;
+}
 .gdm-fields {
   margin-top:5px;
   color: #555;
@@ -303,6 +317,7 @@ export default {
 .gdm-image-5.gdm-fields {
   font-size: 1em;
 }
+
 .gdm-image.gdm-image-view {
   display: grid;
   grid-template-columns: 100px minmax(150px,1fr) minmax(150px,1fr);
@@ -321,5 +336,26 @@ export default {
   grid-column: 2/3;
   grid-row: 1;
 }
-
+.gdm-removed {
+  background: linear-gradient(-45deg, white 25%,
+  #EEE 25%, #EEE 50%, 
+  white 50%, white 75%, 
+  #EEE 75%);
+background-size: 10px 10px;
+}
+ div.gdm-image-remove {
+    width:30px;
+    height:30px;
+    text-align:center;
+    line-height:30px;
+    cursor:pointer;
+    opacity:0.8;
+    color:red;
+    margin-top: -10px;
+    border-color: 1px dotted white;
+  }
+  div.gdm-image-remove:hover {
+    opacity:1;
+    border: 1px dotted red;
+  }
 </style>
