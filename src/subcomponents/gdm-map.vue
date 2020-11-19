@@ -125,7 +125,7 @@ export default {
       this.controlLayer.tiles.arcgisTopo.layer.addTo(this.map)
       this.controlLayer.addTo(this.map)
       if (this.fullscreen) {
-        this.fullscreenLayer = new L.Control.Fullscreen(this.fullscreen, {lang: this.$i18n.locale, removeHeight: this.removeHeight})
+        this.fullscreenLayer = new L.Control.Fullscreen(this.fullscreen, {lang: this.$i18n.locale, removeHeight: this.removeHeight, mouseWheel: true})
         this.fullscreenLayer.addTo(this.map)
       }
       this.controlLegend = new L.Control.Legend(this.$i18n.locale, function (uuid) { return 'i' + uuid;})
