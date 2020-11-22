@@ -322,7 +322,7 @@ export default {
           } else {
             list[index].feature.properties.removed = false
           }
-          var urlImg = this.api.replace('/api', '/pleiades/getImage') + '?img=' + encodeURIComponent(list[index].feature.properties.icon) + '&_bearer=' + this.token
+          var urlImg = this.api.replace('/api', '/upload/pleiades/') + list[index].feature.properties.icon
           list[index].feature.properties.quicklook = urlImg
         }
         this.images.push(list[index].feature.properties)
