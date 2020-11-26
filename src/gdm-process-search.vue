@@ -62,8 +62,11 @@
          <tr v-for="feature in featureCollection.features" :class="'row' + feature.properties.id" 
          @mouseenter="highlight(feature.properties.id)" @click="selectProcess(feature.properties.id)">
          <td>
-           <div><b>{{feature.properties.id.toString().padStart(5,'0')}}</b></div>
-           <div class="gdm-token" v-if="feature.properties.token">{{feature.properties.token}}</div>
+           <div>
+	           <b>
+	           {{feature.properties.id.toString().padStart(5,'0')}}<span  v-if="feature.properties.token">-{{feature.properties.token}}</span>
+	           </b>
+           </div>
            
            <div class="toSelect" :class="{selectedService: parameters.service}" 
                @click="selectService({id:feature.properties.serviceId, name:feature.properties.serviceName}, $event)">

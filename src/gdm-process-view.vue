@@ -34,7 +34,7 @@
 	 <gdm-service-status  :name="process.serviceName" :status="process.serviceStatus" :top="5" :right="10" :lang="lang" ></gdm-service-status>
 	 <div class="gdm-process-header" :style="{background: $shadeColor(color,0.95)}">
 	   <div class="header-0">
-	    <h1 :style="{color:color}">{{(process.id + '').padStart(5, '0')}}<span v-if="process.name"> - {{process.name }}</span></h1>
+	    <h1 :style="{color:color}">{{(process.id + '').padStart(5, '0')}}-{{process.token}}<span v-if="process.name"> - {{process.name }}</span></h1>
 	   </div>
 	   <div class="header-1">
 	     <div class="gdm-map-container">
