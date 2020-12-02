@@ -131,6 +131,8 @@
        </div>
 		 </div>
 		 </div>
+		 <div> <gdm-parameters v-if="describe" :describe="describe" :default-parameters="defaultParameters" :width="380" :color="color"></gdm-parameters>
+      </div>
 		 <div class="gdm-list-parameters" >
 			 <h2 :style="{color:color}">{{$t('parameters')}}</h2>
 			 <div>
@@ -140,7 +142,7 @@
 			  </div>
 			  </div>
 		  </div>
-		  <div class="gdm-list-images" >
+		 <div class="gdm-list-images" >
 		  <h2 :style="{color:color}">Images</h2>
 		  <div v-if="images.length > 0">
 			  <div  v-for="image in images" class="gdm-images-child" >
@@ -162,6 +164,7 @@ import GdmProcessStatus from './subcomponents/gdm-process-status.vue'
 import GdmProcessProgress from './subcomponents/gdm-process-progress.vue'
 import GdmProcessResult from './subcomponents/gdm-process-result.vue'
 import GdmImage from './subcomponents/gdm-image.vue'
+import GdmParameters from './subcomponents/gdm-parameters.vue'
 export default {
   name: 'GdmProcessView',
   components: {
@@ -171,7 +174,8 @@ export default {
     GdmProcessStatus,
     GdmProcessProgress,
     GdmProcessResult,
-    GdmImage
+    GdmImage,
+    GdmParameters
   },
   props: {
     id: {
@@ -235,7 +239,9 @@ export default {
       imageLayers: null,
       log: null,
       token: null,
-      type: 'PEPS'
+      type: 'PEPS',
+      describe: null,
+      defaultParameters: null
     }
   },
   methods: {
@@ -280,8 +286,10 @@ export default {
       }
     },
     display (response) {
+      console.log(response)
+      this.describe = response.serviceParametersUrl
+      this.defaultParameters = response.feature.properties.parameters
       var parameters = response.feature.properties.parameters
-      console.log(parameters)
       var keys = Object.keys(parameters)
       keys.sort()
       for(var prop in keys) {
@@ -351,6 +359,9 @@ export default {
       .then(
           response => this.setStatusList(response.body),
           response => this.error(response))
+    },
+    setDescribe (srv) {
+      console.log(srv)
     },
     setStatusList (status) {
       if (!status.error) {
