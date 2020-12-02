@@ -2,9 +2,8 @@
 {
   "en": {
     "cloud_cover": "Cloud cover",
+    "columns_rows": "Columns/Rows",
     "nb_bands": "Nb bands",
-    "nb_cols": "Nb cols",
-    "nb_rows": "Nb rows",
     "no_image": "NO IMAGE FOR THIS DATE",
     "platform": "Platform",
     "producer": "Producer",
@@ -13,20 +12,22 @@
     "processing_level": "Processing Level",
     "relative_orbit": "Relative Orbit",
     "remove_image": "Remove the image\nfrom your library",
+    "remove": "Remove",
     "select_first_date": "Start date",
     "select_image": "Select image",
     "select_last_date": "Last date",
+    "spectral_band": "Spectral band",
     "snow_cover": "Snow cover",
     "size": "Size",
     "unselect_image": "Unselect image",
+    "zoom_in": "Zoom in",
     "zoom_out": "Zoom out",
     "zoom_to": "Zoom to the footprint"
   },
   "fr": {
      "cloud_cover": "Couverture nuageuse",
      "nb_bands": "Nb bandes",
-     "nb_cols": "Nb cols",
-     "nb_rows": "Nb lignes",
+     "columns_rows": "Col/lignes",
      "no_image": "AUCUNE IMAGE POUR CETTE DATE",
      "platform": "Plateforme",
      "producer": "Producteur",
@@ -35,12 +36,15 @@
      "processing_level": "Niveau de traitement",
      "relative_orbit": "Orbite relative",
      "remove_image": "Supprimer l'image\nde votre bibliothèque",
+     "remove": "Suppr.",
      "select_first_date": "Date de début",
      "select_image": "Selectionner cette image",
      "select_last_date": "Date de fin",
      "snow_cover": "Couverture neigeuse",
+     "spectral_band": "Bande spectrale",
      "size": "Taille",
      "unselect_image": "Désélectionner cette image",
+     "zoom_in": "Zoomer",
      "zoom_out": "Dézoomer",
      "zoom_to": "Zoomer sur l'emprise"
     }
@@ -60,14 +64,18 @@
 	<div class="gdm-image-2 gdm-fields">
 	   <div><label>Date : </label><span :style="{color: 'black'}">{{printDate(image.startDate)}}</span></div>
 	   <div v-if="image.productIdentifier">
-	     <div><label>{{$t('product_type')}} : </label>{{image.productType}}</div>
-	     <div v-if="type === 'PEPS'">        
+	     <div v-if="type === 'PEPS'">    
+	       <div><label>{{$t('product_type')}} : </label>{{image.productType}}</div>
+           
          <div><label>{{$t('platform')}} : </label>{{image.platform}}</div>
          <div><label>{{$t('relative_orbit')}} : </label> {{image.relativeOrbitNumber}}</div>
        </div>
        <div v-else-if="type === 'PLEIADES'">
-          <div><label>{{$t('producer')}} : </label>{{image.producer}}</div>
-          <div><label>{{$t('platform')}} : </label>{{image.platform}}</div>
+          <div><label>Instrument: </label>{{image.instrument}}</div>
+          <div><label>Geometric processing level : </label>{{image.processingLevel}}</div>
+          <div v-if="image.radiometricProcessingLevel">
+          <label>Radiometric processing level : </label>{{image.radiometricProcessingLevel}}</div>
+       
        </div>
     </div>
 	</div>
@@ -81,11 +89,11 @@
        <div><label>{{$t('processing_level')}} : </label>{{image.processingLevel}}</div>
     </div>
     <div v-else-if="type === 'PLEIADES'">
-      <div><label>{{$t('nb_cols')}} : </label>{{image.dimensions.cols}}</div>
-      <div><label>{{$t('nb_rows')}} : </label> {{image.dimensions.rows}}</div>
-      <div><label>{{$t('nb_bands')}} : </label> {{image.dimensions.bands}}</div>
-      <div><label>Format : </label>{{image.format}}</div>
-    </div>
+      <div><label>{{$t('producer')}} : </label>{{image.producer}}</div>
+      <div><label>Format : </label>{{image.format}}<span v-if="image.encoding"> ({{image.encoding}}bits)</span></div>
+      <div><label>{{$t('columns_rows')}}: </label>{{image.dimensions.cols}} /  {{image.dimensions.rows}}</div>
+      <div v-if="image.spectralBand"><label>{{$t('spectral_band')}}: </label> {{image.spectralBand}}</div>
+       </div>
   </div>
 	<div v-if="image.productIdentifier && mode === 'S2ST-STACK'" class="gdm-image-4 gdm-fields" >
 	  <div v-if="!searching && order > 0" >
@@ -106,8 +114,8 @@
 	<div v-if="image.productIdentifier && type === 'PLEIADES' & mode !== 'view'" class="gdm-image-4 gdm-fields" 
   style="color:black;">
     <div>
-       <span style="cursor:pointer;" @click="zoomTo">
-         <span style="width:80px;">{{$t('zoom_to')}}</span>
+       <span style="cursor:pointer;" @click="zoomTo" :title="$t('zoom_to')">
+         <span style="width:80px;">{{$t('zoom_in')}}</span>
          <i class="fa fa-search-plus" style="font-size:1.2em;"></i>
        </span>
     </div>
@@ -117,7 +125,10 @@
         <i class="fa fa-search-minus" style="font-size:1.2em;"></i>
       </span>
     </div>
-
+    <div style="cursor:pointer;margin-top:5px;" v-if="!image.removed && !checked"  @click="removeImage()" :title="$t('remove_image')">
+        <span style="width:80px;"">{{$t('remove')}}</span>
+        <i class="fa fa-trash" style="font-size:1.2em;"></i>
+     </div>
   </div>
   <div v-if="mode !== 'view'" class="gdm-image-5 gdm-fields">
      <div v-if="!searching" style="color:black;text-align:center;">
@@ -126,11 +137,7 @@
         <span class="fa" :class="{'fa-square-o': !checked, 'fa-check-square-o': checked}" @click="selectImage($event)"></span>
      </div>
   </div>
-   <div v-if="image.productIdentifier && type === 'PLEIADES' & mode !== 'view'" class="gdm-image-6 gdm-fields">
-     <div  v-if="!image.removed && !checked" class="gdm-image-remove" @click="removeImage()">
-        <span class="fa fa-close"  :title="$t('remove_image')"></span>
-     </div>
-  </div>
+  
 </div>
 </template>
 <script>
@@ -206,7 +213,7 @@ export default {
         if (this.lang === 'fr') {
           return moment.utc(date).format('D MMM YYYY HH:mm:ss')
         } else {
-          return moment.utc(date).format('MMM Do, YYYY HH:mm:ss')
+          return moment.utc(date).format('MMM D, YYYY HH:mm:ss')
         }
         
       } else {
@@ -264,8 +271,8 @@ export default {
   border-bottom:1px solid lightgrey;
 }
 .gdm-image.gdm-pleiade {
-   grid-template-columns: 100px minmax(150px,1fr) 125px minmax(150px,1fr)  minmax(150px,1fr) 60px;
- 
+   grid-template-columns: 90px minmax(330px,2fr) minmax(220px,2fr) minmax(90px, 1fr) minmax(90px, 1fr) ;
+  grid-template-rows: 10px 84px; 
 }
 .gdm-image.gdm-no-image {
   background: linear-gradient(-45deg, #EEE 12.5%, #fff 12.5%, #fff 37.5%, #EEE 37.5%, #EEE 62.5%, #fff 62.5%, #fff 87.5%, #EEE 87.5%);
@@ -307,6 +314,9 @@ export default {
 .gdm-image-4.gdm-fields > div {
   text-align:right;
   padding: 0px 0;
+}
+.gdm-pleiade .gdm-image-4.gdm-fields > div {
+  text-align: center;
 }
 .gdm-image-4.gdm-fields > div:first-child{
   padding-top: 0;

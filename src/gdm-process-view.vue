@@ -34,7 +34,7 @@
 	 <gdm-service-status  :name="process.serviceName" :status="process.serviceStatus" :top="5" :right="10" :lang="lang" ></gdm-service-status>
 	 <div class="gdm-process-header" :style="{background: $shadeColor(color,0.95)}">
 	   <div class="header-0">
-	    <h1 :style="{color:color}">{{(process.id + '').padStart(5, '0')}}-{{process.token}}<span v-if="process.name"> - {{process.name }}</span></h1>
+	    <h1 :style="{color:color}">{{(process.id + '').padStart(5, '0')}}<span v-if="process.token">-{{process.token}}</span><span v-if="process.name">  {{process.name }}</span></h1>
 	   </div>
 	   <div class="header-1">
 	     <div class="gdm-map-container">
@@ -43,8 +43,8 @@
 	     </div>
 	      <div style="text-align:center;margin-top:10px;">
 	         {{date2str(process.tempStart, true)}}
-	         <span class="fa fa-long-arrow-right"></span>
-	         {{date2str(process.tempEnd, true)}}
+	         <span v-if="type !== 'PLEIADES'" class="fa fa-long-arrow-right"></span>
+	         <span v-if="type !== 'PLEIADES'">{{date2str(process.tempEnd, true)}}</span> 
 	     </div>
 	   </div>
 	   <div class="header-2-1" style="padding: 0 10px;">
@@ -144,7 +144,7 @@
 		  <h2 :style="{color:color}">Images</h2>
 		  <div v-if="images.length > 0">
 			  <div  v-for="image in images" class="gdm-images-child" >
-	        <gdm-image :image="image" :type="type" :searching="true" :checked="true" mode="view" :lang="lang"></gdm-image>
+	        <gdm-image :image="image" :type="type" :searching="false" :checked="false" mode="aview" :lang="'fr'"></gdm-image>
 	      </div>
 		  </div>
 		  <div v-else style="text-align:center;padding: 30px;">NO IMAGES SELECTED - TYPE REQUEST</div>

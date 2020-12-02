@@ -7,6 +7,7 @@
     "end": "Job end",
     "process_dates": "Job information",
     "identifiers": "Identifiers",
+    "image_dates": "Date of images",
     "temporal_extent": "Temporal extent",
     "parameters": "Parameters",
     "no_process": "No process",
@@ -21,6 +22,7 @@
     "end": "Fin",
     "process_dates": "Job information",
     "identifiers": "Identifiants",
+    "image_dates": "Date des images",
     "temporal_extent": "Etendue temporelle",
     "parameters": "Paramètres",
     "no_process": "Aucun calcul",
@@ -54,7 +56,10 @@
          <th :style="{background:$shadeColor(color, 0.8)}">{{$t('identifiers')}}</th>
          <th :style="{background:$shadeColor(color, 0.8)}">Status</th>
          <th :style="{background:$shadeColor(color, 0.8)}">{{$t('process_dates')}}</th>
-         <th :style="{background:$shadeColor(color, 0.8)}">{{$t('temporal_extent')}}</th>
+         <th :style="{background:$shadeColor(color, 0.8)}">
+	         <span v-if="group === 'DEM'">{{$t('image_dates')}}</span>
+	         <span v-else>{{$t('temporal_extent')}}</span>
+         </th>
          <th :style="{background:$shadeColor(color, 0.8)}">{{$t('parameters')}}</th>
          
          </thead>
@@ -136,9 +141,11 @@
          </td>
          
          <td style="text-align:center;">
-         {{printDate(feature.properties.temporalExtent[0])}}
-         <b>&rarr;</b>
-         {{printDate(feature.properties.temporalExtent[1])}}
+	         {{printDate(feature.properties.temporalExtent[0])}}
+	         <span v-if="group !== 'DEM'">
+	            <b>&rarr;</b>
+	            {{printDate(feature.properties.temporalExtent[1])}}
+	         </span>
          </td>
          <td style="min-width:40%;">
            <div style="width:100%;max-height:100px;">
