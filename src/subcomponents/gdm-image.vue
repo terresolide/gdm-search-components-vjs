@@ -3,6 +3,7 @@
   "en": {
     "cloud_cover": "Cloud cover",
     "columns_rows": "Columns/Rows",
+    "geo_processing_level": "Geometric processing level",
     "nb_bands": "Nb bands",
     "no_image": "NO IMAGE FOR THIS DATE",
     "platform": "Platform",
@@ -10,6 +11,7 @@
     "product_type": "Product Type",
     "processing_center": "Processing Center",
     "processing_level": "Processing Level",
+    "radio_processing_level": "Radiometric processing level",
     "relative_orbit": "Relative Orbit",
     "remove_image": "Remove the image\nfrom your library",
     "remove": "Remove",
@@ -28,6 +30,7 @@
      "cloud_cover": "Couverture nuageuse",
      "nb_bands": "Nb bandes",
      "columns_rows": "Col/lignes",
+     "geo_processing_level": "Niv. traitement géométrique",
      "no_image": "AUCUNE IMAGE POUR CETTE DATE",
      "platform": "Plateforme",
      "producer": "Producteur",
@@ -35,6 +38,7 @@
      "processing_center": "Centre de traitement",
      "processing_level": "Niveau de traitement",
      "relative_orbit": "Orbite relative",
+     "radio_processing_level": "Niv. traitement radiométrique",
      "remove_image": "Supprimer l'image\nde votre bibliothèque",
      "remove": "Suppr.",
      "select_first_date": "Date de début",
@@ -72,9 +76,9 @@
        </div>
        <div v-else-if="type === 'PLEIADES'">
           <div><label>Instrument: </label>{{image.instrument}}</div>
-          <div><label>Geometric processing level : </label>{{image.processingLevel}}</div>
+          <div><label>{{$t('geo_processing_level')}}: </label>{{image.processingLevel}}</div>
           <div v-if="image.radiometricProcessingLevel">
-          <label>Radiometric processing level : </label>{{image.radiometricProcessingLevel}}</div>
+          <label>{{$t('radio_processing_level')}}: </label>{{image.radiometricProcessingLevel}}</div>
        
        </div>
     </div>
@@ -114,19 +118,19 @@
 	<div v-if="image.productIdentifier && type === 'PLEIADES' & mode !== 'view'" class="gdm-image-4 gdm-fields" 
   style="color:black;">
     <div>
-       <span style="cursor:pointer;" @click="zoomTo" :title="$t('zoom_to')">
-         <span style="width:80px;">{{$t('zoom_in')}}</span>
+       <span class="gdm-action"  @click="zoomTo" :title="$t('zoom_to')">
+         <span >{{$t('zoom_in')}}</span>
          <i class="fa fa-search-plus" style="font-size:1.2em;"></i>
        </span>
     </div>
     <div>
-      <span style="cursor:pointer;" @click="zoomOut">
-        <span style="width:80px;">{{$t('zoom_out')}}</span>
+      <span class="gdm-action" @click="zoomOut">
+        <span >{{$t('zoom_out')}}</span>
         <i class="fa fa-search-minus" style="font-size:1.2em;"></i>
       </span>
     </div>
-    <div style="cursor:pointer;margin-top:5px;" v-if="!image.removed && !checked"  @click="removeImage()" :title="$t('remove_image')">
-        <span style="width:80px;"">{{$t('remove')}}</span>
+    <div class="gdm-action" style="margin-top:5px;" v-if="!image.removed && !checked"  @click="removeImage()" :title="$t('remove_image')">
+        <span >{{$t('remove')}}</span>
         <i class="fa fa-trash" style="font-size:1.2em;"></i>
      </div>
   </div>
@@ -134,7 +138,7 @@
      <div v-if="!searching" style="color:black;text-align:center;">
         <span v-if="checked">{{$t('unselect_image')}}</span>
         <span v-else >{{$t('select_image')}}</span>
-        <span class="fa" :class="{'fa-square-o': !checked, 'fa-check-square-o': checked}" @click="selectImage($event)"></span>
+        <span class="gdm-action fa" :class="{'fa-square-o': !checked, 'fa-check-square-o': checked}" @click="selectImage($event)"></span>
      </div>
   </div>
   
@@ -271,8 +275,24 @@ export default {
   border-bottom:1px solid lightgrey;
 }
 .gdm-image.gdm-pleiade {
-   grid-template-columns: 90px minmax(330px,2fr) minmax(220px,2fr) minmax(90px, 1fr) minmax(90px, 1fr) ;
+   grid-template-columns: 90px minmax(330px,3fr) minmax(210px,2fr) minmax(90px, 1fr) minmax(90px, 1fr) ;
   grid-template-rows: 10px 84px; 
+}
+.gdm-image.gdm-image-view {
+  display: grid;
+  grid-template-columns: 100px minmax(150px,1fr) minmax(150px,1fr);
+  /*grid-auto-rows: minmax(100px, auto);*/
+}
+.gdm-image.gdm-pleiade.gdm-image-view {
+   grid-template-columns: 100px minmax(330px,3fr) minmax(210px,2fr);
+  grid-template-rows: 10px 84px; 
+}
+.gdm-image img {
+  max-height:85px;
+  max-width:85px;
+  margin: 2px;
+  padding:3px;
+  border: 1px solid grey;
 }
 .gdm-image.gdm-no-image {
   background: linear-gradient(-45deg, #EEE 12.5%, #fff 12.5%, #fff 37.5%, #EEE 37.5%, #EEE 62.5%, #fff 62.5%, #fff 87.5%, #EEE 87.5%);
@@ -327,7 +347,13 @@ export default {
 .gdm-image-5.gdm-fields {
   font-size: 1em;
 }
-
+.gdm-action {
+  cursor: pointer;
+  opacity:0.9;
+}
+.gdm-action:hover {
+  opacity:1;
+}
 .gdm-image.gdm-image-view {
   display: grid;
   grid-template-columns: 100px minmax(150px,1fr) minmax(150px,1fr);
