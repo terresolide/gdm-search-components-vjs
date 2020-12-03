@@ -539,6 +539,7 @@ span.gdm-information {
   display:inline-block; 
   width:380px;
   max-width:380px;
+  font-size: 0.9rem;
 }
 .gdm-list-parameters > div {
    max-height:500px;
