@@ -131,9 +131,14 @@
        </div>
 		 </div>
 		 </div>
-		 <div> <gdm-parameters v-if="describe" :describe="describe" :default-parameters="defaultParameters" :width="380" :color="color"></gdm-parameters>
+		 <div class="gdm-list-parameters"> 
+		  <h2 :style="{color:color}">{{$t('parameters')}}</h2>
+       <div>
+		 <gdm-parameters v-if="describe" mode="view" :describe="describe" :default-parameters="defaultParameters" :width="360" :color="color"></gdm-parameters>
+        <div style="height:120px;"></div>
       </div>
-		 <div class="gdm-list-parameters" >
+      </div>
+		<!--  <div class="gdm-list-parameters" >
 			 <h2 :style="{color:color}">{{$t('parameters')}}</h2>
 			 <div>
 			  <div v-for="(value, prop) in parameters" style="font-size:0.9rem;max-width:400px;"
@@ -141,7 +146,7 @@
 			    <b >{{prop}}:</b> <div style="vertical-align:top;max-width:350px;display:inline-block;overflow-wrap:anywhere">{{value}}</div>
 			  </div>
 			  </div>
-		  </div>
+		  </div> --> 
 		 <div class="gdm-list-images" >
 		  <h2 :style="{color:color}">Images</h2>
 		  <div v-if="images.length > 0">

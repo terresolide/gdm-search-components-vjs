@@ -9,35 +9,36 @@
 }
 </i18n>
 <template>
-<span class="gdm-parameters" v-show="show" style="direction:ltr;" >
- <div v-if="!root" style="margin-left: -18px;":title="describe.short">
+<span class="gdm-parameters" v-show="show" style="direction:ltr;" @contextmenu="$event.preventDefault()" >
+ <div v-if="!root" style="margin-left: -18px;":title="describe.short" >
 <!--   <div  v-if="used" class="gdm-deployed" @click="deployed = !deployed" style="width:6px;pointer:cursor;">{{deployed ? '-' : '+'}}</div>
  <div v-else="used" class="gdm-deployed" style="color:grey;">{{deployed ? '-' : '+'}}</div>
  -->
-  <div  v-show="required" class="gdm-used fa fa-check-square-o" :style="{color: 'grey'}"></div>
+  <div  v-show="required" class="gdm-used fa fa-check-square-o" style="color:grey;"></div>
   
   <div  v-if="type === 'complexeReturn'"  class="gdm-used fa"  @click="changeUsed"  
-  :class="{ 'fa-square-o': !used, 'fa-check-square-o': used, disabled: disabled}"></div>
+  :class="{ 'fa-square-o': !used, 'fa-check-square-o': used, disabled: disabled || mode === 'view'}"></div>
   
-  <div v-else v-show="!required" class="gdm-used fa"  @click="used = !used"  :class="{ 'fa-square-o': !used, 'fa-check-square-o': used}"></div>
+  <div v-else v-show="!required" class="gdm-used fa"  @click="used = !used"  :class="{ 'fa-square-o': !used, 'fa-check-square-o': used, 'disabled': mode === 'view'}"></div>
   
-  <span class="gdm-complexe-title" v-if="used" :style="{color: color}"  @click="deployed = !deployed" @contextmenu="showTooltip($event)">
+  <span class="gdm-complexe-title" v-if="used || mode === 'view'" :style="{color: color}"  @click="deployed = !deployed" @contextmenu="showTooltip($event)">
   {{title}}
    <span> {{deployed ? '-' : '+'}}</span>
   </span>
-  <span v-if="!used" :style="{color: color, opacity:0.7}"  @contextmenu="showTooltip($event)" >{{title}}</span>
+  <span v-if="!used && mode !== 'view'" :style="{color: color, opacity:0.7}"  @contextmenu="showTooltip($event)" >{{title}}</span>
    <div v-if="description" class="gdm-tooltip" @click="hideTooltip()" @contextmenu="hideTooltip()">
     <h4 v-if="describe.short">{{describe.short}}</h4>
     <div v-html="description"></div>
    </div>
 </div>
-<div v-show="deployed && used"  style="margin-left:20px;">
-<div v-if="name === 'dsmopt_use_roi' || name === 'correl_use_roi'"
+<div v-show="deployed && (used || mode === 'view')"  style="margin-left:20px;">
+<div v-if="mode !== 'view' && (name === 'dsmopt_use_roi' || name === 'correl_use_roi')"
  style="margin-top:5px;font-size:0.9em;text-align:center;">
    <span class="button fa fa-edit" @click="triggerDrawBbox"> &nbsp;Draw a bbox</span>
 </div>
- <div v-for="(parameter, key) in parameters" style="overflow: visible;position:relative;" :style="{marginTop:'5px'}" :key="key" >
-   <gdm-parameters :ref="parameter.name" v-if="parameter.type === 'complexe' || parameter.type === 'complexeReturn'" 
+ <div v-for="(parameter, key) in parameters" style="overflow: visible;position:relative;" :style="{marginTop:'5px'}" :key="key" 
+  v-if="!(mode === 'view' && parameter.type === 'customInputImages')">
+   <gdm-parameters :ref="parameter.name" :mode="mode" v-if="parameter.type === 'complexe' || parameter.type === 'complexeReturn'" 
    :describe="parameter" :parent="prefix" :color="color" :defaultParameters="defaultParameters">
    </gdm-parameters>
    <div v-if="['complexe', 'complexeReturn', 'hidden'].indexOf(parameter.type) < 0" v-show="parameter.show" :class="parameter.classname">
@@ -53,17 +54,21 @@
      
      <div v-if="parameter.type === 'select' || parameter.type === 'customTypeSelect'" 
      style="display:inline-block;">
-        <select v-if="parameter.associative" :name="prefix + parameter.name" @change="change(parameter)"
-        v-model="values[prefix + parameter.name]" :class="{disabled: parameter.type === 'customTypeSelect'}">
+        <select v-if="parameter.associative" :name="prefix + parameter.name" @change="change(parameter)" 
+        v-model="values[prefix + parameter.name]" :class="{disabled: parameter.type === 'customTypeSelect'}"
+        :disabled="mode === 'view'">
           <option v-for="(option, key) in parameter.options" :value="key">{{option}}</option>
         </select>
         <select v-else :name="prefix + parameter.name" v-model="values[prefix + parameter.name]"
-        :class="{disabled : parameter.type === 'customTypeSelect'}" @change="change(parameter)">
+        :class="{disabled : parameter.type === 'customTypeSelect'}" :disabled="mode === 'view'"
+        @change="change(parameter)">
           <option v-for="option in parameter.options" :value="option">{{option}}</option>
         </select>
      </div>
      <div v-if="parameter.type === 'datalist'">
-        <input type="text" :list="'list_' + prefix + parameter.name" v-model="values[prefix + parameter.name]" style="width:250px;min-width:250px" :pattern="parameter.pattern" :name="prefix + parameter.name" :regex="parameter.regex">
+        <input type="text" :list="'list_' + prefix + parameter.name" v-model="values[prefix + parameter.name]" 
+        style="width:250px;min-width:250px" :pattern="parameter.pattern" :name="prefix + parameter.name" :regex="parameter.regex"
+        :disabled="mode === 'view'">
 				<datalist v-if="parameter.associative" :id="'list_' + prefix + parameter.name">
 				    <option v-for="(option, key) in parameter.options" :value="key">{{key}} - {{option}}</option>
 				</datalist>
@@ -73,27 +78,33 @@
        
      </div>
      <input v-if="parameter.type === 'date'" type="date"  :name="prefix + parameter.name" v-model="values[prefix + parameter.name]" 
-         style="max-width:135px;"   :required="parameter.required" :min="parameter.min" :max="parameter.max" @change="change(parameter)"/>
+         style="max-width:135px;"   :required="parameter.required" :min="parameter.min" :max="parameter.max" 
+         :disabled="mode === 'view'" @change="change(parameter)"/>
    
      <div v-if="parameter.type === 'text'">
-          <input type="text" :required="required" :name="prefix + parameter.name" v-model="values[prefix + parameter.name]" @change="change(parameter)"/>
+          <input type="text" :required="required" :name="prefix + parameter.name" v-model="values[prefix + parameter.name]" 
+          :disabled="mode === 'view'" @change="change(parameter)"/>
      </div>
      <input v-if="parameter.type === 'number'"
        type="number" :name="prefix + parameter.name" :min="parameter.min" :max="parameter.max" :step="parameter.step"
-        v-model="values[prefix + parameter.name]"  @change="change(parameter)" :class="{disabled:(parameter.type === 'customTypeNumber') || parameter.disabled}"/>
+        v-model="values[prefix + parameter.name]"  @change="change(parameter)" 
+        :disabled="mode === 'view'" :class="{disabled:(parameter.type === 'customTypeNumber') || parameter.disabled}"/>
      
      <input v-if="parameter.type === 'customTypeNumber'" type="text" :name="prefix + parameter.name" style="max-width:80px;"
-        v-model="values[prefix + parameter.name]"  @change="change(parameter)" class="disabled"/>
+        v-model="values[prefix + parameter.name]" :disabled="mode === 'view'"
+         @change="change(parameter)" class="disabled"/>
   
      <span v-if="parameter.type === 'checkbox'">
      <input type="checkbox"   style="vertical-align:middle;" v-model="values[prefix + parameter.name]" 
-      @click="values[prefix + parameter.name] = !values[prefix + parameter.name]" @change="change(parameter)"/>
+      @click="values[prefix + parameter.name] = !values[prefix + parameter.name]" 
+      :disabled="mode === 'view'" @change="change(parameter)"/>
       <input type="hidden" v-model="values[prefix + parameter.name]" :name="prefix + parameter.name" />
     </span>
      <div v-if="parameter.type === 'customTypeText'">
-        <input type="text" class="disabled" :name="prefix + parameter.name" v-model="values[prefix + parameter.name]" placeholder="automatically filled" />
+        <input type="text" class="disabled" :name="prefix + parameter.name" v-model="values[prefix + parameter.name]"
+        :disabled="mode === 'view'"  placeholder="automatically filled" />
      </div>
-     <span v-if="parameter.type === 'customInputImages'"><b>{{parameter.count}}</b>
+     <span v-if="parameter.type === 'customInputImages' && mode !== 'view'"><b>{{parameter.count}}</b>
 	     <i v-if="parameter.min || parameter.max" style="font-size:0.9em;margin-left:10px;">
 	       (<span v-if="parameter.min">{{parameter.min}} &#x2264; </span>N<span v-if="parameter.max"> &#x2264; {{parameter.max}}</span>)
 	     </i>
@@ -129,6 +140,10 @@ export default {
     width: {
       type: Number,
       default: 280
+    },
+    mode: {
+      type: String,
+      default: null
     },
     defaultParameters: {
       type: Object | Array,
@@ -510,6 +525,7 @@ div[id="app"] .gdm-tooltip a:hover {
 <style scoped>
 .gdm-parameters .disabled {
   pointer-events: none;
+  color: grey;
 }
 .gdm-parameters .gdm-complexe-title{
   cursor: pointer;
