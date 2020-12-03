@@ -119,26 +119,26 @@
   style="color:black;">
     <div>
        <span class="gdm-action"  @click="zoomTo" :title="$t('zoom_to')">
-         <span >{{$t('zoom_in')}}</span>
          <i class="fa fa-search-plus" style="font-size:1.2em;"></i>
        </span>
     </div>
     <div>
-      <span class="gdm-action" @click="zoomOut">
-        <span >{{$t('zoom_out')}}</span>
+      <span class="gdm-action" @click="zoomOut" :title="$t('zoom_out')">
         <i class="fa fa-search-minus" style="font-size:1.2em;"></i>
       </span>
     </div>
-    <div class="gdm-action" style="margin-top:5px;" v-if="!image.removed && !checked"  @click="removeImage()" :title="$t('remove_image')">
-        <span >{{$t('remove')}}</span>
-        <i class="fa fa-trash" style="font-size:1.2em;"></i>
+    <div>
+	    <span class="gdm-action" style="margin-top:5px;" v-if="!image.removed && !checked"  @click="removeImage()" :title="$t('remove_image')">
+	        <!--  <span >{{$t('remove')}}</span>-->
+	        <i class="fa fa-trash" style="font-size:1.2em;"></i>
+	     </span>
      </div>
   </div>
   <div v-if="mode !== 'view'" class="gdm-image-5 gdm-fields">
-     <div v-if="!searching" style="color:black;text-align:center;">
+     <div v-if="!searching" style="color:black;text-align:center;cursor:pointer;"  @click="selectImage($event)">
         <span v-if="checked">{{$t('unselect_image')}}</span>
         <span v-else >{{$t('select_image')}}</span>
-        <span class="gdm-action fa" :class="{'fa-square-o': !checked, 'fa-check-square-o': checked}" @click="selectImage($event)"></span>
+        <span class="gdm-action fa" :class="{'fa-square-o': !checked, 'fa-check-square-o': checked}"></span>
      </div>
   </div>
   
@@ -275,7 +275,8 @@ export default {
   border-bottom:1px solid lightgrey;
 }
 .gdm-image.gdm-pleiade {
-   grid-template-columns: 90px minmax(330px,3fr) minmax(210px,2fr) minmax(90px, 1fr) minmax(90px, 1fr) ;
+  min-width:750px;
+   grid-template-columns: 90px minmax(270px,3fr) minmax(190px,2fr) minmax(30px, 50px) minmax(70px, 100px) ;
   grid-template-rows: 10px 84px; 
 }
 .gdm-image.gdm-image-view {
@@ -352,10 +353,14 @@ export default {
 }
 .gdm-action {
   cursor: pointer;
-  opacity:0.9;
+  opacity:0.8;
+  padding:2px 2px;
+  display:inline-block;
+  border:1px dotted white;
 }
 .gdm-action:hover {
   opacity:1;
+   border:1px dotted grey;
 }
 .gdm-image.gdm-image-view {
   display: grid;
