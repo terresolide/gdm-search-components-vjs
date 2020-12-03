@@ -57,7 +57,7 @@
 <template>
 <div class="gdm-image" :class="{'gdm-no-image': !image.productIdentifier, 'gdm-image-view': mode === 'view', 'gdm-pleiade': type === 'PLEIADES', 'gdm-removed': image.removed}">
 	<div class="gdm-image-1">
-	<img v-if="image.quicklook" :src="image.quicklook" style="max-height:85px;max-width:85px;margin: 3px 5px;padding:3px;border: 1px solid grey;"/>
+	<img v-if="image.quicklook" :src="image.quicklook" />
 	<img v-else src="../assets/images/no_image.png" width="85" style="margin: 3px 5px;padding:3px;border: 1px solid grey;"/>
   
 	</div>
@@ -293,6 +293,9 @@ export default {
   margin: 2px;
   padding:3px;
   border: 1px solid grey;
+}
+.gdm-image.gdm-pleiade.gdm-image img {
+  max-width: 80px;
 }
 .gdm-image.gdm-no-image {
   background: linear-gradient(-45deg, #EEE 12.5%, #fff 12.5%, #fff 37.5%, #EEE 37.5%, #EEE 62.5%, #fff 62.5%, #fff 87.5%, #EEE 87.5%);

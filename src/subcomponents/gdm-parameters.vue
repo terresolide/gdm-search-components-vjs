@@ -534,7 +534,7 @@ div[id="app"] .gdm-tooltip a:hover {
   margin-left:3px;
 }
 .gdm-parameters .gdm-title {
-  line-height: 0.9;
+  line-height: 1;
 }
 /*.gdm-title > div {
   display: flex;
