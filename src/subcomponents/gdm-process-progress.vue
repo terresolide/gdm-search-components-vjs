@@ -121,7 +121,7 @@ export default {
   },
   methods:{
     stepClass (index) {
-      if (this.steps[index].stp_order < this.findStep.stp_order) {
+      if (this.steps[index].stp_order <= this.findStep.stp_order) {
         return 'done'
       } else if (this.steps[index].stp_order === this.findStep.stp_order){
         return this.classes
