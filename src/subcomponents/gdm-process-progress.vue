@@ -17,7 +17,11 @@
  <div v-if="stepId && findStep" class="gdm-steps" >
  <ul class="gdm-progress-step">
     <li v-for="(step, index) in steps" :class="stepClass(index)"
-    :style="{width: 100/steps.length + '%'}" :title="step.stp_description">{{step.stp_name.replace(/_/g, ' ')}}</li>
+    :style="{width: 100/steps.length + '%'}" :title="step.stp_description">
+	    <div style="padding:0 3px;line-height:1">
+	    {{step.stp_name.replace(/_/g, ' ')}}
+	    </div>
+    </li>
   </ul>
   </div>
   <div v-else  class="gdm-progressbar" >
