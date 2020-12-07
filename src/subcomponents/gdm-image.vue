@@ -1,8 +1,11 @@
 <i18n>
 {
   "en": {
+    "click_to_enlarge": "Click to enlarge",
+    "click_to_reduce": "Click to reduce",
     "cloud_cover": "Cloud cover",
     "columns_rows": "Columns/Rows",
+    "hide_image": "Hide image",
     "geo_processing_level": "Geometric processing level",
     "nb_bands": "Nb bands",
     "no_image": "NO IMAGE FOR THIS DATE",
@@ -18,6 +21,7 @@
     "select_first_date": "Start date",
     "select_image": "Select image",
     "select_last_date": "Last date",
+    "show_image": "Display on map",
     "spectral_band": "Spectral band",
     "snow_cover": "Snow cover",
     "size": "Size",
@@ -27,7 +31,10 @@
     "zoom_to": "Zoom to the footprint"
   },
   "fr": {
+     "click_to_enlarge": "Cliquer pour agrandir",
+     "click_to_reduce": "Cliquer pour fermer",
      "cloud_cover": "Couverture nuageuse",
+     "hide_image": "Cacher",
      "nb_bands": "Nb bandes",
      "columns_rows": "Col/lignes",
      "geo_processing_level": "Niv. traitement géométrique",
@@ -44,6 +51,7 @@
      "select_first_date": "Date de début",
      "select_image": "Selectionner cette image",
      "select_last_date": "Date de fin",
+     "show_image": "Afficher",
      "snow_cover": "Couverture neigeuse",
      "spectral_band": "Bande spectrale",
      "size": "Taille",
@@ -56,8 +64,12 @@
 </i18n>
 <template>
 <div class="gdm-image" :class="{'gdm-no-image': !image.productIdentifier, 'gdm-image-view': mode === 'view', 'gdm-pleiade': type === 'PLEIADES', 'gdm-removed': image.removed}">
+	<div v-if="displayedImageId === image.productIdentifier" class="gdm-full"  @click="displayImage($event)" :title="$t('click_to_reduce')">
+	  <img :src="image.quicklook" >
+	</div>
 	<div class="gdm-image-1">
-	<img v-if="image.quicklook" :src="image.quicklook" />
+	<img v-if="image.quicklook" :src="image.quicklook" @click="displayImage($event)" 
+	:title="displayedImageId === image.productIdentifier ? $t('click_to_reduce') : $t('click_to_enlarge')" style="cursor:pointer;" :class="{selected: displayedImageId === image.productIdentifier}"/>
 	<img v-else src="../assets/images/no_image.png" width="85" style="margin: 3px 5px;padding:3px;border: 1px solid grey;"/>
   
 	</div>
@@ -134,12 +146,16 @@
 	     </span>
      </div>
   </div>
-  <div v-if="mode !== 'view'" class="gdm-image-5 gdm-fields">
-     <div v-if="!searching" style="color:black;text-align:center;cursor:pointer;"  @click="selectImage($event)">
+  <div v-if="mode !== 'view' && !searching" class="gdm-image-5 gdm-fields">
+     <div  style="color:black;text-align:center;cursor:pointer;"  @click="selectImage($event)">
         <span v-if="checked">{{$t('unselect_image')}}</span>
         <span v-else >{{$t('select_image')}}</span>
         <span class="gdm-action fa" :class="{'fa-square-o': !checked, 'fa-check-square-o': checked}"></span>
      </div>
+    <!--    <div v-if="image.productIdentifier && type === 'PEPS'" style="margin-top:5px;color:black;text-align:center;cursor:pointer;"  @click="displayImage($event)">
+        <span v-if="!displayedImageId || displayedImageId !== image.productIdentifier ">{{$t('show_image')}} <i class="gdm-action fa fa-globe" ></i></span>
+        <span v-else >{{$t('hide_image')}} <i class="gdm-action fa fa-eye-slash" ></i></span>
+     </div> -->
   </div>
   
 </div>
@@ -182,6 +198,10 @@ export default {
     lang: {
       type: String,
       default: 'en'
+    },
+    displayedImageId: {
+      type: String,
+      default: null
     }
   },
   computed: {
@@ -205,6 +225,18 @@ export default {
       } else {
         return false
       }
+    },
+    layer () {
+      if (this.image.services && this.image.services.browse && this.image.services.browse.layer) {
+        return this.image.services.browse.layer
+      } else {
+        return null
+      }
+    }
+  },
+  data () {
+    return {
+      full: false
     }
   },
   created () {
@@ -212,6 +244,11 @@ export default {
     this.$i18n.locale = this.lang
   },
   methods: {
+    displayImage (event) {
+//       var layer = this.layer
+//       layer.id = this.image.productIdentifier
+      this.$emit('displayImage', this.image.productIdentifier)
+    },
     printDate (date) {
       if (this.type === 'PLEIADES') {
         if (this.lang === 'fr') {
@@ -288,12 +325,30 @@ export default {
    grid-template-columns: 100px minmax(330px,3fr) minmax(210px,2fr);
   grid-template-rows: 10px 84px; 
 }
-.gdm-image img {
+.gdm-image .gdm-full {
+  position:fixed;
+  height:auto;
+  top: calc(50% - 250px);
+  margin-left:90px;
+  padding: 20px;
+  background: #333;
+  border-radius: 5px;
+  cursor:pointer;
+}
+.gdm-image .gdm-full img {
+  min-width:500px;
+  min-height:500px;
+}
+.gdm-image .gdm-image-1 img {
   max-height:85px;
   max-width:85px;
   margin: 2px;
   padding:3px;
   border: 1px solid grey;
+}
+.gdm-image img.selected {
+  background: #333;
+  border: 2px solid darkred;
 }
 .gdm-image.gdm-pleiade.gdm-image img {
   max-width: 80px;
