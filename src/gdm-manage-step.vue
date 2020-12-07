@@ -4,8 +4,10 @@
    <span v-if="!steps[index].edit">{{step.stp_name}}</span>
    <div v-else>
      <form :id="'form_' + index">
-      <label>Nom</label>
+      <label>Identifiant</label>
       <input type="text"  v-model="step.stp_name" pattern="[a-zA-Z0-9_-]{3,30}" title="Chaîne alphanumérique  entre 3 et 20 caractères">
+      <label>Titre</label>
+      <input type="text"  v-model="step.stp_title"  >
       <label>Description</label>
       <textarea v-model="step.stp_description"></textarea>
       <div class="gdm-button-serie" >
@@ -27,9 +29,11 @@
 	 </div>
 	 <div v-else class="gdm-step">
 	   <form id="form_new">
-	     <label>Nom</label>
+	     <label>Identifiant</label>
 	     <input type="text" name="" v-model="newStep.stp_name" pattern="[a-zA-Z0-9_-]{3,30}" title="Chaîne alphanumérique  entre 3 et 20 caractères">
-	      <label>Description</label>
+	       <label>Titre</label>
+       <input type="text" name="" v-model="newStep.stp_title"  >
+      <label>Description</label>
 	      <textarea v-model="newStep.stp_description"></textarea>
 	      <div class="gdm-button-serie">
 		      <span class="gdm-button" @click="reset(null)">Annuler</span>
@@ -74,6 +78,7 @@ export default {
       mode: null,
       newStep: {
         stp_name: null,
+        stp_title: null,
         stp_description: null
       }
     }

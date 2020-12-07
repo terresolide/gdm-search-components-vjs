@@ -19,7 +19,7 @@
     <li v-for="(step, index) in steps" :class="stepClass(index)"
     :style="{width: 100/steps.length + '%'}" :title="step.stp_description">
 	    <div style="padding:0 3px;line-height:1">
-	    {{step.stp_name.replace(/_/g, ' ')}}
+	    {{step.stp_title ? step.stp_title : step.stp_name.replace(/_/g, ' ')}}
 	    </div>
     </li>
   </ul>

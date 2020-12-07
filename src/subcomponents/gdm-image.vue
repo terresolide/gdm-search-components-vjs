@@ -68,8 +68,10 @@
 	  <img :src="image.quicklook" >
 	</div>
 	<div class="gdm-image-1">
-	<img v-if="image.quicklook" :src="image.quicklook" @click="displayImage($event)" 
+	<img v-if="image.quicklook && mode !== 'view' && type === 'PEPS'" :src="image.quicklook" @click="displayImage($event)" 
 	:title="displayedImageId === image.productIdentifier ? $t('click_to_reduce') : $t('click_to_enlarge')" style="cursor:pointer;" :class="{selected: displayedImageId === image.productIdentifier}"/>
+  <img v-else-if="image.quicklook" :src="image.quicklook"  />
+  
 	<img v-else src="../assets/images/no_image.png" width="85" style="margin: 3px 5px;padding:3px;border: 1px solid grey;"/>
   
 	</div>
