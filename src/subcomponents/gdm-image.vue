@@ -117,21 +117,21 @@
     <div v-else-if="type === 'PLEIADES' && angles" >
 	    <div><label>Orientation:</label> {{printFloat(angles.azimuth)}}°</div>
 	    <div> <ul style="padding-left:0;padding-top:2px;" >
-	        <li><label>Incidence Across track:</label> {{printFloat(angles.incidence.acrossTrack)}}</li>
-	        <li><label>Incidence Along track:</label> {{printFloat(angles.incidence.alongTrack)}}</li>
-	        <li><label>Incidence Overall:</label> {{printFloat(angles.incidence.angle)}}</li>
+	        <li><label>Incidence Across track:</label> {{printFloat(angles.incidence.acrossTrack)}}°</li>
+	        <li><label>Incidence Along track:</label> {{printFloat(angles.incidence.alongTrack)}}°</li>
+	        <li><label>Incidence Overall:</label> {{printFloat(angles.incidence.angle)}}°</li>
 	      </ul>
 	    </div>
 	    <div>
 	      <ul style="padding-left:0;padding-top:2px;" >
-	        <li><label>Viewing Across track:</label> {{printFloat(angles.viewing.acrossTrack)}}</li>
-	        <li><label>Viewing Along track:</label> {{printFloat(angles.viewing.alongTrack)}}</li>
+	        <li><label>Viewing Across track:</label> {{printFloat(angles.viewing.acrossTrack)}}°</li>
+	        <li><label>Viewing Along track:</label> {{printFloat(angles.viewing.alongTrack)}}°</li>
 	      </ul>
 	    </div>
 	    <div>
         <ul style="padding-left:0;padding-top:2px;" >
-          <li><label>Sun azimuth:</label> {{printFloat(angles.sunAzimuth)}}</li>
-          <li><label>Sun elevation:</label> {{printFloat(angles.sunElevation)}}</li>
+          <li><label>Sun azimuth:</label> {{printFloat(angles.sunAzimuth)}}°</li>
+          <li><label>Sun elevation:</label> {{printFloat(angles.sunElevation)}}°</li>
         </ul>
       </div>
       <div style="padding-top:2px">
