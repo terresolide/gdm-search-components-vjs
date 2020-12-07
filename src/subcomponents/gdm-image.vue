@@ -90,11 +90,19 @@
        </div>
        <div v-else-if="type === 'PLEIADES'">
           <div><label>Instrument: </label>{{image.instrument}}</div>
-          <div><label>{{$t('geo_processing_level')}}: </label>{{image.processingLevel}}</div>
-          <div v-if="image.radiometricProcessingLevel">
-          <label>{{$t('radio_processing_level')}}: </label>{{image.radiometricProcessingLevel}}</div>
-       
-       </div>
+          <div>
+           <label>Processing level: </label>
+            <ul >
+	            <li>
+	            <label>Geometric: </label>{{image.processingLevel}}
+	            </li>
+	            
+              <li  v-if="image.radiometricProcessingLevel" >
+                <label>Radiometric: </label>{{image.radiometricProcessingLevel}}
+              </li>
+            </ul>
+         </div>
+    </div>
     </div>
 	</div>
 	<div v-if="image.productIdentifier" class="gdm-image-3 gdm-fields">
@@ -106,12 +114,30 @@
        <div><label>{{$t('snow_cover')}} : </label>{{image.snowCover !== null ? image.snowCover : '--'}}</div>
        <div><label>{{$t('processing_level')}} : </label>{{image.processingLevel}}</div>
     </div>
-    <div v-else-if="type === 'PLEIADES'">
-      <div><label>{{$t('producer')}} : </label>{{image.producer}}</div>
-      <div><label>Format : </label>{{image.format}}<span v-if="image.encoding"> ({{image.encoding}}bits)</span></div>
-      <div><label>{{$t('columns_rows')}}: </label>{{image.dimensions.cols}} /  {{image.dimensions.rows}}</div>
-      <div v-if="image.spectralBand"><label>{{$t('spectral_band')}}: </label> {{image.spectralBand}}</div>
-       </div>
+    <div v-else-if="type === 'PLEIADES' && angles" >
+	    <div><label>Orientation:</label> {{printFloat(angles.azimuth)}}°</div>
+	    <div> <ul style="padding-left:0;padding-top:2px;" >
+	        <li><label>Incidence Across track:</label> {{printFloat(angles.incidence.acrossTrack)}}</li>
+	        <li><label>Incidence Along track:</label> {{printFloat(angles.incidence.alongTrack)}}</li>
+	        <li><label>Incidence Overall:</label> {{printFloat(angles.incidence.angle)}}</li>
+	      </ul>
+	    </div>
+	    <div>
+	      <ul style="padding-left:0;padding-top:2px;" >
+	        <li><label>Viewing Across track:</label> {{printFloat(angles.viewing.acrossTrack)}}</li>
+	        <li><label>Viewing Along track:</label> {{printFloat(angles.viewing.alongTrack)}}</li>
+	      </ul>
+	    </div>
+	    <div>
+        <ul style="padding-left:0;padding-top:2px;" >
+          <li><label>Sun azimuth:</label> {{printFloat(angles.sunAzimuth)}}</li>
+          <li><label>Sun elevation:</label> {{printFloat(angles.sunElevation)}}</li>
+        </ul>
+      </div>
+      <div style="padding-top:2px">
+      <label>Ground sample dist.:</label> {{printFloat(angles.groundSampleDistance.across)}} x {{printFloat(angles.groundSampleDistance.along)}}
+      </div>
+    </div>
   </div>
 	<div v-if="image.productIdentifier && mode === 'S2ST-STACK'" class="gdm-image-4 gdm-fields" >
 	  <div v-if="!searching && order > 0" >
@@ -129,7 +155,14 @@
        <span class="fa" :class="{'fa-square-o': !startChecked, 'fa-check-square-o': startChecked}" @click="selectFirstDate($event)"></span>
     </div>
 	</div>
-	<div v-if="image.productIdentifier && type === 'PLEIADES' & mode !== 'view'" class="gdm-image-4 gdm-fields" 
+	<div v-if="image.productIdentifier && type === 'PLEIADES'" class="gdm-image-4  gdm-fields" >
+	    <div><label>{{$t('producer')}} : </label>{{image.producer}}</div>
+      <div><label>Format : </label>{{image.format}}<span v-if="image.encoding"> ({{image.encoding}}bits)</span></div>
+      <div><label>{{$t('columns_rows')}}: </label>{{image.dimensions.cols}} /  {{image.dimensions.rows}}</div>
+      <div v-if="image.spectralBand"><label>{{$t('spectral_band')}}: </label> {{image.spectralBand}}</div>
+   
+	</div>
+	<div v-if="image.productIdentifier && type === 'PLEIADES' & mode !== 'view'" class="gdm-image-5 gdm-fields" 
   style="color:black;">
     <div>
        <span class="gdm-action"  @click="zoomTo" :title="$t('zoom_to')">
@@ -148,7 +181,7 @@
 	     </span>
      </div>
   </div>
-  <div v-if="mode !== 'view' && !searching" class="gdm-image-5 gdm-fields">
+  <div v-if="mode !== 'view' && !searching" :class="{'gdm-image-5': type === 'PEPS', 'gdm-image-6': type == 'PLEIADES'}" class="gdm-fields">
      <div  style="color:black;text-align:center;cursor:pointer;"  @click="selectImage($event)">
         <span v-if="checked">{{$t('unselect_image')}}</span>
         <span v-else >{{$t('select_image')}}</span>
@@ -207,6 +240,15 @@ export default {
     }
   },
   computed: {
+    angles () {
+      if (this.image.angles) {
+        if (this.image.angles[1]) {
+          return this.image.angles[1]
+        } 
+        return this.image.angles
+      }
+      return null
+    },
     startChecked () {
       if (this.temporal.start === this.image.startDate) {
         return true
@@ -244,12 +286,19 @@ export default {
   created () {
     moment.locale(this.lang)
     this.$i18n.locale = this.lang
+    console.log(this.image)
+    console.log(this.angles)
   },
   methods: {
     displayImage (event) {
 //       var layer = this.layer
 //       layer.id = this.image.productIdentifier
       this.$emit('displayImage', this.image.productIdentifier)
+    },
+    printFloat (value) {
+      console.log(value)
+      value = Math.round(value * 100) / 100
+      return value.toLocaleString()
     },
     printDate (date) {
       if (this.type === 'PLEIADES') {
@@ -313,10 +362,17 @@ export default {
   font-size:0.8em;
   border-bottom:1px solid lightgrey;
 }
+.gdm-image.gdm-pleiade ul {
+margin: 0;
+padding: 0 5px;
+line-height:1;
+list-style-type: none;
+}
 .gdm-image.gdm-pleiade {
   min-width:750px;
-   grid-template-columns: 90px minmax(270px,3fr) minmax(190px,2fr) minmax(30px, 50px) minmax(70px, 100px) ;
-  grid-template-rows: 10px 84px; 
+   grid-template-columns: 90px minmax(100px,2fr) minmax(230px,2fr)  minmax(110px,2fr) minmax(30px, 50px) minmax(70px, 100px) ;
+   grid-gap: 3px;
+  grid-template-rows: 10px 135px; 
 }
 .gdm-image.gdm-image-view {
   display: grid;
@@ -324,8 +380,8 @@ export default {
   /*grid-auto-rows: minmax(100px, auto);*/
 }
 .gdm-image.gdm-pleiade.gdm-image-view {
-   grid-template-columns: 100px minmax(330px,3fr) minmax(210px,2fr);
-  grid-template-rows: 10px 84px; 
+   grid-template-columns: 100px minmax(110px,2fr) minmax(150px,2fr) minmax(150px,2fr);
+  grid-template-rows: 10px 135px; 
 }
 .gdm-image .gdm-full {
   position:fixed;
@@ -354,6 +410,7 @@ export default {
 }
 .gdm-image.gdm-pleiade.gdm-image img {
   max-width: 80px;
+  max-height: 110px;
 }
 .gdm-image.gdm-no-image {
   background: linear-gradient(-45deg, #EEE 12.5%, #fff 12.5%, #fff 37.5%, #EEE 37.5%, #EEE 62.5%, #fff 62.5%, #fff 87.5%, #EEE 87.5%);
@@ -397,7 +454,7 @@ export default {
   padding: 0px 0;
 }
 .gdm-pleiade .gdm-image-4.gdm-fields > div {
-  text-align: center;
+  text-align: left;
 }
 .gdm-image-4.gdm-fields > div:first-child{
   padding-top: 0;

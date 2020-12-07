@@ -123,9 +123,9 @@
 	     </gdm-process-actions>
 	   </div>
 	    
-	    <div  :class="{highlight:seeResult}"
+	    <div v-if="process && process.result && process.status === 'TERMINATED'" :class="{highlight:seeResult}" style="margin-top:15px;"
 	    :style="{background: seeResult ? $shadeColor(color,0.92): 'none'}">
-       <gdm-process-result v-if="process && process.result && process.status === 'TERMINATED'" :result="process.result" 
+       <gdm-process-result  :result="process.result" 
         :lang="lang" :color="color" :images="imageLayers" @toggleImage="toggleImage" >
        </gdm-process-result>
        </div>

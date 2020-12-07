@@ -114,6 +114,7 @@ export default {
       this.mode = null
       this.newStep = {
         stp_name: null,
+        stp_title: null,
         stp_description: null
       }
       this.steps = response.body
