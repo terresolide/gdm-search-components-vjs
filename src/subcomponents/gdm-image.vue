@@ -286,8 +286,6 @@ export default {
   created () {
     moment.locale(this.lang)
     this.$i18n.locale = this.lang
-    console.log(this.image)
-    console.log(this.angles)
   },
   methods: {
     displayImage (event) {
@@ -296,7 +294,6 @@ export default {
       this.$emit('displayImage', this.image.productIdentifier)
     },
     printFloat (value) {
-      console.log(value)
       value = Math.round(value * 100) / 100
       return value.toLocaleString(this.lang, {minimumFractionDigits: 2})
     },

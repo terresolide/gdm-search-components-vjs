@@ -178,7 +178,6 @@ export default {
   mounted () {
   },
   beforeDestroy () {
-    console.log('before Destroy')
     this.removeListeners()
   },
   methods: {
@@ -318,7 +317,6 @@ export default {
       if (this.emit) {
         var event = new CustomEvent(this.emit, {detail: {value: this.values[this.name]}})
         document.dispatchEvent(event)
-        console.log(event)
       }
     },
     getValues () {
@@ -348,7 +346,6 @@ export default {
       })
     },
     showTooltip (event) {
-      console.log(event)
       event.preventDefault()
       if (event.target.classList.contains('tooltip-show')) {
         event.target.classList.remove('tooltip-show')

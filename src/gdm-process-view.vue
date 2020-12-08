@@ -294,7 +294,6 @@ export default {
       }
     },
     display (response) {
-      console.log(response)
       this.describe = response.serviceParametersUrl
       this.defaultParameters = response.feature.properties.parameters
       var parameters = response.feature.properties.parameters
@@ -305,8 +304,17 @@ export default {
       }
       if (response.images && response.images[0] &&
           response.images[0].collection === 'PLEIADES') {
-        this.type = 'PLEIADES'
+        this.type = 'PLEIADES' 
       }
+      // sort image
+      if (response.images && response.images[0] && response.images[0].feature )
+      response.images.sort(function (a,b) {
+        if (a.feature && b.feature) {
+          return a.feature.properties.startDate > b.feature.properties.startDate ? 1 : -1
+        } else {
+          return 0
+        }
+      })
       this.getImage(response.images, 0)
       this.feature = response.feature
       this.feature.properties.id = this.id
@@ -369,7 +377,6 @@ export default {
           response => this.error(response))
     },
     setDescribe (srv) {
-      console.log(srv)
     },
     setStatusList (status) {
       if (!status.error) {
@@ -377,7 +384,6 @@ export default {
       }
       if (this.$el && this.$el.querySelector) {
         this.headerHeight = this.$el.querySelector('.gdm-process-header').clientHeight
-        console.log(this.headerHeight)
       }
     },
     statusChange (detail) {
