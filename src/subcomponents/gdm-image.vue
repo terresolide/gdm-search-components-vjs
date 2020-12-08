@@ -156,10 +156,10 @@
     </div>
 	</div>
 	<div v-if="image.productIdentifier && type === 'PLEIADES'" class="gdm-image-4  gdm-fields" >
-	    <div><label>{{$t('producer')}} : </label>{{image.producer}}</div>
+	    <div><label>Producer: </label>{{image.producer}}</div>
       <div><label>Format : </label>{{image.format}}<span v-if="image.encoding"> ({{image.encoding}}bits)</span></div>
-      <div><label>{{$t('columns_rows')}}: </label>{{image.dimensions.cols}} /  {{image.dimensions.rows}}</div>
-      <div v-if="image.spectralBand"><label>{{$t('spectral_band')}}: </label> {{image.spectralBand}}</div>
+      <div><label>Columns/Rows: </label>{{image.dimensions.cols}} /  {{image.dimensions.rows}}</div>
+      <div v-if="image.spectralBand"><label>Spectral band: </label> {{image.spectralBand}}</div>
    
 	</div>
 	<div v-if="image.productIdentifier && type === 'PLEIADES' & mode !== 'view'" class="gdm-image-5 gdm-fields" 
