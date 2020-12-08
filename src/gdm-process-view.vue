@@ -482,7 +482,7 @@ border: 4px solid lightgrey;
    position: relative;
   margin-top:0px;
   display:grid;
-  grid-template-columns: 310px 2fr 2fr;
+  grid-template-columns: 310px 2fr 1.7fr;
   grid-template-rows: 50px 1fr 50px 1fr;
   background:#f3F3F3;
   padding: 10px 5px;
@@ -514,6 +514,7 @@ span.gdm-information {
   grid-column: 2;
   grid-row: 4;
   padding: 10px;
+  align-self: center;
 }
 .header-3 {
   grid-column: 3;
