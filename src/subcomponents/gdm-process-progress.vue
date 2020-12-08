@@ -131,7 +131,7 @@ export default {
   },
   methods:{
     stepClass (index) {
-      if (this.steps[index].stp_order <= this.findStep.stp_order) {
+      if (this.steps[index].stp_order < this.findStep.stp_order) {
         return 'done'
       } else if (this.steps[index].stp_order === this.findStep.stp_order){
         return this.classes
@@ -292,7 +292,12 @@ div.gdm-progress-running > div {
 .gdm-progress-step li.done:before,  
 .gdm-progress-step li.done:after,
 .gdm-progress-step li.gdm-progress-running:after,
-.gdm-progress-step li.gdm-progress-failed:after{
+.gdm-progress-step li.gdm-progress-failed:after,
+.gdm-progress-step li.gdm-progress-terminated:after,
+.gdm-progress-step li.gdm-progress-completed:after,
+.gdm-progress-step li.gdm-progress-running:after,
+.gdm-progress-step li.gdm-progress-waiting:after
+{
   background:#28a428;
   color: white;
 }
