@@ -81,13 +81,19 @@ export default {
   },
   computed: {
     findStep () {
+      if (this.steps.length === 0) {
+        return null
+      }
+      if (this.status === 'TERMINATED' || this.status === 'PURGED') {
+        return this.steps[this.steps.length - 1]
+      }
       var _this = this
       var step = this.steps.find(obj => obj.stp_id === _this.stepId )
-     if (step) {
-       return step
-     } else {
-       return -1
-     }
+      if (step) {
+        return step
+      } else {
+        return -1
+      }
     },
     classes () {
       var classname = ''
