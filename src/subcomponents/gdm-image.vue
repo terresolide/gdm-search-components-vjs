@@ -422,7 +422,7 @@ list-style-type: none;
   grid-column: 2/5;
   grid-row: 1;
 }
-.gdm-image-pleiade .gdm-image-title {
+.gdm-pleiade .gdm-image-title {
   grid-column: 2/6;
   grid-row: 1;
 }
@@ -495,8 +495,8 @@ list-style-type: none;
   grid-column: 2/3;
   grid-row: 1;
 }
-.gdm-image-view.gdm-image-pleiade .gdm-title {
-   grid-column: 2/4s;
+.gdm-image-view.gdm-pleiade .gdm-image-title {
+   grid-column: 2/4;
   grid-row: 1;
 }
 .gdm-removed {
