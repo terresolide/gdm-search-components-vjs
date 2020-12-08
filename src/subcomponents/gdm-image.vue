@@ -495,6 +495,10 @@ list-style-type: none;
   grid-column: 2/3;
   grid-row: 1;
 }
+.gdm-image-view.gdm-image-pleiade .gdm-title {
+   grid-column: 2/4s;
+  grid-row: 1;
+}
 .gdm-removed {
   background: linear-gradient(-45deg, white 25%,
   #EEE 25%, #EEE 50%, 
