@@ -422,6 +422,10 @@ list-style-type: none;
   grid-column: 2/5;
   grid-row: 1;
 }
+.gdm-image-pleiade .gdm-image-title {
+  grid-column: 2/6;
+  grid-row: 1;
+}
 .gdm-image-2 {
   grid-column: 2;
   grid-row: 2;
