@@ -283,6 +283,9 @@ export default {
     },
     addResult (result) {
       if (result && result.thumbnails) {
+        result.thumbnails.sort(function (a, b) {
+          return a.title > b.title ? 1 : -1
+        })
         var imageLayers = result.thumbnails
         imageLayers.forEach(function (image) {
           image.checked = false

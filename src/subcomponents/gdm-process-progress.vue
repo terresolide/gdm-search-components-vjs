@@ -14,7 +14,7 @@
 </i18n>
 <template>
 <div class="gdm-progress" >
- <div v-if="stepId && findStep" class="gdm-steps" >
+ <div v-if="steps.length > 0" class="gdm-steps" >
  <ul class="gdm-progress-step">
     <li v-for="(step, index) in steps" :class="stepClass(index)"
     :style="{width: 100/steps.length + '%'}" :title="step.stp_description">
@@ -83,7 +83,11 @@ export default {
     findStep () {
       var _this = this
       var step = this.steps.find(obj => obj.stp_id === _this.stepId )
-      return step
+     if (step) {
+       return step
+     } else {
+       return -1
+     }
     },
     classes () {
       var classname = ''

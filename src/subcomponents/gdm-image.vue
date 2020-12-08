@@ -298,7 +298,7 @@ export default {
     printFloat (value) {
       console.log(value)
       value = Math.round(value * 100) / 100
-      return value.toLocaleString()
+      return value.toLocaleString(this.lang, {minimumFractionDigits: 2})
     },
     printDate (date) {
       if (this.type === 'PLEIADES') {
