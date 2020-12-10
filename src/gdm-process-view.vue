@@ -39,6 +39,7 @@
 	   <div class="header-1">
 	     <div class="gdm-map-container">
 	      <gdm-map ref="map" :bbox="process.feature" :images="imageLayers" :tile="feature.properties.bboxTile"
+	      :service-name="process.serviceName"
 	      fullscreen="fmtLargeMap" :remove-height="8" @imageAdded="imageAdded" @imageRemoved="imageRemoved"></gdm-map>
 	     </div>
 	      <div style="text-align:center;margin-top:10px;">
@@ -410,7 +411,7 @@ export default {
         }
       } else {
         this.$set(this.process, 'status', detail.status)
-        this.$set(this.process, 'cost', detail.cost)
+         this.$set(this.process, 'cost', detail.cost)
         if (detail.hasOwnProperty('quota')) {
           this.$set(this.process, 'quota', detail.quota)
         }
