@@ -258,7 +258,7 @@ export default {
       return null
     },
     stereo () {
-      if (!stereoList) {
+      if (!this.stereoList) {
         return null
       }
       var extract = this.stereoList.filter(str => str.id === this.image.id)
