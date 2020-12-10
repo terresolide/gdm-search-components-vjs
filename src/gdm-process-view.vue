@@ -151,7 +151,7 @@
 		  <h2 :style="{color:color}">Images</h2>
 		  <div v-if="images.length > 0">
 			  <div  v-for="image in images" class="gdm-images-child" >
-	        <gdm-image :image="image" :type="type" :searching="true" :checked="true" mode="view" :lang="lang"></gdm-image>
+	        <gdm-image :image="image" :type="type" :searching="true" :checked="true" :stereo-list="stereo" mode="view" :lang="lang"></gdm-image>
 	      </div>
 		  </div>
 		  <div v-else style="text-align:center;padding: 30px;">NO IMAGES SELECTED - TYPE REQUEST</div>
@@ -170,6 +170,7 @@ import GdmProcessProgress from './subcomponents/gdm-process-progress.vue'
 import GdmProcessResult from './subcomponents/gdm-process-result.vue'
 import GdmImage from './subcomponents/gdm-image.vue'
 import GdmParameters from './subcomponents/gdm-parameters.vue'
+import hs from './modules/howstereo.js'
 export default {
   name: 'GdmProcessView',
   components: {
@@ -246,6 +247,7 @@ export default {
       token: null,
       type: 'PEPS',
       describe: null,
+      stereo: null,
       defaultParameters: null
     }
   },
@@ -346,6 +348,7 @@ export default {
           } else {
             list[index].feature.properties.removed = false
           }
+          list[index].feature.properties.id = list[index].id
           var urlImg = this.api.replace('/api', '/upload/pleiades/') + list[index].feature.properties.icon
           list[index].feature.properties.quicklook = urlImg
         }
@@ -359,6 +362,18 @@ export default {
           this.getImage(list, index + 1)
           
         })
+      }
+      // last pleiade image compute stereo
+      if (index === list.length - 1 && this.type === 'PLEIADES') {
+        // extract angles by image id
+        this.stereo = hs.computeStereo(this.images)
+//         var angles = {}
+//         list.forEach(function (img) {
+//           img.feature.properties.angles.sort(function (a, b) {
+//             return a.date < b.date ? -1 : 1
+//           })
+//           // angles.push(img.feature.properties.angles[1])
+//         })
       }
     },
     error (response) {

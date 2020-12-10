@@ -160,7 +160,11 @@
       <div><label>Format : </label>{{image.format}}<span v-if="image.encoding"> ({{image.encoding}}bits)</span></div>
       <div><label>Columns/Rows: </label>{{image.dimensions.cols}} /  {{image.dimensions.rows}}</div>
       <div v-if="image.spectralBand"><label>Spectral band: </label> {{image.spectralBand}}</div>
-   
+      <div class="gdm-stereo" v-if="stereo && stereo.length > 0" style="margin-top:5px; padding:3px;color:black;">
+        <div v-for="st in stereo">
+        &delta;<sub>{{st.name}}</sub> = {{printFloat(st.angle)}}°, B/H<sub>{{st.name}}</sub> = {{printFloat(st.bh)}}
+        </div>
+      </div>
 	</div>
 	<div v-if="image.productIdentifier && type === 'PLEIADES' & mode !== 'view'" class="gdm-image-5 gdm-fields" 
   style="color:black;">
@@ -237,6 +241,10 @@ export default {
     displayedImageId: {
       type: String,
       default: null
+    },
+    stereoList: {
+      type: Array,
+      default: null
     }
   },
   computed: {
@@ -248,6 +256,14 @@ export default {
         return this.image.angles
       }
       return null
+    },
+    stereo () {
+      var extract = this.stereoList.filter(str => str.id === this.image.id)
+      if (extract.length === 1) {
+        return extract[0].stereo
+      } else {
+        return null
+      }
     },
     startChecked () {
       if (this.temporal.start === this.image.startDate) {

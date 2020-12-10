@@ -123,6 +123,14 @@ export default {
       this.map = L.map( container, {scrollWheelZoom: false}).setView([51.505, -0.09], 1);
       this.controlLayer = new L.Control.Fmtlayer(null, null,{position: 'topleft'})
       this.controlLayer.tiles.arcgisTopo.layer.addTo(this.map)
+      // if (this.service.s_name === 'GDM-OPT-SLIDE' || this.service.s_name === 'GDM-OPT-ICE') {
+          var options = {
+            layers: 'GLIMS_GLACIERS',
+            format: 'image/png'
+          }
+          var glacierLayer = L.tileLayer.wms('https://www.glims.org/mapservice?', options)
+          this.controlLayer.addOverlay(glacierLayer, 'GLIMS Glaciers')
+      //  }
       this.controlLayer.addTo(this.map)
       if (this.fullscreen) {
         this.fullscreenLayer = new L.Control.Fullscreen(this.fullscreen, {lang: this.$i18n.locale, removeHeight: this.removeHeight, mouseWheel: true})
