@@ -8,6 +8,8 @@ Number.prototype.toDeg = function () {
 }
 export default {
   img (scan, ortho, az) {
+    ortho = ortho * (-1)
+    az = az * (-1)
     return {
       scan: scan,
       ortho: ortho,
