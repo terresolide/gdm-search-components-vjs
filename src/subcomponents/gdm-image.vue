@@ -159,7 +159,7 @@
 	    <div><label>Producer: </label>{{image.producer}}</div>
       <div><label>Format : </label>{{image.format}}<span v-if="image.encoding"> ({{image.encoding}}bits)</span></div>
       <div><label>Columns/Rows: </label>{{image.dimensions.cols}} /  {{image.dimensions.rows}}</div>
-      <div v-if="image.spectralBand"><label>Spectral band: </label> {{image.spectralBand}}</div>
+      <div v-if="image.spectralProcessing"><label>Spectral Processing: </label> {{image.spectralProcessing}}</div>
       <div class="gdm-stereo" v-if="stereo && stereo.length > 0" style="margin-top:5px; padding:3px;color:black;">
         <div v-for="st in stereo">
         &delta;<sub>{{st.name}}</sub> = {{printFloat(st.angle)}}°, B/H<sub>{{st.name}}</sub> = {{printFloat(st.bh)}}
