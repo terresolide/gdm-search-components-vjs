@@ -63,7 +63,7 @@
 }
 </i18n>
 <template>
-<div class="gdm-image" :class="{'gdm-no-image': !image.productIdentifier, 'gdm-image-view': mode === 'view', 'gdm-pleiade': type === 'PLEIADES', 'gdm-removed': image.removed}">
+<div class="gdm-image" :class="{'gdm-no-image': !image.productIdentifier, 'gdm-image-view': mode === 'view', 'gdm-pleiade': type === 'PLEIADES', 'gdm-removed': image.removed}" @mouseover="mouseover">
 	<div v-if="displayedImageId === image.productIdentifier" class="gdm-full"  @click="displayImage($event)" :title="$t('click_to_reduce')">
 	  <img :src="image.quicklook" >
 	</div>
@@ -311,6 +311,9 @@ export default {
 //       var layer = this.layer
 //       layer.id = this.image.productIdentifier
       this.$emit('displayImage', this.image.productIdentifier)
+    },
+    mouseover () {
+      this.$emit('mouseover', this.image.productIdentifier)
     },
     printFloat (value) {
       value = Math.round(value * 100) / 100
