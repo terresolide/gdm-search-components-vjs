@@ -313,7 +313,7 @@ export default {
       this.$emit('displayImage', this.image.productIdentifier)
     },
     mouseover () {
-      this.$emit('mouseover', this.image.productIdentifier)
+      this.$emit('mouseover', this.image.id)
     },
     printFloat (value) {
       value = Math.round(value * 100) / 100
