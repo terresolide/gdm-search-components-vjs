@@ -313,7 +313,11 @@ export default {
       this.$emit('displayImage', this.image.productIdentifier)
     },
     mouseover () {
-      this.$emit('mouseover', this.image.id)
+      var value = this.image.productIdentifier
+      if (this.type === 'PLEIADES') {
+        value = this.image.id
+      }
+      this.$emit('mouseover', value)
     },
     printFloat (value) {
       value = Math.round(value * 100) / 100
