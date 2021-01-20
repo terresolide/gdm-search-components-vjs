@@ -1,10 +1,12 @@
 <i18n>
 {
   "en": {
-    "product_type": "Product Type"
+    "product_type": "Product Type",
+    "right_click": "Right click for infos"
   },
   "fr": {
-     "product_type": "Type de Produit"
+     "product_type": "Type de Produit",
+     "right_click": "Clic droit pour + infos"
     }
 }
 </i18n>
@@ -21,7 +23,8 @@
   
   <div v-else v-show="!required" class="gdm-used fa"  @click="used = !used"  :class="{ 'fa-square-o': !used, 'fa-check-square-o': used, 'disabled': mode === 'view'}"></div>
   
-  <span class="gdm-complexe-title" v-if="used || mode === 'view'" :style="{color: color}"  @click="deployed = !deployed" @contextmenu="showTooltip($event)">
+  <span class="gdm-complexe-title" v-if="used || mode === 'view'" :style="{color: color}"  @click="deployed = !deployed" 
+  @contextmenu="showTooltip($event)" :title="getTitle(describe)">
   {{title}}
    <span> {{deployed ? '-' : '+'}}</span>
   </span>
@@ -39,13 +42,14 @@
  <div v-for="(parameter, key) in parameters" style="overflow: visible;position:relative;" :style="{marginTop:'5px'}" :key="key" 
   v-if="!(mode === 'view' && parameter.type === 'customInputImages')">
    <gdm-parameters :ref="parameter.name" :mode="mode" v-if="parameter.type === 'complexe' || parameter.type === 'complexeReturn'" 
-   :describe="parameter" :parent="prefix" :color="color" :defaultParameters="defaultParameters">
+   :describe="parameter" :parent="prefix" :color="color" :lang="lang"
+   :defaultParameters="defaultParameters">
    </gdm-parameters>
    <div v-if="['complexe', 'complexeReturn', 'hidden'].indexOf(parameter.type) < 0" v-show="parameter.show" :class="parameter.classname">
    <div   style="opacity:0.5;margin-left:-18px;display:inline-block;width:14px;text-align: center;">-</div>
    <div   style="display:inline-block;vertical-align:top;" :style="{maxWidth: width + 'px'}">
      <div v-if="parameter.type!== 'complexe' && parameter.type !== 'complexeReturn'" class="gdm-title"
-     :style="titleStyle(parameter)"  :title="parameter.short" @contextmenu="showTooltip($event)">{{parameter.title}}</div>
+     :style="titleStyle(parameter)"  :title="getTitle(parameter)" @contextmenu="showTooltip($event)">{{parameter.title}}</div>
      
      <div v-if="parameter.description" class="gdm-tooltip" @click="hideTooltip()" @contextmenu="hideTooltip()">
      <h4 v-if="parameter.short">{{parameter.short}}</h4>
@@ -148,6 +152,10 @@ export default {
     defaultParameters: {
       type: Object | Array,
       default: () => {}
+    },
+    lang: {
+      type: String,
+      default: 'en'
     }
   },
   data () {
@@ -172,6 +180,7 @@ export default {
     }
   },
   created () {
+    this.$i18n.locale = this.lang
     // moment.locale(this.$store.state.lang)
     this.init()
   },
@@ -337,6 +346,9 @@ export default {
       this.listeners.forEach(function (listener) {
         document.removeEventListener(listener.event, listener.funct)
       })
+      if (!this.parameters) {
+        return
+      }
       this.parameters.forEach(function (parameter) {
         if (parameter.listeners) {
           parameter.listeners.forEach(function (listener) {
@@ -486,6 +498,14 @@ export default {
       })
       this.$forceUpdate()
     },
+    getTitle (parameter) {
+      var title = parameter.short ? parameter.short : ''
+      if (parameter.description) {
+        title += parameter.short ? '\n' : ''
+        title += this.$i18n.t('right_click')
+      }
+      return title
+    },
     titleStyle (parameter) {
       if (['checkbox', 'number', 'customTypeNumber', 'select', 'customInputImages', 'date'].indexOf(parameter.type) >= 0) {
         return {
@@ -496,13 +516,15 @@ export default {
         //  maxWidth: '200px',
           maxHeight: '30px',
           overflow: 'hidden',
-          textAlign: 'left'
+          textAlign: 'left',
+          cursor: parameter.description ? 'help' : 'pointer'
         }
       } else {
         return {
           color: this.color,
           display: 'block',
-          textAlign: 'left'
+          textAlign: 'left',
+          cursor: parameter.description ? 'help' : 'pointer'
         }
       }
     }

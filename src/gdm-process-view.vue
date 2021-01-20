@@ -135,7 +135,7 @@
 		 <div class="gdm-list-parameters"> 
 		  <h2 :style="{color:color}">{{$t('parameters')}}</h2>
        <div>
-		 <gdm-parameters v-if="describe" mode="view" :describe="describe" :default-parameters="defaultParameters" :width="360" :color="color"></gdm-parameters>
+		 <gdm-parameters v-if="describe" mode="view" :describe="describe" :default-parameters="defaultParameters" :width="360" :color="color" :lang="lang"></gdm-parameters>
         <div style="height:120px;"></div>
       </div>
       </div>
