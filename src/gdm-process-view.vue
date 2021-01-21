@@ -152,7 +152,7 @@
 		  <h2 :style="{color:color}">Images</h2>
 		  <div v-if="images.length > 0">
 			  <div  v-for="image in images" class="gdm-images-child" >
-	        <gdm-image :image="image" :type="type" :searching="true" :checked="true" :stereo-list="stereo" mode="view" :lang="lang"></gdm-image>
+	        <gdm-image :image="image" :type="type" :searching="false" :checked="false" :stereo-list="stereo" mode="view" :lang="lang"></gdm-image>
 	      </div>
 		  </div>
 		  <div v-else style="text-align:center;padding: 30px;">NO IMAGES SELECTED - TYPE REQUEST</div>

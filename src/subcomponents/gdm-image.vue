@@ -5,6 +5,7 @@
     "click_to_reduce": "Click to reduce",
     "cloud_cover": "Cloud cover",
     "columns_rows": "Columns/Rows",
+    "display_satellite": "Show approximate \nsatellite position",
     "hide_image": "Hide image",
     "geo_processing_level": "Geometric processing level",
     "nb_bands": "Nb bands",
@@ -34,6 +35,7 @@
      "click_to_enlarge": "Cliquer pour agrandir",
      "click_to_reduce": "Cliquer pour fermer",
      "cloud_cover": "Couverture nuageuse",
+     "display_satellite": "Voir la position \napproximative du satellite",
      "hide_image": "Cacher",
      "nb_bands": "Nb bandes",
      "columns_rows": "Col/lignes",
@@ -167,7 +169,7 @@
       </div>
 	</div>
 	<div v-if="image.productIdentifier && type === 'PLEIADES' & mode !== 'view'" class="gdm-image-5 gdm-fields" 
-  style="color:black;">
+  style="color:black;text-align:center;">
     <div>
        <span class="gdm-action"  @click="zoomTo" :title="$t('zoom_to')">
          <i class="fa fa-search-plus" style="font-size:1.2em;"></i>
@@ -178,6 +180,12 @@
         <i class="fa fa-search-minus" style="font-size:1.2em;"></i>
       </span>
     </div>
+     <div>
+      <span class="gdm-action" style="margin-top:5px;" v-if="image.satellitePosition"  @click="showSatellite" :title="$t('display_satellite')">
+          <!--  <span >{{$t('remove')}}</span>-->
+          <img src="../assets/images/satellite-32.png" width="24" />
+       </span>
+     </div>
     <div>
 	    <span class="gdm-action" style="margin-top:5px;" v-if="!image.removed && !checked"  @click="removeImage()" :title="$t('remove_image')">
 	        <!--  <span >{{$t('remove')}}</span>-->
@@ -337,6 +345,13 @@ export default {
     },
     removeImage () {
       this.$emit('removeImage', this.image.id )
+    },
+    showSatellite () {
+      var value = this.image.productIdentifier
+      if (this.type === 'PLEIADES') {
+        value = this.image.id
+      }
+      this.$emit('showSatellite', value)
     },
     selectFirstDate () {
       var value = this.image.startDate

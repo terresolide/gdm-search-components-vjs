@@ -6,6 +6,9 @@ var buildName = PACKAGE.name;
 var {CleanWebpackPlugin} = require('clean-webpack-plugin');
 var prodUrl = PACKAGE.production.url + '/' + buildName + '@' + buildVersion +  '/dist/' ;
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
+function resolve (dir) {
+  return path.join(__dirname, '..', dir)
+}
 var pathsToClean = [
   'dist/*.*'
 ]
@@ -56,11 +59,12 @@ module.exports = {
         }]
       },
       {
-        test: /\.(png|jpeg|gif|svg)(\?.*)?$/,
+        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         loader: 'url-loader',
         options: {
           limit: 10000,
-          name: 'assets/img/[name].[hash:7].[ext]'
+          name: 'assets/img/[name].[hash:7].[ext]',
+          esModule: false
         }
       }
     ]
@@ -69,8 +73,10 @@ module.exports = {
 	  new VueLoaderPlugin() 
   ],
   resolve: {
+    extensions: ['.js', '.vue', '.json', '.jsx'],
     alias: {
-      'vue$': 'vue/dist/vue.esm.js'
+      'vue$': 'vue/dist/vue.esm.js',
+      '@': resolve('src')
     }
   },
   devServer: {
