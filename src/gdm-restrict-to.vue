@@ -5,21 +5,31 @@
      <option></option>
      <option v-for="role in roles" :value="role.index" :selected="role.index===current">{{role.value}}</option>
    </select>
-   <div v-if="mode === 'add'" class="gdm-add-role">
-     Nouveau 
-	   <input  type="text"  placeholder="ROLE" v-model="newRole" pattern="[A-Z]{3,10}"/>
-	   <span v-if="userProviders.length > 0" title="Seuls les responsables de ce fournisseur pourront donner ce rôle à un utilisateur">
-	     associé à 
-		   <select v-model="selectedProvider">
-		     <option v-for="provider in userProviders" :value="provider.id">{{provider.name}}</option>
-		   </select>
-	   </span>
-	   <input type="button" value="Ajouter"@click="addRole"/>
-	   <input type="button" value="Annuler" @click="cancel"/>
-   </div>   
+   <div  v-if="mode === 'add'">
+	   <div class="gdm-add-role">
+	     Nouveau 
+		   <input  type="text"  placeholder="ROLE" v-model="newRole" pattern="[A-Z]{3,10}"/>
+		   <span v-if="userProviders.length > 0" title="Seuls les responsables de ce fournisseur pourront donner ce rôle à un utilisateur">
+		     associé à 
+			   <select v-model="selectedProvider">
+			     <option v-for="provider in userProviders" :value="provider.id">{{provider.name}}</option>
+			   </select>
+		   </span>
+		   <div>Description:</div>
+		   <div style="margin-left:5px;" >
+		     <span style="vertical-align:top;">fr: </span><textarea v-model="description['fr']"></textarea>
+		     <span style="vertical-align:top;">en: </span><textarea v-model="description['en']"></textarea>
+		   </div>
+		   <div style="float:right;padding:10px 0;">
+		   <input type="button" value="Ajouter"@click="addRole"/>
+		   <input type="button" value="Annuler" @click="cancel"/>
+		   </div>
+		   <div style="clear:right;color:darkred;font-style:italic;">{{msg}}</div>
+		   
+	   </div>  
+   </div> 
    <input v-if="mode !== 'add' && userProviders.length > 0" type="button" value="Nouveau Rôle" @click="mode='add'"/>
-   <span style="color:darkred;font-style:italic;">{{msg}}</span>
- </span>
+    </span>
 </template>
 <script>
 export default {
@@ -56,9 +66,10 @@ export default {
       providers: [],
       userProviders: [],
       selectedProvider: null,
+      description: {fr: '', en: ''},
       msg: null
     }
-  },  
+  }, 
   methods: {
     addNewRole (data) {
       if (data.error) {
@@ -82,10 +93,13 @@ export default {
       }
     },
     addRole () {
+      console.log(this.description)
       this.$http.post(this.url + 'roles/addService', 
         {
           role: this.newRole,
-          provider: this.selectedProvider
+          provider: this.selectedProvider,
+          description_fr: this.description.fr,
+          description_en: this.description.en
         },
         {credentials: true, emulateJSON: true}
       ).then(function (resp) {
@@ -112,6 +126,8 @@ export default {
       }, resp => console.log('error providers'))
     },
     initialize () {
+      this.description['fr'] = ''
+      this.description['en'] = ''
       this.getUserProviders()
     },
     initRoles (data) {
@@ -132,7 +148,12 @@ export default {
 </script>
 <style>
 .gdm-add-role {
+ display: inline-block;
  font-size: 0.9rem;
+ border:1px solid grey;
+ padding:10px;
+ background: #F3F3F3;
+ margin:5px 0 0 10px;
 }
 .gdm-add-role input[type="text"]{
   min-width:80px;
