@@ -210,7 +210,7 @@ export default {
 <style>
 .gdm-process-row {
 display: grid;
-  grid-template-columns: minmax(150px,1fr) 110px minmax(190px,1fr) minmax(100px, 1fr) minmax(150px, 1fr) minmax(150px, 1fr);
+  grid-template-columns: minmax(180px,1fr) 110px minmax(190px,1fr) minmax(100px, 1fr) minmax(150px, 1fr) minmax(150px, 1fr);
   grid-gap: 5px;
   grid-template-rows: 10px 100px; 
   /*grid-auto-rows: minmax(100px, auto);*/
@@ -270,6 +270,7 @@ div.toSelect {
   border-radius:2px;
   max-width: 250px;
   white-space:normal;
+  word-break: break-all;
 }
 div.toSelect:hover {
  background: #e5e5e5;
@@ -307,7 +308,7 @@ div.toSelect.selectedService:hover  {
 .gdm-process-row div.gdm-tooltip:hover {
   display:block;
 }
-.gdm-process-row tr:last-child div.gdm-tooltip{
+.gdm-process-row:last-child div.gdm-tooltip{
   margin-left:70px;
   margin-top:-80px;
 }

@@ -436,7 +436,7 @@ font-size: 0.9rem;
 }
 .gdm-process-header {
 display: grid;
-  grid-template-columns: minmax(150px,1fr) 110px minmax(190px,1fr) minmax(100px, 1fr) minmax(300px, 2fr);
+  grid-template-columns: minmax(180px,1fr) 110px minmax(190px,1fr) minmax(100px, 1fr) minmax(300px, 2fr);
   grid-gap: 5px;
    grid-template-rows: 20px;
    text-align:left;
@@ -451,6 +451,7 @@ display: grid;
 .gdm-process-header-column-2 {
   grid-column: 2;
   grid-row: 1;
+  text-align:center;
 }
 .gdm-process-header-column-3 {
   grid-column: 3;
