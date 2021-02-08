@@ -1,32 +1,22 @@
 <i18n>
 {
   "en": {
-    "clear_data": "All results will be deleted on this date",
-    "created": "Created",
-    "consult": "Consult",
-    "end": "Job end",
     "process_dates": "Job information",
     "identifiers": "Identifiers",
     "image_dates": "Date of images",
     "temporal_extent": "Temporal extent",
     "parameters": "Parameters",
     "no_process": "No process",
-    "start": "Job start",
     "unauthorized": "Access Unauthorized",
     "forbidden": "Access Forbidden: deconnected?"
   },
   "fr": {
-    "clear_data": "Tous les résultats seront effacés à cette date",
-    "created": "Création",
-    "consult": "Consulter",
-    "end": "Fin",
     "process_dates": "Job information",
     "identifiers": "Identifiants",
     "image_dates": "Date des images",
     "temporal_extent": "Etendue temporelle",
     "parameters": "Paramètres",
     "no_process": "Aucun calcul",
-    "start": "Début",
     "unauthorized": "Accès non autorisé à cette ressource",
     "forbidden": "Access interdit: deconnecté?"
   }
@@ -51,133 +41,23 @@
        <gdm-paging :start-index="pagination.startIndex" :max-records="pagination.maxRecords"  
        :count="pagination.count" :total-results="pagination.totalResults"
        :lang="lang" :color="color" @change="pageChange"></gdm-paging>
-       <table class="gdm-list-process" style="width:100%;" :style="{height: listHeight + 'px'}">
-         <thead >
-         <th :style="{background:$shadeColor(color, 0.8)}">{{$t('identifiers')}}</th>
-         <th :style="{background:$shadeColor(color, 0.8)}">Status</th>
-         <th :style="{background:$shadeColor(color, 0.8)}">{{$t('process_dates')}}</th>
-         <th :style="{background:$shadeColor(color, 0.8)}">
-	         <span v-if="group === 'DEM'">{{$t('image_dates')}}</span>
-	         <span v-else>{{$t('temporal_extent')}}</span>
-         </th>
-         <th :style="{background:$shadeColor(color, 0.8)}">{{$t('parameters')}}</th>
-         
-         </thead>
-         <tbody @mouseleave="highlight(null)" >
-         <tr v-for="feature in featureCollection.features" :class="'row' + feature.properties.id" 
-         @mouseenter="highlight(feature.properties.id)" @click="selectProcess(feature.properties.id)">
-         <td>
-           <div>
-	           <b>
-	           {{feature.properties.id.toString().padStart(5,'0')}}<span  v-if="feature.properties.token">-{{feature.properties.token}}</span>
-	           </b>
-           </div>
-           
-           <div class="toSelect" :class="{selectedService: parameters.service}" 
-               @click="selectService({id:feature.properties.serviceId, name:feature.properties.serviceName}, $event)">
-               {{feature.properties.serviceName}}
-           </div>
-           <div v-if="userId">{{feature.properties.email}}</div>
-           <div v-else>
-               <div class="toSelect" :class="{selectedUser: parameters.user}" 
-               @click="selectUser({id:feature.properties.userId, email:feature.properties.email}, $event)">
-                  {{feature.properties.email}}
-                </div>
-           </div>
-          
-           <div v-if="feature.properties.processusName">({{feature.properties.processusName}})</div>
-         </td>
-         <td style="text-align:center;">
-            <gdm-process-status :status="feature.properties.status" :status-list="statusList" 
-            :progress="feature.properties.progress" :lang="lang"></gdm-process-status>
-            <div>
-               <a v-if="url" :href="url + feature.properties.id" class="button">{{$t('consult')}}</a>
-            </div>
-            <i v-if="back && (feature.properties.status === 'RUNNING' || feature.properties.status === 'FAILED')" class="gdm-log fa fa-question-circle"  ></i>
-            <div  class="gdm-tooltip">
-              <span>{{feature.properties.progress}} %</span>
-              <div v-if="feature.properties.log">{{feature.properties.log}}</div>
-              </div>
-          <!--   <a v-if="back  && feature.properties.status === 'WAITING'"  :href="launchUrl + 'process/launch/' + feature.properties.id" class="button">Test Curl</a>
-            <span v-if="!back && feature.properties.status === 'WAITING'"  @click="launch(feature.properties.id, $event)" class="button">{{$t('launch')}}</span>
-            
-            <a v-if="back" :href="launchUrl + 'process/postdata/' + feature.properties.id" class="button" target="_blanck">Voir postdata</a>
-            
-            <span class="button" v-if="back && feature.properties.token && ['RUNNING', 'ACCEPTED'].indexOf(feature.properties.status) >= 0" @click="getStatus(feature.properties.id, $event)" >Test getStatus</span>
-             <span class="button" v-if="feature.properties.hasDismiss && feature.properties.token && ['RUNNING', 'ACCEPTED'].indexOf(feature.properties.status) >= 0" @click="dismiss(feature.properties.id, $event)" >Dismiss</span>
-            
-            <span class="button" v-if="back &&  ['FAILED', 'TERMINATED', 'KILLED', 'PURGED'].indexOf(feature.properties.status) >= 0" @click="restart(feature.properties.id, $event)" >Restart</span>
-          <span class="button" v-if=" feature.properties.hasPurge && ['TERMINATED'].indexOf(feature.properties.status) >= 0" @click="purge(feature.properties.id, $event)" >Purge</span>
-       --> 
-         <td style="text-align:left;font-size:0.9em;">
-         <div >
-           <b>{{$t('created')}}: </b>
-           <span style="white-space:nowrap;">
-             {{printDate(feature.properties.start, true)}}
-           </span>
+      <div  :style="{background:$shadeColor(color, 0.8)}" class="gdm-process-header">
+         <div class="gdm-process-header-column-1">{{$t('identifiers')}}</div>
+         <div class="gdm-process-header-column-2">Status</div>
+         <div class="gdm-process-header-column-3">{{$t('process_dates')}}</div>
+         <div class="gdm-process-header-column-4">
+           <span v-if="group === 'DEM'">{{$t('image_dates')}}</span>
+           <span v-else>{{$t('temporal_extent')}}</span>
          </div>
-         <div v-if="['TERMINATED', 'RUNNING', 'FAILED', 'ABORTED', 'PURGED'].indexOf(feature.properties.status) >=0">
-	         <div>
-		         <b>{{$t('start')}}: </b>
-		         <span style="white-space:nowrap;">
-		         {{printDate(feature.properties.processStart,true)}}
-		         </span>
-	         </div>
-	         <div>
-		         <b>{{$t('end')}}:</b>
-		         <span v-if="feature.properties.processEnd" style="white-space:nowrap;">
-		         {{printDate(feature.properties.processEnd, true)}}
-		         </span>
-		         <span v-else style="color:grey;white-space:nowrap;">
-		         {{printDate(feature.properties.end, true)}}
-		         </span>
-	         </div>
-         </div>
-          <span v-if="feature.properties.datePurge && feature.properties.status === 'TERMINATED'" class="date-purge"> 
-            <i class="fa fa-exclamation-triangle"></i>
-            <b>Purge: </b>{{printDate(feature.properties.datePurge)}}
-         </span>
-         <div class="gdm-tooltip">{{$t('clear_data')}}</div>
-         </td>
-         
-         <td style="text-align:center;">
-	         {{printDate(feature.properties.temporalExtent[0])}}
-	         <span v-if="group !== 'DEM'">
-	            <b>&rarr;</b>
-	            {{printDate(feature.properties.temporalExtent[1])}}
-	         </span>
-         </td>
-         <td style="min-width:40%;">
-           <div style="width:100%;max-height:100px;">
-	         <div class="infos">
-		         <div v-for="type in ['provider', 'position']" >
-			          <div v-if="feature.properties[type]" >
-	                <div v-for="(value, prop) in feature.properties[type]" v-if="prop !== 'bbox' && prop !== 'providerName'">
-	                  <div><b>{{prop}}:</b> {{value}}</div>
-	                </div>
-			         </div>
-		         </div>
-	         </div>
-	          <div class="infos" >
-             <div v-if="feature.properties.parameters && Object.keys(feature.properties.parameters).length < 10"  >
-                <div v-for="(value, prop) in feature.properties.parameters" >
-                  <div><b>{{prop}}:</b> {{value}}</div>
-                </div>
-             </div>
-             <div v-else>
-                <div v-for="prop in ['correl_split_date', 'correl_input_mode', 'correl_correlator', 'do_analysis', 'do_correction_filtering']" >
-                  <div v-if="feature.properties.parameters.hasOwnProperty(prop)"><b>{{$hypens2camel(prop)}}:</b> {{feature.properties.parameters[prop]}}</div>
-                </div>
-                <div v-for="prop in ['dsmopt_ortho', 'dsmopt_default_correlation', 'dsmopt_export_l93', 'dsmopt_use_roi', 'dsmopt_roi_sizex', 'dsmopt_roi_sizey']" >
-                  <div v-if="feature.properties.parameters.hasOwnProperty(prop)"><b>{{$hypens2camel(prop.replace('dsmopt_', ''))}}:</b> {{feature.properties.parameters[prop]}}</div>
-                </div>
-             </div>
-	         </div>
-	         </div>
-         </td>
-         </tr>
-         </tbody>
-       </table>
+         <div class="gdm-process-header-column-5" >{{$t('parameters')}}</div>
+      </div>
+      <div @mouseleave="highlight(null)" :style="{height: listHeight + 'px'}" style="border:1px solid lightgrey; overflow:auto;">
+       <gdm-process-row v-if="featureCollection" v-for="feature in featureCollection.features" 
+       :process="feature" :selected="selectedProcessId" :back="back" :selected-service="parameters.service" @selectService="selectService"
+       :user-id="userId" :selected-user="parameters.user" @selectUser="selectUser"
+       :status-list="statusList" :url="url" :group="group" :lang="lang"
+       @highlight="highlight" @selectProcess="selectProcess"></gdm-process-row>
+      </div>
      </div>
      </div>
    </div>
@@ -189,12 +69,13 @@ import GdmFormProcess from './subcomponents/gdm-form-process.vue'
 import moment from 'moment'
 import GdmDrawBbox from './subcomponents/gdm-draw-bbox.vue'
 import GdmProcessStatus from './subcomponents/gdm-process-status.vue'
-
+import GdmProcessRow from './subcomponents/gdm-process-row.vue'
 export default {
   name: 'GdmProcessSearch',
   components: {
     GdmPaging,
     GdmFormProcess,
+    GdmProcessRow,
     GdmDrawBbox,
     GdmProcessStatus
   },
@@ -281,12 +162,12 @@ export default {
    document.addEventListener('mapNodeChange', this.mapListener)
    this.launchUrl = this.api.substr(0, this.api.indexOf('api'))
    this.$i18n.locale = this.lang
-   moment.locale(this.lang)
-   if (this.lang === 'en') {
-     this.dateFormatDisplay = 'MM/DD/YYYY'
-   } else {
-     this.dateFormatDisplay = 'DD/MM/YYYY'
-   }
+//    moment.locale(this.lang)
+//    if (this.lang === 'en') {
+//      this.dateFormatDisplay = 'MM/DD/YYYY'
+//    } else {
+//      this.dateFormatDisplay = 'DD/MM/YYYY'
+//    }
    var search = this.search
    this.timer = setInterval(search, 60000)
    this.search()
@@ -358,12 +239,6 @@ export default {
       this.parameters[name] = e.value
       this.search()
     },
-//     dismiss (id, event) {
-//       event.stopPropagation()
-//       var url = this.launchUrl + 'api/dismiss/' + id
-//       this.$http.get(url, {credentials: true})
-//       .then( this.search())
-//     },
     display (response) {
       var pagination = response.body.properties
       this.pagination = {
@@ -395,12 +270,6 @@ export default {
         alert(this.$i18n.t('unauthorized'))
       }
     },
-//     getStatus (id, event) {
-//       event.stopPropagation()
-//       var url = this.launchUrl + 'api/getStatus/' + id
-//       this.$http.get(url, {credentials: true})
-//       .then( this.search())
-//     },
     highlight (featureId) {
       // remove all highlight
       var nodes = document.querySelectorAll('.gdm-process-search .highlight')
@@ -414,12 +283,6 @@ export default {
       var event = new CustomEvent('gdm:processHighlight', {detail: {id: featureId}})
       document.dispatchEvent(event)
     },
-//     launch (id, event) {
-//       event.stopPropagation()
-//       var url = this.launchUrl + 'api/launchz/' + id
-//       this.$http.get(url, {credentials: true})
-//       .then( this.search())
-//     },
     pageChange(values) {
       this.pagination = values
       this.search()
@@ -532,11 +395,76 @@ export default {
   }
 }
 </script>
+<style>
+.button{
+    font-family: Arial;
+    font-size: 1em;
+    display: inline-block;
+    margin: 0px 7px 3px 0;
+    padding: 3px 12px;
+    height: auto;
+    line-height: 1.43;
+    white-space: normal;
+    text-align: center;
+    background: #ececea;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 3px;
+    border-color: #ffffff #d4d4cf #d4d4cf;
+    color: #000;
+    text-decoration: none;
+  /*  text-shadow: 0 -1px 1px #bcbcb4, 1px 0 1px #d4d4cf, 0 1px 1px #d4d4cf, -1px 0 1px #bcbcb4;*/
+    vertical-align: top;
+    cursor: pointer;
+    pointer-events: auto;
+    box-sizing: border-box;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);}
+    
+.button:hover
+{
+   background: #f0f0e6;
+   text-decoration: none;
+ }
+.button:disabled{
+    color: #999;
+    pointer-events: none;
+  }
+</style>
 <style scoped>
 .gdm-process-search{
 font-size: 0.9rem;
 }
-.gdm-process-search i.gdm-log {
+.gdm-process-header {
+display: grid;
+  grid-template-columns: minmax(150px,1fr) 110px minmax(190px,1fr) minmax(100px, 1fr) minmax(300px, 2fr);
+  grid-gap: 5px;
+   grid-template-rows: 20px;
+   text-align:left;
+   font-weight:700;
+   border: 1px solid lightgrey;
+}
+.gdm-process-header-column-1 {
+  grid-column: 1;
+  grid-row: 1;
+  padding-left:5px;
+}
+.gdm-process-header-column-2 {
+  grid-column: 2;
+  grid-row: 1;
+}
+.gdm-process-header-column-3 {
+  grid-column: 3;
+  grid-row: 1;
+}
+.gdm-process-header-column-4 {
+  grid-column: 4;
+  grid-row: 1;
+}
+.gdm-process-header-column-5 {
+  grid-column: 5;
+  grid-row: 1;
+}
+/* .gdm-process-search i.gdm-log {
 	font-size:20px;
 	margin-top:5px;
 	color:grey;
@@ -561,7 +489,7 @@ font-size: 0.9rem;
   -moz-box-shadow: 0px 2px 5px 2px rgba(0, 0, 0, 0.4);
   z-index:100;
 }
-gdm-process-search div.gdm-tooltip:hover {
+.gdm-process-search div.gdm-tooltip:hover {
   display:block;
 }
 .gdm-process-search tr:last-child div.gdm-tooltip{
@@ -573,7 +501,7 @@ gdm-process-search div.gdm-tooltip:hover {
 }
 .gdm-process-search i.gdm-log:hover + div.gdm-tooltip {
   display:block;
-}
+} */
 .gdm-process-search div.column-right{
  width: calc(100% - 295px);
  display: block;
@@ -586,7 +514,7 @@ div.message {
   text-align: center;
   font-style: italic;
 }
-table.gdm-list-process {
+/* table.gdm-list-process {
   position:relative;
   display:block;
   width:100%;
@@ -597,7 +525,7 @@ table.gdm-list-process {
   border-collapse: collapse;
   box-shadow: 1px 1px 1px 2px rgba(0, 0, 0, 0.1);
   z-index:0;
-}
+} */
 .gdm-process-search div.gdm-wrapper {
   max-width:1950px;
   margin:auto;
@@ -610,7 +538,7 @@ table.gdm-list-process {
 }
 
 
-table.gdm-list-process th {
+/* table.gdm-list-process th {
   position: sticky; 
   top: 0;
   padding:3px 8px;
@@ -624,19 +552,19 @@ table.gdm-list-process th {
 .gdm-process-search tr{
    min-height:100px;
    height:100px;
-}
-.gdm-process-search tr.highlight {
+} */
+.gdm-process-search div.highlight {
   background: #EFF6F6;
 }
-.gdm-process-search tr.selected {
+/*.gdm-process-search tr.selected {
   background: #F6EFEF;
-}
+} */
 /**thead {
  border: 1px solid #ccc;
  background: 
  text-align: left;
 }**/
-table.gdm-list-process td{
+/*table.gdm-list-process td{
   padding:3px 8px;
   vertical-align:top;
   border-bottom: 1px solid #ccc;
@@ -687,38 +615,6 @@ div.gdm-token{
   font-style:italic;
   max-width: 190px;
 overflow-wrap: break-word;
-}
-.button{
-    font-family: Arial;
-    font-size: 1em;
-    display: inline-block;
-    margin: 0px 7px 3px 0;
-    padding: 3px 12px;
-    height: auto;
-    line-height: 1.43;
-    white-space: normal;
-    text-align: center;
-    background: #ececea;
-    border-width: 1px;
-    border-style: solid;
-    border-radius: 3px;
-    border-color: #ffffff #d4d4cf #d4d4cf;
-    color: #000;
-    text-decoration: none;
-  /*  text-shadow: 0 -1px 1px #bcbcb4, 1px 0 1px #d4d4cf, 0 1px 1px #d4d4cf, -1px 0 1px #bcbcb4;*/
-    vertical-align: top;
-    cursor: pointer;
-    pointer-events: auto;
-    box-sizing: border-box;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);}
-    
-.button:hover
-{
-   background: #f0f0e6;
-   text-decoration: none;
- }
-.button:disabled{
-    color: #999;
-    pointer-events: none;
-  }
+} */
+
 </style>
