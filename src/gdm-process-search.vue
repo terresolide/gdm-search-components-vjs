@@ -438,10 +438,11 @@ font-size: 0.9rem;
 display: grid;
   grid-template-columns: minmax(180px,1fr) 110px minmax(190px,1fr) minmax(100px, 1fr) minmax(300px, 2fr);
   grid-gap: 5px;
-   grid-template-rows: 20px;
    text-align:left;
    font-weight:700;
    border: 1px solid lightgrey;
+   min-height:20px;
+   max-height:35px;
 }
 .gdm-process-header-column-1 {
   grid-column: 1;

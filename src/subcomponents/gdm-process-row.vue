@@ -174,6 +174,7 @@ export default {
     }
   },
   created () {
+    this.$i18n.locale = this.lang
     moment.locale(this.lang)
     if (this.lang === 'en') {
       this.dateFormatDisplay = 'MM/DD/YYYY'
