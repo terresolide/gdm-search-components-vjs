@@ -71,11 +71,13 @@
              </span>
            </div>
          </div>
-          <span v-if="process.properties.datePurge && process.properties.status === 'TERMINATED'" class="date-purge"> 
-            <i class="fa fa-exclamation-triangle"></i>
-            <b>Purge: </b>{{printDate(process.properties.datePurge)}}
-         </span>
-         <div class="gdm-tooltip">{{$t('clear_data')}}</div>
+         <div style="position:relative;">
+	         <span v-if="process.properties.datePurge && process.properties.status === 'TERMINATED'" class="date-purge"> 
+	            <i class="fa fa-exclamation-triangle"></i>
+	            <b>Purge: </b>{{printDate(process.properties.datePurge)}}
+	         </span>
+	         <div class="gdm-tooltip">{{$t('clear_data')}}</div>
+         </div>
     
    </div>
     <div class="gdm-process-column-4">
