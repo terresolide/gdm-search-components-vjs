@@ -132,22 +132,24 @@
        </div>
 		 </div>
 		 </div>
-		 <div class="gdm-list-parameters"> 
+		 <div class="gdm-list-parameters" v-if="describe"> 
 		  <h2 :style="{color:color}">{{$t('parameters')}}</h2>
        <div>
-		 <gdm-parameters v-if="describe" mode="view" :describe="describe" :default-parameters="defaultParameters" :width="360" :color="color" :lang="lang"></gdm-parameters>
+		 <gdm-parameters  mode="view" :describe="describe" :default-parameters="defaultParameters" :width="360" :color="color" :lang="lang"></gdm-parameters>
         <div style="height:120px;"></div>
       </div>
       </div>
-		<!--  <div class="gdm-list-parameters" >
+		 <div class="gdm-list-parameters" v-else >
 			 <h2 :style="{color:color}">{{$t('parameters')}}</h2>
 			 <div>
-			  <div v-for="(value, prop) in parameters" style="font-size:0.9rem;max-width:400px;"
-			   v-if="['dsmopt_image_input', 'correl_image_input', 't2_app_name', 't2_token','t2_user', 'wf_id'].indexOf(prop) < 0 ">
+			  <div v-for="(value, prop) in parameters" style="font-size:0.9rem;max-width:400px;">
 			    <b >{{prop}}:</b> <div style="vertical-align:top;max-width:350px;display:inline-block;overflow-wrap:anywhere">{{value}}</div>
 			  </div>
+			  <div v-for="(value, prop) in position" v-if="prop !== 'bbox'" style="font-size:0.9rem;max-width:400px;">
+          <b >{{prop}}:</b> <div style="vertical-align:top;max-width:350px;display:inline-block;overflow-wrap:anywhere">{{value}}</div>
+        </div>
 			  </div>
-		  </div> --> 
+		  </div>  
 		 <div class="gdm-list-images" >
 		  <h2 :style="{color:color}">Images</h2>
 		  <div v-if="images.length > 0">
@@ -235,6 +237,7 @@ export default {
   data() {
     return {
       parameters: {},
+      position: {},
       feature: null,
       process: null,
       // INPUT IMAGES
@@ -300,6 +303,7 @@ export default {
       this.describe = response.serviceParametersUrl
       this.defaultParameters = response.feature.properties.parameters
       var parameters = response.feature.properties.parameters
+      this.position = response.feature.properties.position
       var keys = Object.keys(parameters)
       keys.sort()
       for(var prop in keys) {
