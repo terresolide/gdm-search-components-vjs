@@ -188,7 +188,8 @@ div.gdm-tooltip:hover {
 div.gdm-progress-terminated,
 div.gdm-progress-failed,
 div.gdm-progress-waiting,
-div.gdm-progress-running {
+div.gdm-progress-running,
+div.gdm-progress-debug {
   position: relative;
   display:inline-block;
   height:25px;
@@ -217,7 +218,8 @@ div.gdm-progress-running {
  border-radius:10px 0 0 10px;
 }
 div.gdm-progress-debug {
- background: #28a428;
+ background: #fc9303;
+ border-radius:10px 0 0 10px;
 }
 div.gdm-completed {
   border-radius: 10px;
@@ -236,6 +238,18 @@ div.gdm-progress-running > div {
   color:white;
   top: 0; left: 0; bottom: 0; right: 0;
   background-image: linear-gradient(-45deg,#16e000,rgba(0, 255, 0, .3),#16e000,rgba(0, 255, 0, .3),#16e000);
+  z-index: 1;
+  background-size: 50px 50px;
+  animation: running 8s linear infinite;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  overflow: hidden;
+}
+div.gdm-progress-debug > div {
+  position: absolute;
+  color:white;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background-image: linear-gradient(-45deg,#fec06d,rgba(252, 147, 3, 0.6),#fec06d,rgba(252, 147, 3, 0.6),#fec06d);
   z-index: 1;
   background-size: 50px 50px;
   animation: running 8s linear infinite;
