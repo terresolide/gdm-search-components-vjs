@@ -119,8 +119,11 @@ export default {
           case 'ABORTED':
             classname = 'gdm-progress-failed'
             break
+          case 'DEBUG':
+            classname = 'gdm-progress-debug'
+            break;
         }
-        if (this.progress > 90) {
+        if (this.progress > 90 && this.status !== 'DEBUG') {
           classname += ' gdm-completed'
         }
         return classname
@@ -213,6 +216,9 @@ div.gdm-progress-running {
  background:  #28a428;
  border-radius:10px 0 0 10px;
 }
+div.gdm-progress-debug {
+ background: #28a428;
+}
 div.gdm-completed {
   border-radius: 10px;
   text-align:center;
@@ -296,7 +302,8 @@ div.gdm-progress-running > div {
 .gdm-progress-step li.gdm-progress-terminated:after,
 .gdm-progress-step li.gdm-progress-completed:after,
 .gdm-progress-step li.gdm-progress-running:after,
-.gdm-progress-step li.gdm-progress-waiting:after
+.gdm-progress-step li.gdm-progress-waiting:after,
+.gdm-progress-step li.gdm-progress-debug:after
 {
   background:#28a428;
   color: white;
@@ -309,12 +316,25 @@ background-image: linear-gradient(-45deg,#16e000,#28a428,#16e000,#28a428,#16e000
   font-size:11px;
   text-shadow: 1px 1px black;
 }
+.gdm-progress-step li.gdm-progress-debug:before{
+background-image: linear-gradient(-45deg,#fec06d,#fc9303,#fec06d,#fc9303,#fec06d);
+  color: white;
+   animation: running 10s linear infinite;
+  overflow:hidden;
+  font-size:11px;
+  text-shadow: 1px 1px black;
+}
 .gdm-progress-step li.gdm-progress-terminated:before,
 .gdm-progress-step li.gdm-progress-waiting:before{
    background:#28a428;
     color:white;
     font-size:11px;
 }
+/*.gdm-progress-step li.gdm-progress-debug:before{
+    background:orange;
+    color:white;
+    font-size:11px;
+} */
 .gdm-progress-step li.gdm-progress-failed:before{
     background:#e00000;
     color:white;

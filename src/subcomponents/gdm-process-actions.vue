@@ -11,7 +11,9 @@
      "cancel": "Stop",
      "purge": "To trash",
      "evaluate": "Evaluate",
-     "duplicate": "Duplicate"  
+     "duplicate": "Duplicate",
+     "debug": "Switch to debug",
+     "run": "end of debug"
    },
    "fr":{
      "abort": "Abandonner",
@@ -24,7 +26,9 @@
      "cancel": "Stopper",
      "purge": "Vider",
      "evaluate": "Evaluer",
-     "duplicate": "Dupliquer"   
+     "duplicate": "Dupliquer",
+     "debug": "Passer en mode debug",
+     "run": "Fin du debug"  
    }
 }
 </i18n>
@@ -55,6 +59,16 @@
         <a class="button" @click="clickGetStatus" :class="{disabled: disabled}" :disabled="disabled">{{$t('refresh')}}</a>
         <a class="button"  @click="dismiss" :class="{disabled: disabled}" :disabled="disabled">
            <span>{{$t('abort')}}</span>
+        </a>
+        <a class="button" v-if="back" @click="switchDebug" :title="$t('debug')">
+        <i class="fa fa-arrow-right"></i>
+        DEBUG
+        </a>
+      </div>
+      <div v-else-if="process.status === 'DEBUG'">
+         <a class="button" v-if="back" @click="switchDebug" :title="$t('run')">
+        <i class="fa fa-arrow-right"></i>
+        DEBUG END
         </a>
       </div>
       <div v-else-if="process.status === 'SAVED'">
@@ -263,6 +277,39 @@ export default {
         this.submitting = false
       })
       
+    },
+    switchDebug() {
+      // if process running and back
+      var status = this.process.status === 'RUNNING' ? 'DEBUG' : 'RUNNING';
+      this.$http.post(
+          this.api.replace('api', 'scripts') + '/setStatus',
+          {
+            process_token: this.process.token,
+            status: status,
+            step: this.process.stepName,
+            progress: this.process.progress,
+            log: this.process.log
+          },
+          {
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              credentials: true
+           }
+      ).then(function (resp) {
+        if (resp.body.success) {
+          var process = Object.assign(this.process, {status: status})
+          console.log(process)
+          this.$emit('statusChange', process)
+        }
+        this.submitting = false
+        this.status = resp.body.status
+        this.launchTimer()
+      }, function (resp) {
+        console.log('error request ', resp.status)
+        
+      })
     }
   }
 }
