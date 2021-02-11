@@ -143,7 +143,7 @@ export default {
       default: 'en'
     },
     selected: {
-      type: Number,
+      type: String,
       default: null
     },
     selectedService: {

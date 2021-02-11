@@ -52,7 +52,7 @@
          <div class="gdm-process-header-column-5" >{{$t('parameters')}}</div>
       </div>
       <div @mouseleave="highlight(null)" :style="{height: listHeight + 'px'}" style="border:1px solid lightgrey; overflow:auto;">
-       <gdm-process-row v-if="featureCollection" v-for="feature in featureCollection.features" 
+       <gdm-process-row v-if="featureCollection" v-for="(feature, key) in featureCollection.features" :key="key" 
        :process="feature" :selected="selectedProcessId" :back="back" :selected-service="parameters.service" @selectService="selectService"
        :user-id="userId" :selected-user="parameters.user" @selectUser="selectUser"
        :status-list="statusList" :url="url" :group="group" :lang="lang"
