@@ -484,8 +484,6 @@ export default {
   .gdm-process-view #fmtMap {
 border: 4px solid lightgrey;
 }
-</style>
-<style scoped>
 .gdm-process-view{
   width:calc(100% - 30px);
   margin:0 auto;
