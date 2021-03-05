@@ -2,11 +2,13 @@
 {
    "en":{
      "download": "Download",
+     "folder": "Folder",
      "results": "Results" ,
      "preview": "Preview"  
    },
    "fr":{
      "download": "Télécharger",
+     "folder": "Répertoire",
      "results": "Résultats",
      "preview": "Visualisation"   
    }
@@ -23,6 +25,9 @@ DRAW SVG
   
       <a v-if="result.results" :href="result.results" class="button" >
        <i class="fa fa-download"></i> {{$t('download')}}
+      </a>
+      <a v-if="result.dir" :href="result.dir" class="button" target="_blank" style="margin-bottom:20px;">
+         <i class="fa fa-folder"></i> {{$t('folder')}}
       </a>
     </div>
     <div v-if="images && images.length > 0" style="width:100%;margin-bottom:5px;">

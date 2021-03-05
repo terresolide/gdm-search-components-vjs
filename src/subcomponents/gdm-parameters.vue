@@ -47,7 +47,7 @@
    </gdm-parameters>
    <div v-if="['complexe', 'complexeReturn', 'hidden'].indexOf(parameter.type) < 0" v-show="parameter.show" :class="parameter.classname">
    <div   style="opacity:0.5;margin-left:-18px;display:inline-block;width:14px;text-align: center;">-</div>
-   <div   style="display:inline-block;vertical-align:top;" :style="{maxWidth: width + 'px'}">
+   <div   style="display:inline-block;vertical-align:top;" :style="{maxWidth: (width - 30) + 'px'}">
      <div v-if="parameter.type!== 'complexe' && parameter.type !== 'complexeReturn'" class="gdm-title"
      :style="titleStyle(parameter)"  :title="getTitle(parameter)" @contextmenu="showTooltip($event)">{{parameter.title}}</div>
      
