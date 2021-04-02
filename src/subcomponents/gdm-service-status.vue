@@ -3,11 +3,13 @@
    "en":{
      "ENABLED": "Service Open",
      "DISABLED": "Service Closed",
+     "FORBIDDEN": "You are not authorized\nto access this service",
      "MAINTENANCE":"Service Under Maintenance\n(You can only edit and save your job)"    
    },
    "fr":{
      "ENABLED": "Service Ouvert",
      "DISABLED": "Service Fermé",
+     "FORBIDDEN": "Vous n'êtes pas autorisé\nà accéder à ce service",
      "MAINTENANCE":"Service En maintenance\n(Vous pouvez uniquement éditer et sauvegarder vos jobs)"   
    }
 }
@@ -70,6 +72,7 @@ export default {
       case 'ENABLED':
         return 'radial-gradient(circle at 30%, #00FF00, #008000)'
       case 'DISABLED':
+      case 'FORBIDDEN':
         return 'radial-gradient(circle at 30%, #FF0000, #800000)'
       case 'MAINTENANCE':
         return 'radial-gradient(circle at 30%, #FFA500, #FF5733)'
