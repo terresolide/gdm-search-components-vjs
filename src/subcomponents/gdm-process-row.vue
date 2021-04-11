@@ -24,7 +24,7 @@
 	      @click="selectService($event)">
 	      {{process.properties.serviceName}}
 	   </div>
-	   <div v-if="userId && (back || group !=='MNS')">{{process.properties.email}}</div>
+	   <div v-if="userId && (back || ['MNS', 'DSM'].indexOf(group) < 0)">{{process.properties.email}}</div>
 	   <div v-else>
 	       <div class="toSelect" :class="{selectedUser: selectedUser}" 
 	       @click="selectUser($event)">
