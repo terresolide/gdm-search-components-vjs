@@ -24,7 +24,7 @@
 	      @click="selectService($event)">
 	      {{process.properties.serviceName}}
 	   </div>
-	   <div v-if="userId">{{process.properties.email}}</div>
+	   <div v-if="userId && (back || group !=='MNS')">{{process.properties.email}}</div>
 	   <div v-else>
 	       <div class="toSelect" :class="{selectedUser: selectedUser}" 
 	       @click="selectUser($event)">
@@ -151,7 +151,7 @@ export default {
       default: null
     },
     selectedUser: {
-      type: String,
+      type: Object,
       default: null
     },
     statusList: {

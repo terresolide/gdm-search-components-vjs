@@ -337,10 +337,15 @@ export default {
         alert(process.error)
         return
       }
+      var url = this.url
+      if (this.group) {
+        url = this.url + this.group + '/'
+      }
+     
       if (this.back) {
-        window.location.href = this.url + 'process/' + process.id 
+        window.location.href = url + 'process/' + process.id 
       } else {
-        window.location.href = this.url + 'process/' + process.id + '/edit'
+        window.location.href = url + 'process/' + process.id + '/edit'
       }
     },
     getImage(list, index) {
