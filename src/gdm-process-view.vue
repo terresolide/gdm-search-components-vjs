@@ -119,8 +119,8 @@
 	   <div class="header-4">--> 
 	   <div class="process-actions">
 	     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" 
-	     :process="process" :can-edit="!pleiadeRemoved" :lang="lang" @processChange="statusChange" 
-	     @statusChange="statusChange" @duplicate="duplicate">
+	     :process="process" :can-edit="!pleiadeRemoved" :lang="lang" :ciest2="ciest2" @processChange="statusChange" 
+	     @statusChange="statusChange" @ownerChange="userChange" @duplicate="duplicate">
 	     </gdm-process-actions>
 	   </div>
 	    
@@ -206,6 +206,10 @@ export default {
     url: {
       type: String,
       default: ''
+    },
+    ciest2: {
+      type: Boolean,
+      default: false
     },
     back: {
       type: Boolean,
@@ -410,6 +414,12 @@ export default {
       if (this.$el && this.$el.querySelector) {
         this.headerHeight = this.$el.querySelector('.gdm-process-header').clientHeight
       }
+    },
+    userChange (process) {
+      console.log(process)
+      this.process = Object.assign(this.process, process)
+      this.feature = Object.assign(this.feature, process.feature)
+      
     },
     statusChange (detail) {
       if (detail.hasOwnProperty('err') || detail.hasOwnProperty('error')) {

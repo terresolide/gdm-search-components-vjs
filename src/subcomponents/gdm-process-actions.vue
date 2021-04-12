@@ -13,7 +13,8 @@
      "evaluate": "Evaluate",
      "duplicate": "Duplicate",
      "debug": "Switch to debug",
-     "run": "end of debug"
+     "run": "end of debug",
+     "share_ciest2": "Share with CIEST2"
    },
    "fr":{
      "abort": "Abandonner",
@@ -28,7 +29,8 @@
      "evaluate": "Evaluer",
      "duplicate": "Dupliquer",
      "debug": "Passer en mode debug",
-     "run": "Fin du debug"  
+     "run": "Fin du debug" ,
+     "share_ciest2": "Partager CIEST2"
    }
 }
 </i18n>
@@ -54,7 +56,9 @@
       <!--  PURGED NOTHING TO DO => CREATE NEW PROCESS WITH THIS-->
       <div v-else-if="process.status === 'PURGED' || process.status === 'ABORTED' || process.status === 'TERMINATED'">
          <a class="button" @click="duplicate"  :class="{disabled: !canEdit}">{{$t('duplicate')}}</a>
+          <a class="button" v-if="ciest2 && process.status==='TERMINATED'" @click="share"  :class="{disabled: !canEdit}">{{$t('share_ciest2')}}</a>
       </div>
+       
       <div v-else-if="process.status === 'RUNNING' || process.status === 'PRE-RUN' || process.status === 'ACCEPTED'">
         <a class="button" @click="clickGetStatus" :class="{disabled: disabled}" :disabled="disabled">{{$t('refresh')}}</a>
         <a class="button"  @click="dismiss" :class="{disabled: disabled}" :disabled="disabled">
@@ -104,6 +108,10 @@ export default {
     url: {
       type: String,
       default: ''
+    },
+    ciest2: {
+      type: Boolean,
+      default: false
     },
     back: {
       type: Boolean,
@@ -277,6 +285,16 @@ export default {
         this.submitting = false
       })
       
+    },
+    share () {
+      this.submitting = true
+      this.$http.get(this.api + '/share/' + this.process.id, {credentials: true})
+      .then(function (resp) {
+        this.$emit('ownerChange', resp.body)
+        this.submitting = false
+      }, function (e) {
+        this.submitting = false
+      })
     },
     switchDebug() {
       // if process running and back
