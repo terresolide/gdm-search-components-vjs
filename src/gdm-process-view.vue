@@ -416,7 +416,6 @@ export default {
       }
     },
     userChange (process) {
-      console.log(process)
       this.process = Object.assign(this.process, process)
       this.feature = Object.assign(this.feature, process.feature)
       

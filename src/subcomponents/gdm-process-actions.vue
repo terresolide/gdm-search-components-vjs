@@ -56,7 +56,7 @@
       <!--  PURGED NOTHING TO DO => CREATE NEW PROCESS WITH THIS-->
       <div v-else-if="process.status === 'PURGED' || process.status === 'ABORTED' || process.status === 'TERMINATED'">
          <a class="button" @click="duplicate"  :class="{disabled: !canEdit}">{{$t('duplicate')}}</a>
-          <a class="button" v-if="ciest2 && process.status==='TERMINATED'" @click="share"  :class="{disabled: !canEdit}">{{$t('share_ciest2')}}</a>
+          <a class="button" v-if="ciest2 && !isCiest2 && process.status==='TERMINATED'" @click="share"  :class="{disabled: !canEdit}">{{$t('share_ciest2')}}</a>
       </div>
        
       <div v-else-if="process.status === 'RUNNING' || process.status === 'PRE-RUN' || process.status === 'ACCEPTED'">
@@ -130,7 +130,8 @@ export default {
     return {
       submitting: false,
       status: null,
-      timer: null
+      timer: null,
+      isCiest2: false
     }
   },
   computed: {
@@ -291,6 +292,7 @@ export default {
       this.$http.get(this.api + '/share/' + this.process.id, {credentials: true})
       .then(function (resp) {
         this.$emit('ownerChange', resp.body)
+        this.isCiest2 = true
         this.submitting = false
       }, function (e) {
         this.submitting = false

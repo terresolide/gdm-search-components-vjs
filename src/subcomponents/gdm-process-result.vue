@@ -1,12 +1,18 @@
 <i18n>
 {
    "en":{
+     "copied_to_clipboard": "The curl command has been copied to clipboard",
+     "copy_curl": "Curl cmd",
+     "copy_in_clipboard": "Copy the curl command\nin clipboard",
      "download": "Download",
      "folder": "Folder",
      "results": "Results" ,
      "preview": "Preview"  
    },
    "fr":{
+     "copied_to_clipboard": "La commande Curl a été copiée dans le presse-papier",
+     "copy_curl": "Cmd Curl",
+     "copy_in_clipboard": "Copier la commande curl\ndans le presse-papier",
      "download": "Télécharger",
      "folder": "Répertoire",
      "results": "Résultats",
@@ -20,11 +26,16 @@ DRAW SVG
 </span>
 <span v-else> -->
 <div class="gdm-process-result">
-     <div >
+     <div style="position:relative;">
       <h3 :style="{color:color}" style="margin-bottom:10px;">{{$t('results')}}</h3>
   
       <a v-if="result.results" :href="result.results" class="button" >
        <i class="fa fa-download"></i> {{$t('download')}}
+      </a>
+       <a v-if="result.results" @click="copyCmd(result.results)" class="button" :title="$t('copy_in_clipboard')">
+        <i class="fa fa-clipboard"></i> {{$t('copy_curl')}}
+        <div class="result-tooltip" v-show="showTooltip">{{$t('copied_to_clipboard')}}</div>
+        <textarea ref="areaCmd" v-model="cmdCurl" v-show="false">{{cmdCurl}}</textarea>
       </a>
       <a v-if="result.dir" :href="result.dir" class="button" target="_blank" style="margin-bottom:20px;">
          <i class="fa fa-folder"></i> {{$t('folder')}}
@@ -65,19 +76,43 @@ export default {
   },
   data(){
     return {
+      cmdCurl: null,
+      showTooltip: false
     }
   },
   computed: {
+  },
+  watch: {
+    result (newvalue) {
+      this.initCmdCurl(newvalue)
+    }
   },
   destroyed: function() {
   },
   created: function () {
     this.$i18n.locale = this.lang
+    this.initCmdCurl(this.result)
   },
   mounted: function(){
     
   },
   methods:{
+     copyCmd (url) {
+       this.$refs.areaCmd.select()
+       // node.setSelectionRange(0, 99999);
+       document.execCommand("copy");
+       this.showTooltip = true
+       var _this = this
+       setTimeout(function () {
+         _this.showTooltip = false
+       }, 2000)
+     },
+     initCmdCurl (result) {
+       if (result.results) {
+         var filename = result.results.split('/').pop().split('#')[0].split('?')[0]
+         this.cmdCurl = 'curl "' + result.results + '" -o ' + filename
+       }
+     },
      toggleImage (index) {
 //        var layer = this.layers[e]
 //        layer.checked = !layer.checked
@@ -103,5 +138,17 @@ export default {
 .gdm-process-result h3 {
   margin-top:0; 
   margin-bottom:5px;
+}
+.result-tooltip {
+  position: absolute;
+  background-color: #fafafa;
+  border: 1px solid #a3a3a3;
+  font-size: smaller;
+  padding: 4px;
+  width: 160px;
+  text-align: left;
+  left:150px;
+  -webkit-box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
 }
 </style>
