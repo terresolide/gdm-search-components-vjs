@@ -119,7 +119,7 @@
 	   <div class="header-4">--> 
 	   <div class="process-actions">
 	     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" 
-	     :process="process" :can-edit="!pleiadeRemoved" :lang="lang" :ciest2="ciest2" @processChange="statusChange" 
+	     :process="process" :user-id="userId" :can-edit="!pleiadeRemoved" :lang="lang" :ciest2="ciest2" @processChange="statusChange" 
 	     @statusChange="statusChange" @ownerChange="userChange" @duplicate="duplicate">
 	     </gdm-process-actions>
 	   </div>
@@ -210,6 +210,10 @@ export default {
     ciest2: {
       type: Boolean,
       default: false
+    },
+    userId: {
+      type: Number,
+      default: null
     },
     back: {
       type: Boolean,
