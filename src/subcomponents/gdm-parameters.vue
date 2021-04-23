@@ -11,8 +11,8 @@
 }
 </i18n>
 <template>
-<span class="gdm-parameters" v-show="show" style="direction:ltr;" @contextmenu="$event.preventDefault()" >
- <div v-if="!root" style="margin-left: -18px;":title="describe.short" >
+<span class="gdm-parameters" v-show="show" style="direction:ltr;" > <!--  @contextmenu="$event.preventDefault()" >-->
+ <div v-if="!root" style="margin-left: -18px;":title="tr(describe.short)" >
 <!--   <div  v-if="used" class="gdm-deployed" @click="deployed = !deployed" style="width:6px;pointer:cursor;">{{deployed ? '-' : '+'}}</div>
  <div v-else="used" class="gdm-deployed" style="color:grey;">{{deployed ? '-' : '+'}}</div>
  -->
@@ -25,13 +25,13 @@
   
   <span class="gdm-complexe-title" v-if="used || mode === 'view'" :style="{color: color}"  @click="deployed = !deployed" 
   @contextmenu="showTooltip($event)" :title="getTitle(describe)">
-  {{title}}
+  {{tr(title)}}
    <span> {{deployed ? '-' : '+'}}</span>
   </span>
-  <span v-if="!used && mode !== 'view'" :style="{color: color, opacity:0.7}"  @contextmenu="showTooltip($event)" >{{title}}</span>
+  <span v-if="!used && mode !== 'view'" :style="{color: color, opacity:0.7}"  @contextmenu="showTooltip($event)" >{{tr(title)}}</span>
    <div v-if="description" class="gdm-tooltip" @click="hideTooltip()" @contextmenu="hideTooltip()">
-    <h4 v-if="describe.short">{{describe.short}}</h4>
-    <div v-html="description"></div>
+    <h4 v-if="describe.short">{{tr(describe.short)}}</h4>
+    <div v-html="tr(description)"></div>
    </div>
 </div>
 <div v-show="deployed && (used || mode === 'view')"  style="margin-left:20px;">
@@ -49,11 +49,11 @@
    <div   style="opacity:0.5;margin-left:-18px;display:inline-block;width:14px;text-align: center;">-</div>
    <div   style="display:inline-block;vertical-align:top;" :style="{maxWidth: (width - 30) + 'px'}">
      <div v-if="parameter.type!== 'complexe' && parameter.type !== 'complexeReturn'" class="gdm-title"
-     :style="titleStyle(parameter)"  :title="getTitle(parameter)" @contextmenu="showTooltip($event)">{{parameter.title}}</div>
+     :style="titleStyle(parameter)"  :title="getTitle(parameter)" @contextmenu="showTooltip($event)">{{tr(parameter.title)}}</div>
      
      <div v-if="parameter.description" class="gdm-tooltip" @click="hideTooltip()" @contextmenu="hideTooltip()">
-     <h4 v-if="parameter.short">{{parameter.short}}</h4>
-     <div v-html="parameter.description"></div>
+     <h4 v-if="parameter.short">{{tr(parameter.short)}}</h4>
+     <div v-html="tr(parameter.description)"></div>
      </div>
      
      <div v-if="parameter.type === 'select' || parameter.type === 'customTypeSelect'" 
@@ -68,6 +68,13 @@
         @change="change(parameter)">
           <option v-for="option in parameter.options" :value="option">{{option}}</option>
         </select>
+     </div>
+     <div v-if="parameter.type === 'multipleCheckbox'" style="display:inline-block;">
+       <span  v-for="option in parameter.options" style="margin-right:3px;">
+         {{option}}
+         <input type="checkbox" :name="prefix + parameter.name + '[]'" :value="option" 
+         :checked="parameter.default.indexOf(option) >= 0 "/>
+       </span>
      </div>
      <div v-if="parameter.type === 'datalist'">
         <input type="text" :list="'list_' + prefix + parameter.name" v-model="values[prefix + parameter.name]" 
@@ -190,6 +197,13 @@ export default {
     this.removeListeners()
   },
   methods: {
+    tr (name) {
+      if (name && name[this.lang]) {
+        return name[this.lang]
+      } else {
+        return name
+      }
+    },
     change (parameter) {
       var event0 = new CustomEvent('parameterChange')
       document.dispatchEvent(event0)
@@ -217,7 +231,7 @@ export default {
         this.load()
       } else {
         this.parameters = this.describe.parameters
-        this.title = this.describe.title
+        this.title = this.tr(this.describe.title)
         this.type = this.describe.type
         this.description = this.describe.description
         this.initUsed()
@@ -374,7 +388,7 @@ export default {
     },
     extractChildValues () {
       var _this = this
-      this.parameters.forEach(function (parameter) {
+      this.parameters.forEach(function (parameter , index) {
         var name = _this.prefix + parameter.name
         if (parameter.type.indexOf('complexe') >= 0) {
           _this.complexes.push(parameter.name)
@@ -438,6 +452,18 @@ export default {
                   _this.$forceUpdate()
                 }
               }
+              if (listener.function === 'multiple') {
+                // case rlookChange
+                var value0 = parseInt(e.detail.value)
+                var value = value0
+                var options = {}
+                while (value <= 32) {
+                  options[value + ''] = value + '-LOOKS'
+                  value = value * 2
+                }
+                _this.parameters[index].options = options
+                _this.$set(_this.values, name, value0 + '')
+              }
             }
             // listener.listen = listener.funct.bind(listener)
             document.addEventListener(listener.event, listener.funct)
@@ -499,7 +525,7 @@ export default {
       this.$forceUpdate()
     },
     getTitle (parameter) {
-      var title = parameter.short ? parameter.short : ''
+      var title = parameter.short ? this.tr(parameter.short) : ''
       if (parameter.description) {
         title += parameter.short ? '\n' : ''
         title += this.$i18n.t('right_click')
@@ -507,7 +533,7 @@ export default {
       return title
     },
     titleStyle (parameter) {
-      if (['checkbox', 'number', 'customTypeNumber', 'select', 'customInputImages', 'date'].indexOf(parameter.type) >= 0) {
+      if (['checkbox', 'number', 'customTypeNumber', 'multipleCheckbox', 'select', 'customInputImages', 'date', 'text'].indexOf(parameter.type) >= 0) {
         return {
           color: this.color,
           display: parameter.display ? parameter.display : 'inline-block',
@@ -542,10 +568,6 @@ div[id="app"] .gdm-tooltip a:hover {
 }
 </style>
 <style scoped>
-.gdm-parameters .disabled {
-  pointer-events: none;
-  color: grey;
-}
 .gdm-parameters .gdm-complexe-title{
   cursor: pointer;
 }
@@ -633,13 +655,28 @@ div[id="app"] .gdm-tooltip a:hover {
 .gdm-parameters input.invalid {
   box-shadow: 1px 1px 5px red;
 }
-
+.gdm-parameters input[type="text"] {
+  padding: 1px 2px;
+}
 .gdm-parameters input[type="number"] {
   max-width: 70px;
 }
-.gdm-parameters div.small-number input[type="number"] {
+.gdm-parameters input[type="checkbox"] {
+  vertical-align:middle;
+  line-height:19px;
+}
+.gdm-parameters div.small-number input[type="number"],
+.gdm-parameters div.small input[type="text"] {
   max-width: 48px;
 }
+.gdm-parameters div.small div:not(.gdm-tooltip) {
+  display: inline-block;
+}
+.gdm-parameters div.disabled input[type="text"] {
+  background: #F3F3F3;
+  pointer-events: none;
+  color: #777;
+} 
 .gdm-parameters input[type="checkbox"] {
   cursor: pointer;
 }
