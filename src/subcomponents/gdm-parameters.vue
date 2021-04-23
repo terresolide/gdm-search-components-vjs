@@ -568,6 +568,10 @@ div[id="app"] .gdm-tooltip a:hover {
 }
 </style>
 <style scoped>
+.gdm-parameters .gdm-used.disabled {
+  color:grey;
+  pointer-events:none;
+}
 .gdm-parameters .gdm-complexe-title{
   cursor: pointer;
 }
