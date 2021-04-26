@@ -517,6 +517,10 @@ export default {
             parameter[prop] = parameter.save[prop]
           }
         }
+        if (parameter.emit) {
+          var event = new CustomEvent(parameter.emit, {detail: {value: _this.values[_this.prefix + parameter.name]}})
+          document.dispatchEvent(event)
+        }
       })
       this.complexes.forEach(function (name) {
         var comp = _this.$refs[name][0]
