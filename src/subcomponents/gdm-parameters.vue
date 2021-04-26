@@ -69,11 +69,11 @@
           <option v-for="option in parameter.options" :value="option">{{option}}</option>
         </select>
      </div>
-     <div v-if="parameter.type === 'multipleCheckbox'" style="display:inline-block;">
+      <div v-if="parameter.type === 'multipleCheckbox'" style="display:inline-block;">
        <span  v-for="option in parameter.options" style="margin-right:3px;">
          {{option}}
          <input type="checkbox" :name="prefix + parameter.name + '[]'" :value="option" 
-         :checked="parameter.default.indexOf(option) >= 0 "/>
+         v-model="values[prefix + parameter.name]"/>
        </span>
      </div>
      <div v-if="parameter.type === 'datalist'">
