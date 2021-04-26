@@ -11,7 +11,7 @@
 }
 </i18n>
 <template>
-<span class="gdm-parameters" v-show="show" style="direction:ltr;" > <!--  @contextmenu="$event.preventDefault()" >-->
+<span class="gdm-parameters" v-show="show" style="direction:ltr;" @contextmenu="$event.preventDefault()" >
  <div v-if="!root" style="margin-left: -18px;":title="tr(describe.short)" >
 <!--   <div  v-if="used" class="gdm-deployed" @click="deployed = !deployed" style="width:6px;pointer:cursor;">{{deployed ? '-' : '+'}}</div>
  <div v-else="used" class="gdm-deployed" style="color:grey;">{{deployed ? '-' : '+'}}</div>
