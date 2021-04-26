@@ -106,6 +106,9 @@
                 </div>
              </div>
              <div v-else>
+                <div v-for="prop in ['atmo', 'rlooks_int', 'rlooks_unw']" >
+                  <div v-if="process.properties.parameters.hasOwnProperty(prop)"><b>{{$hypens2camel(prop)}}:</b> {{process.properties.parameters[prop]}}</div>
+                </div>
                 <div v-for="prop in ['correl_split_date', 'correl_input_mode', 'correl_correlator', 'do_analysis', 'do_correction_filtering']" >
                   <div v-if="process.properties.parameters.hasOwnProperty(prop)"><b>{{$hypens2camel(prop)}}:</b> {{process.properties.parameters[prop]}}</div>
                 </div>

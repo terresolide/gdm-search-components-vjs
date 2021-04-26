@@ -347,7 +347,11 @@ export default {
       var values = this.values
       this.complexes.forEach(function (name) {
         var comp = _this.$refs[name][0]
-        values = Object.assign(values, comp.getValues())
+        if (name.substr(name.length - 1) === ':') {
+          values[name.substr(0, name.length - 1)] = comp.getValues()
+        } else {
+          values = Object.assign(values, comp.getValues())
+        }
       })
       return values
     },
