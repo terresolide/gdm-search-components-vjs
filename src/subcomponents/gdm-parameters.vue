@@ -394,6 +394,11 @@ export default {
       var _this = this
       this.parameters.forEach(function (parameter , index) {
         var name = _this.prefix + parameter.name
+        // case json format
+        if (parameter.name.substr(parameter.name.length - 1) === ':') {
+          var params = _this.defaultParameters[name.substr(0, name.length - 1)]
+          _this.defaultParameters = Object.assign(_this.defaultParameters, params)
+        }
         if (parameter.type.indexOf('complexe') >= 0) {
           _this.complexes.push(parameter.name)
         } else if (parameter.type.indexOf('customInputImages') >= 0 && parameter.separator) {
@@ -405,16 +410,17 @@ export default {
           parameter.default = parameter.separator
         } else {
           if (_this.defaultParameters.hasOwnProperty(name)) {
-            if (parameter.type === 'select') {
-              // check if value in list value
-              if (parameter.options.indexOf && parameter.options.indexOf(_this.defaultParameters[name])) {
-                parameter.value = _this.defaultParameters[name]
-              } else {
-                parameter.value = _this.defaultParameters[name]
-              }
-            } else {
-              parameter.value = _this.defaultParameters[name]
-            }
+//             if (parameter.type === 'select') {
+//               // check if value in list value
+//               if (parameter.options.indexOf && parameter.options.indexOf(_this.defaultParameters[name])) {
+//                 parameter.value = _this.defaultParameters[name]
+//               } else {
+//                 parameter.value = _this.defaultParameters[name]
+//               }
+//             } else {
+//               parameter.value = _this.defaultParameters[name]
+//             }
+            parameter.value = _this.defaultParameters[name]
 //             if (parameter.emit) {
 //               _this.change(parameter)
 //             }
