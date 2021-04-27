@@ -530,6 +530,7 @@ export default {
             if (Array.isArray(parameter.value)) {
               // get values string
               var data = parameter.value.map(val => val + '')
+              var nodes = _this.$el.querySelectorAll('.' + name)
               nodes.forEach(function (node) {
                 if (data.indexOf(node.value) >=0) {
                   node.checked = true
