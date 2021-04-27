@@ -73,7 +73,7 @@
        <span  v-for="option in parameter.options" style="margin-right:3px;">
          {{option}}
          <input  type="checkbox" :class="prefix + parameter.name" :name="prefix + parameter.name + '[]'" :value="option" 
-         v-model="values[prefix + parameter.name]" @click="change(parameter)" />
+         v-model="values[prefix + parameter.name]" @click="change(parameter)" :disabled="mode === 'view'" />
        </span>
      </div>
      <div v-if="parameter.type === 'datalist'">
@@ -427,7 +427,7 @@ export default {
           } else {
             parameter.value = typeof parameter.default === 'undefined' ? '' : parameter.default
           }
-          _this.values[name] = parameter.value
+          _this.values[name] = parameter.value      
         }
         _this.filters[name] = parameter.filter
         if (!parameter.hasOwnProperty('show')) {
@@ -479,6 +479,13 @@ export default {
             document.addEventListener(listener.event, listener.funct)
           })
         }
+      })
+      // emit event
+      this.parameters.forEach(function (parameter) {
+         if (parameter.emit) {
+            var event = new CustomEvent(parameter.emit, {detail: {value: parameter.value}})
+            document.dispatchEvent(event)
+         }
       })
 //       if (this.complexes.length === 0) {
 //         this.$emit('initialized', this.name)
