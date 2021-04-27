@@ -69,11 +69,11 @@
           <option v-for="option in parameter.options" :value="option">{{option}}</option>
         </select>
      </div>
-      <div v-if="parameter.type === 'multipleCheckbox'" style="display:inline-block;">
+      <div v-if="parameter.type === 'multipleCheckbox'"  style="display:inline-block;">
        <span  v-for="option in parameter.options" style="margin-right:3px;">
          {{option}}
-         <input type="checkbox" :name="prefix + parameter.name + '[]'" :value="option" 
-         v-model="values[prefix + parameter.name]"/>
+         <input  type="checkbox" :class="prefix + parameter.name" :name="prefix + parameter.name + '[]'" :value="option" 
+         v-model="values[prefix + parameter.name]" @click="change(parameter)" />
        </span>
      </div>
      <div v-if="parameter.type === 'datalist'">
@@ -518,6 +518,18 @@ export default {
           } else {
             if (_this.defaultParameters.hasOwnProperty(name)) {
               parameter.value = _this.defaultParameters[name]
+            }
+            // force update multiple checkbox
+            if (Array.isArray(parameter.value)) {
+              // get values string
+              var data = parameter.value.map(val => val + '')
+              nodes.forEach(function (node) {
+                if (data.indexOf(node.value) >=0) {
+                  node.checked = true
+                } else {
+                  node.checked = false
+                }
+              })
             }
             _this.$set(_this.values, name, parameter.value)
           }
