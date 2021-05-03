@@ -108,7 +108,7 @@
      <span v-if="parameter.type === 'checkbox'">
      <input type="checkbox"   style="vertical-align:middle;" v-model="values[prefix + parameter.name]" 
       @click="values[prefix + parameter.name] = !values[prefix + parameter.name]" 
-      :disabled="mode === 'view'" @change="change(parameter)"/>
+      :disabled="mode === 'view' || parameter.disabled" @change="change(parameter)" />
       <input type="hidden" v-model="values[prefix + parameter.name]" :name="prefix + parameter.name" />
     </span>
      <div v-if="parameter.type === 'customTypeText'">
@@ -279,6 +279,18 @@ export default {
               _this.show = false
             }
           }
+          if (listener.hasOwnProperty('or')) {
+            console.log('or1')
+            e.detail.value = e.detail.value || _this.values[_this.name]
+            console.log(e.detail.value)
+          }
+          if (listener.hasOwnProperty('not')) {
+            e.detail.value = !e.detail.value
+          }
+          if (listener.hasOwnProperty('emit')) {
+            var event = new CustomEvent(listener.emit, {detail: {value: e.detail.value}})
+            document.dispatchEvent(event)
+          }
           if (listener.hasOwnProperty('disabled')) {
             if (e.detail.value === listener.disabled) {
               _this.disabled = true
@@ -446,10 +458,16 @@ export default {
                   parameter.show = false
                 }
               }
+              if (listener.hasOwnProperty('or')) {
+                e.detail.value = e.detail.value || _this.values[_this.name]
+              }
               if (listener.hasOwnProperty('value')) {
                 for (var prop in listener.value) {
                   if (prop === 'value') {
                     _this.$set(_this.values, name, e.detail[listener.value[prop]])
+                    if (listener.hasOwnProperty('disabled')) {
+                      parameter.disabled = listener.disabled && e.detail[listener.value[prop]]
+                    }
                   } else {
                     if (!parameter.save) {
                       parameter.save = {}
@@ -459,7 +477,7 @@ export default {
                     }
                     parameter[prop] = e.detail[listener.value[prop]]
                   }
-                  _this.$forceUpdate()
+                  
                 }
               }
               if (listener.function === 'multiple') {
@@ -474,6 +492,7 @@ export default {
                 _this.parameters[index].options = options
                 _this.$set(_this.values, name, value0 + '')
               }
+              _this.$forceUpdate()
             }
             // listener.listen = listener.funct.bind(listener)
             document.addEventListener(listener.event, listener.funct)
@@ -529,8 +548,8 @@ export default {
             // force update multiple checkbox
             if (Array.isArray(parameter.value)) {
               // get values string
-              var data = parameter.value.map(val => val + '')
               var nodes = _this.$el.querySelectorAll('.' + name)
+              var data = parameter.value.map(val => val + '')
               nodes.forEach(function (node) {
                 if (data.indexOf(node.value) >=0) {
                   node.checked = true
