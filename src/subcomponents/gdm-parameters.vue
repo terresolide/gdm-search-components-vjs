@@ -279,15 +279,32 @@ export default {
               _this.show = false
             }
           }
-          if (listener.hasOwnProperty('or')) {
-            console.log('or1')
-            e.detail.value = e.detail.value || _this.values[_this.name]
-            console.log(e.detail.value)
-          }
-          if (listener.hasOwnProperty('not')) {
-            e.detail.value = !e.detail.value
-          }
-          if (listener.hasOwnProperty('emit')) {
+//           if (listener.hasOwnProperty('or')) {
+//             console.log('or1')
+//             e.detail.value = e.detail.value || _this.values[_this.name]
+//             console.log(e.detail.value)
+//           }
+//           if (listener.hasOwnProperty('not')) {
+//             e.detail.value = !e.detail.value
+//           }
+          if (listener.emit) {
+            if (listener.emitValue) {
+              var steps = listener.emitValue
+              steps.forEach(function (operator) {
+                switch (operator) {
+	                case 'and':
+	                  e.detail.value = e.detail.value && _this.values[_this.name]
+	                  break
+	                case 'or':
+	                  e.detail.value = e.detail.value || _this.values[_this.name]
+	                  break
+	                case 'not':
+	                  e.detail.value = !e.detail.value
+	                  break
+                }
+              })
+            }
+            console.log('valeur emise = ', e.detail.value)
             var event = new CustomEvent(listener.emit, {detail: {value: e.detail.value}})
             document.dispatchEvent(event)
           }
