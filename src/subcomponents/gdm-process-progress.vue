@@ -34,7 +34,7 @@
       </div>
       </span>
   </div>
-  <div class="gdm-tooltip" v-if="back && log && (status === 'RUNNING' || status === 'FAILED')">{{this.log}}</div>
+  <div class="gdm-tooltip" v-if="back && log && (status === 'RUNNING' || status === 'FAILED')"><b>Logs:</b> {{log}}</div>
 </div>
 </template>
 <script>
@@ -172,6 +172,9 @@ div.gdm-tooltip {
   z-index:100;
 }
 div.gdm-progressbar:hover + div.gdm-tooltip {
+ display:block;
+}
+div.gdm-steps:hover + div.gdm-tooltip {
  display:block;
 }
 div.gdm-tooltip:hover {
