@@ -79,7 +79,7 @@
      <div v-if="parameter.type === 'datalist'">
         <input type="text" :list="'list_' + prefix + parameter.name" v-model="values[prefix + parameter.name]" 
         style="width:250px;min-width:250px" :pattern="parameter.pattern" :name="prefix + parameter.name" :regex="parameter.regex"
-        :disabled="mode === 'view'">
+         :disabled="mode === 'view'">
 				<datalist v-if="parameter.associative" :id="'list_' + prefix + parameter.name">
 				    <option v-for="(option, key) in parameter.options" :value="key">{{key}} - {{option}}</option>
 				</datalist>
@@ -93,8 +93,8 @@
          :disabled="mode === 'view'" @change="change(parameter)"/>
    
      <div v-if="parameter.type === 'text'">
-          <input type="text" :required="required" :name="prefix + parameter.name" v-model="values[prefix + parameter.name]" 
-          :disabled="mode === 'view'" @change="change(parameter)"/>
+          <input type="text" :required="parameter.required" :name="prefix + parameter.name" v-model="values[prefix + parameter.name]" 
+          :placeholder="parameter.placeholder" :disabled="mode === 'view'" @change="change(parameter)"/>
      </div>
      <input v-if="parameter.type === 'number'"
        type="number" :name="prefix + parameter.name" :min="parameter.min" :max="parameter.max" :step="parameter.step"
