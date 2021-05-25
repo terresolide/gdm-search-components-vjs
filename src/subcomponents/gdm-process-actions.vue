@@ -308,7 +308,7 @@ export default {
       this.$http.post(
           this.api.replace('api', 'scripts') + '/setStatus',
           {
-            process_token: this.process.token,
+            id: this.process.id,
             status: status,
             step: this.process.stepName,
             progress: this.process.progress,
