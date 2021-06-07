@@ -1,8 +1,8 @@
 <i18n>
 {
    "en":{
-     "ENABLED": "Service Open",
-     "DISABLED": "Service Closed",
+     "ENABLED": "Open Service",
+     "DISABLED": "Closed Service",
      "FORBIDDEN": "You are not authorized\nto access this service",
      "MAINTENANCE":"Service Under Maintenance\n(You can only edit and save your job)"    
    },
