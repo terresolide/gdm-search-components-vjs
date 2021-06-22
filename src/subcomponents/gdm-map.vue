@@ -127,7 +127,7 @@ export default {
       this.map = L.map( container, {scrollWheelZoom: false}).setView([51.505, -0.09], 1);
       this.controlLayer = new L.Control.Fmtlayer(null, null,{position: 'topleft'})
       this.controlLayer.tiles.arcgisTopo.layer.addTo(this.map)
-      if (this.serviceName && this.serviceName === 'GDM-OPT-ICE') {
+      if (this.serviceName && (this.serviceName === 'GDM-OPT-ICE' || this.serviceName === 'MPIC-OPT-ICE')) {
           var options = {
             layers: 'GLIMS_GLACIERS',
             format: 'image/png'

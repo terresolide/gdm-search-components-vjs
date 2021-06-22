@@ -80,6 +80,7 @@ module.exports = {
     }
   },
   devServer: {
+    https: true,
     historyApiFallback: true,
     noInfo: true
   },
