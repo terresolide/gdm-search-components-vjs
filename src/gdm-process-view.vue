@@ -237,10 +237,10 @@ export default {
     }
   },
   destroyed () {
-     if (this.timer) {
-       clearInterval(this.timer)
-       this.timer = null
-     }
+//      if (this.timer) {
+//        clearInterval(this.timer)
+//        this.timer = null
+//      }
   },
   data() {
     return {

@@ -169,7 +169,7 @@ export default {
 //      this.dateFormatDisplay = 'DD/MM/YYYY'
 //    }
    var search = this.search
-   this.timer = setInterval(search, 60000)
+   this.timer = setInterval(search, 300000)
    this.search()
   },
   destroyed () {
