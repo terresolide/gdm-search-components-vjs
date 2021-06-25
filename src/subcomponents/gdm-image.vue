@@ -1,6 +1,7 @@
 <i18n>
 {
   "en": {
+    "ciest2_image": "CIEST2 image",
     "click_to_enlarge": "Click to enlarge",
     "click_to_reduce": "Click to reduce",
     "cloud_cover": "Cloud cover",
@@ -32,6 +33,7 @@
     "zoom_to": "Zoom to the footprint"
   },
   "fr": {
+     "ciest2_image": "Image CIEST2",
      "click_to_enlarge": "Cliquer pour agrandir",
      "click_to_reduce": "Cliquer pour fermer",
      "cloud_cover": "Couverture nuageuse",
@@ -187,7 +189,7 @@
        </span>
      </div>
     <div>
-	    <span class="gdm-action" style="margin-top:5px;" v-if="!image.removed && !checked"  @click="removeImage()" :title="$t('remove_image')">
+	    <span class="gdm-action" style="margin-top:5px;" v-if="image.isOwner && !image.removed && !checked"  @click="removeImage()" :title="$t('remove_image')">
 	        <!--  <span >{{$t('remove')}}</span>-->
 	        <i class="fa fa-trash" style="font-size:1.2em;"></i>
 	     </span>

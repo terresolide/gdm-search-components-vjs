@@ -135,7 +135,8 @@ export default {
       submitting: false,
       status: null,
       timer: null,
-      isCiest2: false
+      isCiest2: false,
+      getCount: 0
     }
   },
   computed: {
@@ -219,6 +220,11 @@ export default {
       })
     },
     getStatusInDepth () {
+      this.getCount = this.getCount + 1
+      if (this.getCount % 2 === 0) {
+        this.getStatus()
+        return
+      }
       this.$http.get(this.api + '/getStatusInDepth/' + this.process.id, {credentials: true})
       .then(function (resp) {
         this.$emit('statusChange', resp.body)
