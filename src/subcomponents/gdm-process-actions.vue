@@ -211,29 +211,42 @@ export default {
     getStatus () {
       this.$http.get(this.api + '/getStatus/' + this.process.id, {credentials: true})
       .then(function (resp) {
-        this.$emit('statusChange', resp.body)
-        this.submitting = false
-        this.status = resp.body.status
-        this.launchTimer()
+        this.emitStatusChange(resp.body, 4)
       }, function (e) {
-        this.submitting = false
+        var _this = this
+        setTimeout(function () {
+          _this.submitting = false
+        }, 10000)
       })
     },
     getStatusInDepth () {
       this.getCount = this.getCount + 1
       if (this.getCount % 2 === 0) {
-        this.getStatus()
+        var _this = this
+        setTimeout(function () {
+          _this.getStatus()
+        }, 3000)
         return
       }
       this.$http.get(this.api + '/getStatusInDepth/' + this.process.id, {credentials: true})
       .then(function (resp) {
-        this.$emit('statusChange', resp.body)
-        this.submitting = false
-        this.status = resp.body.status
-        this.launchTimer()
+        this.emitStatusChange(resp.body, 10)
       }, function (e) {
-        this.submitting = false
+        var _this = this
+        setTimeout(function () {
+          _this.submitting = false
+        }, 10000)
       })
+    },
+    emitStatusChange (data, delay) {
+      var _this = this
+      var time = Math.floor(Math.random() * 5) + delay
+      setTimeout(function () {
+        _this.submitting = false
+        _this.$emit('statusChange', data)
+        _this.status = data.status
+        _this.launchTimer()
+      }, time * 1000)
     },
     launch () {
      this.submitting = true
