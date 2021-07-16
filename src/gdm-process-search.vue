@@ -460,6 +460,13 @@ export default {
   }
 </style>
 <style scoped>
+.fa-button {
+  cursor: pointer;
+  padding: 1px 3px;
+}
+.fa-button:hover {
+  border:1px dotted grey;
+}
 .gdm-process-search{
 font-size: 0.9rem;
 }
