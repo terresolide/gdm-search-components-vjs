@@ -478,7 +478,7 @@ display: grid;
    font-weight:700;
    border: 1px solid lightgrey;
    min-height:20px;
-   max-height:35px;
+   max-height:45px;
 }
 .gdm-process-header-column-1 {
   grid-column: 1;
