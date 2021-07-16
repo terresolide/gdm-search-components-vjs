@@ -265,6 +265,9 @@ display: grid;
   grid-row:2;
   font-size: 0.9em;
 }
+.gdm-process-column-1 div {
+  line-height:1;
+}
 div.toSelect {
  cursor: pointer;
  padding: 2px;
@@ -272,6 +275,7 @@ div.toSelect {
   background: #F0f0f0;
   border: 1px solid #909090;
   border-radius:2px;
+  line-height:1;
   max-width: 250px;
   white-space:normal;
   word-break: break-all;

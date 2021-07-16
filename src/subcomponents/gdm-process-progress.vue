@@ -180,6 +180,10 @@ div.gdm-steps:hover + div.gdm-tooltip {
 div.gdm-tooltip:hover {
  display:block;
 }
+.gdm-process-progress {
+ -webkit-box-sizing: content-box;
+ box-sizing: content-box;
+}
 .gdm-process-progress > div {
  background:#eef1f3;
  border:2px solid lightgrey;
@@ -187,6 +191,8 @@ div.gdm-tooltip:hover {
  height:25px;
  width:95%;
  max-width:400px;
+ -webkit-box-sizing: content-box;
+ box-sizing: content-box;
 }
 div.gdm-progress-terminated,
 div.gdm-progress-failed,

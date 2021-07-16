@@ -44,10 +44,16 @@
       <div  :style="{background:$shadeColor(color, 0.8)}" class="gdm-process-header">
          <div class="gdm-process-header-column-1">{{$t('identifiers')}}</div>
          <div class="gdm-process-header-column-2">Status</div>
-         <div class="gdm-process-header-column-3">{{$t('process_dates')}}</div>
+         <div class="gdm-process-header-column-3">
+            {{$t('process_dates')}}<br/> 
+            ( Date <span class="fa-button fa" :class="order.date === 1 ? 'fa-long-arrow-down' : 'fa-long-arrow-up'" 
+            @click="orderChange('date')"></span> )
+         </div>
          <div class="gdm-process-header-column-4">
            <span v-if="group === 'DEM'">{{$t('image_dates')}}</span>
            <span v-else>{{$t('temporal_extent')}}</span>
+           <span class="fa-button fa" :class="order.temporal === 1 ? 'fa-long-arrow-down' : 'fa-long-arrow-up'"
+           @click="orderChange('temporal')"></span>
          </div>
          <div class="gdm-process-header-column-5" >{{$t('parameters')}}</div>
       </div>
@@ -132,6 +138,10 @@ export default {
       selectProcessLayerListener: null,
       resizeListener: null,
       selectedProcessId: null,
+      order: {
+        temporal: 1,
+        date: -1
+      },
       parameters: {
         user: null,
         service: null,
@@ -142,7 +152,8 @@ export default {
         tempEnd: null,
         q: null,
         bbox: null,
-        group: null
+        group: null,
+        order: 'start DESC, tempStart ASC'
       },
       timer: null
     }
@@ -214,6 +225,9 @@ export default {
 	     if (this.parameters.group) {
 	       url +='&group=' + this.parameters.group
 	     }
+	     if (this.parameters.order) {
+	       url += '&order=' + encodeURIComponent(this.parameters.order)
+	     }
 	     url += '&lang=' + this.lang
 	     var self = this
 	     var dateType = ['Start', 'End', 'tempStart', 'tempEnd']
@@ -232,6 +246,21 @@ export default {
       .then(
           response => this.groups = response.body,
           response => console.log('error getGroups'))
+    },
+    orderChange (order) {
+      switch (order) {
+        case 'date':
+          this.order.date = (-1) * this.order.date
+          this.parameters.order = ' start ' + (this.order.date > 0 ? 'ASC' : 'DESC')
+          this.parameters.order += ', tempStart ' + (this.order.temporal > 0 ? 'ASC' : 'DESC')
+          break
+        case 'temporal':
+          this.order.temporal = (-1) * this.order.temporal
+          this.parameters.order = 'tempStart ' + (this.order.temporal > 0 ? 'ASC' : 'DESC')
+          this.parameters.order += ', start ' + (this.order.date > 0 ? 'ASC' : 'DESC')
+          break
+      }
+      this.search()
     },
     dateChange (e) {
       var change = {'from': 'Start', 'to': 'End'}
