@@ -73,7 +73,7 @@
        <span  v-for="option in parameter.options" style="margin-right:3px;">
          {{option}}
          <input  type="checkbox" :class="prefix + parameter.name" :name="prefix + parameter.name + '[]'" :value="option" 
-         v-model="values[prefix + parameter.name]" @click="change(parameter)" :disabled="mode === 'view'" />
+         v-model="values[prefix + parameter.name]" @change="change(parameter)" :disabled="mode === 'view'" />
        </span>
      </div>
      <div v-if="parameter.type === 'datalist'">
