@@ -21,6 +21,7 @@ import GdmProcessSearch from './gdm-process-search.vue'
 import GdmManageStep from './gdm-manage-step.vue'
 import GdmProcessView from './gdm-process-view.vue'
 import GdmRestrictTo from './gdm-restrict-to.vue'
+import GdmStat from './gdm-stat.vue'
 import AerisTheme from 'aeris-commons-components-vjs/src/aeris-theme/aeris-theme.vue'
 
 ljs.addAliases({
@@ -38,6 +39,7 @@ ljs.load('dep', function() {
   Vue.customElement('gdm-manage-step', GdmManageStep)
   Vue.customElement('gdm-process-view', GdmProcessView)
   Vue.customElement('gdm-restrict-to', GdmRestrictTo)
+  Vue.customElement('gdm-stat', GdmStat)
   Vue.customElement('aeris-theme', AerisTheme)
 })
     	  
