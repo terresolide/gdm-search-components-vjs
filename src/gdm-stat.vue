@@ -10,7 +10,7 @@
 </div>
 <div style="margin-left:20px;">
   <h1 v-if="mode === 'service'">Utilisation des services</h1>
-  <h1 v-if="mode === 'connection'">Connexions aux services</h1>
+  <h1 v-if="mode === 'connection'">Connection</h1>
   <div class="user-search">
     <label>Du</label> <input v-model="startDate" type="date" @change="search()">
     <label>au</label> <input v-model="endDate" type="date" @change="search()">
@@ -53,21 +53,33 @@ export default {
   },
   methods: {
     draw () {
-      
+      switch (this.mode) {
+        case 'connection':
+          this.drawConnection()
+          break
+      }
     },
     drawConnection() {
+      var categories = this[this.by + 's']
+      var data = this.sessions[this.by + 's']
       Highcharts.chart('sessions', {
         chart: {
           type: 'column'
         },
         title: {
-          text: 'Histogram using a column chart'
+          text: 'Nombre de connexions'
+        },
+        credits: {
+          enabled:false
+        },
+        legend: {
+          enabled: false
         },
         subtitle: {
           text: ''
         },
         xAxis: {
-          categories: this.days,
+          categories: categories,
           crosshair: true
         },
         yAxis: {
@@ -77,32 +89,38 @@ export default {
           }
         },
         tooltip: {
-          headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+          headerFormat: '<span style="font-size:10px">{point.x}</span><table>',
           pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-            '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+            '<td style="padding:0"><b>{point.y}</b></td></tr>',
           footerFormat: '</table>',
+//           formatter (e) {
+//              if (!this.point) {
+//                return false
+//              }
+//              return this.point.x
+//           },
           shared: true,
           useHTML: true
         },
         plotOptions: {
           column: {
             pointPadding: 0,
-            borderWidth: 0,
+            borderWidth: 1,
             groupPadding: 0,
             shadow: false
           }
         },
         series: [{
-          name: 'Data',
-          data: this.sessions.days
+          name: 'Total',
+          data: data
 
         }]
       });
     },
     initialize () {
-      this.by = 'month'
-      this.startDate = moment().year() + '-01-01'
-      this.endDate = (moment().year() + 1) + '-01-01'
+      this.by = 'day'
+      this.startDate = moment().startOf('month').format('YYYY-MM-DD')
+      this.endDate = moment().endOf('month').format('YYYY-MM-DD')
     },
     setMode (value) {
       this.mode = value
@@ -146,25 +164,95 @@ export default {
       
     },
     treatmentConnection (data) {
-      console.log(this.startDate)
+      this.days = []
+      this.months = []
+      this.years = []
+      this.sessions =  {days: [], months: [], years: []}
       var date = moment(this.startDate, 'YYYY-MM-DD')
       var _this = this
+      var year = date.year()
+      var month = (date.month() + 1).toString().padStart(2, '0') + '-' + year
+      var year2 = null
+      var month2 = null
+      this.years.push(year)
+      this.months.push(month)
+      var countMonth = 0
+      var countYear = 0
       data.sessions.forEach(function (day) {
-        console.log(day)
+        // day data
         var strDay = day['year'].toString() + day['month'].toString().padStart(2, '0') + day['day'].toString().padStart(2, '0')
         var date2 =  moment(strDay, 'YYYYMMDD')
-        console.log(date2.diff(date, 'days'))
+        year2 = date2.year()
+        month2 = (date2.month() + 1).toString().padStart(2, '0') + '-' + year2
+        console.log(month2)
         while (date2.diff(date, 'days') > 0) {
-          _this.days.push(date.format('MM-DD'))
+          _this.days.push(date.format('DD-MM-YYYY'))
           _this.sessions.days.push(0)
           date.add(1, 'days')
+          year2 = date.year()
+          month2 = (date.month() + 1).toString().padStart(2, '0') + '-' + year2
+          if (month2 !== month) {
+            _this.sessions.months.push(countMonth)
+            _this.months.push(month2)
+            month = month2
+            countMonth = 0
+          }
+          if (year2 !== year) {
+            _this.sessions.years.push(countYear)
+            _this.years.push(year2)
+            year = year2
+            countYear = 0
+          }
         }
-        date = date2
-        _this.days.push(date.format('MM-DD'))
+       // date = date2
+        _this.days.push(date2.format('DD-MM-YYYY'))
         _this.sessions.days.push(day['tot'])
-        
+        countMonth += day['tot']
+        countYear += day['tot']
+        if (month2 !== month) {
+          _this.sessions.months.push(countMonth)
+          _this.months.push(month2)
+          month = month2
+          countMonth = 0
+        }
+        if (year2 !== year) {
+          _this.sessions.years.push(countYear)
+          _this.years.push(year2)
+          year = year2
+          countYear = 0
+        }
+        date = date2.add(1, 'days')
       })
-      console.log(this.days)
+      var end = moment(this.endDate, 'YYYY-MM-DD')
+      while(end.diff(date, 'days') >= 0) {
+        this.days.push(date.format('DD-MM-YYYY'))
+        this.sessions.days.push(0)
+        year2 = date.year()
+        month2 = (date.month() + 1).toString().padStart(2, '0') + '-' + year2
+        if (month2 !== month) {
+          _this.sessions.months.push(countMonth)
+          _this.months.push(month2)
+          month2 = month
+          countMonth = 0
+        }
+        if (year2 !== year) {
+          _this.sessions.years.push(countYear)
+          _this.years.push(year2)
+          year2 = month
+          countYear = 0
+        }
+        date.add(1, 'days')
+      }
+      if (this.years.length > this.sessions.years.length) {
+        this.sessions.years.push(countYear)
+      }
+      if (this.months.length > this.sessions.months.length) {
+        this.sessions.months.push(countMonth)
+      }
+      console.log(countMonth)
+      console.log(countYear)
+      console.log(this.years)
+      console.log(this.months)
       console.log(this.sessions)
       this.drawConnection()
     }
