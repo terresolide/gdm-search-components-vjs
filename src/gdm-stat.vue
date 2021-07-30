@@ -12,15 +12,16 @@
   <h1 v-if="mode === 'service'">Utilisation des services</h1>
   <h1 v-if="mode === 'connection'">Connexions aux services</h1>
   <div class="user-search">
-    <label>Du</label> <input v-model="startDate" type="date">
-    <label>au</label> <input v-model="endDate" type="date">
+    <label>Du</label> <input v-model="startDate" type="date" @change="search()">
+    <label>au</label> <input v-model="endDate" type="date" @change="search()">
     <label>Par</label> 
-    <select v-model="by">
+    <select v-model="by" @change="draw()">
       <option value="day">Jour</option>
       <option value="month">Mois</option>
       <option value="year">Year</option>
     </select>
   </div>
+  <div id="sessions"></div>
  </div>
 </div>
 </template>
@@ -39,7 +40,11 @@ export default {
     return {
       startDate: null,
       endDate: null,
-      mode: 'connection'
+      mode: 'connection',
+      sessions: { days:[], months: [], years: []},
+      days:[],
+      months:[],
+      years: []
     }
   },
   created () {
@@ -47,6 +52,53 @@ export default {
     this.search()
   },
   methods: {
+    draw () {
+      
+    },
+    drawConnection() {
+      Highcharts.chart('sessions', {
+        chart: {
+          type: 'column'
+        },
+        title: {
+          text: 'Histogram using a column chart'
+        },
+        subtitle: {
+          text: ''
+        },
+        xAxis: {
+          categories: this.days,
+          crosshair: true
+        },
+        yAxis: {
+          min: 0,
+          title: {
+            text: ''
+          }
+        },
+        tooltip: {
+          headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+          pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+            '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+          footerFormat: '</table>',
+          shared: true,
+          useHTML: true
+        },
+        plotOptions: {
+          column: {
+            pointPadding: 0,
+            borderWidth: 0,
+            groupPadding: 0,
+            shadow: false
+          }
+        },
+        series: [{
+          name: 'Data',
+          data: this.sessions.days
+
+        }]
+      });
+    },
     initialize () {
       this.by = 'month'
       this.startDate = moment().year() + '-01-01'
@@ -81,13 +133,10 @@ export default {
       if (this.endDate) {
         params.push('end=' + this.endDate)
       }
-      if (this.by) {
-        params.push('by=' + this.by)
-      }
       url += params.join('&')
       this.$http.get(url)
       .then(function (response) {
-        console.log(response)
+        this.treatmentConnection(response.body)
       })
     },
     searchService () {
@@ -95,6 +144,29 @@ export default {
     },
     searchCiest2 () {
       
+    },
+    treatmentConnection (data) {
+      console.log(this.startDate)
+      var date = moment(this.startDate, 'YYYY-MM-DD')
+      var _this = this
+      data.sessions.forEach(function (day) {
+        console.log(day)
+        var strDay = day['year'].toString() + day['month'].toString().padStart(2, '0') + day['day'].toString().padStart(2, '0')
+        var date2 =  moment(strDay, 'YYYYMMDD')
+        console.log(date2.diff(date, 'days'))
+        while (date2.diff(date, 'days') > 0) {
+          _this.days.push(date.format('MM-DD'))
+          _this.sessions.days.push(0)
+          date.add(1, 'days')
+        }
+        date = date2
+        _this.days.push(date.format('MM-DD'))
+        _this.sessions.days.push(day['tot'])
+        
+      })
+      console.log(this.days)
+      console.log(this.sessions)
+      this.drawConnection()
     }
   }
 }
