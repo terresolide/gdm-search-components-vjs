@@ -21,7 +21,10 @@
       <option value="year">Year</option>
     </select>
   </div>
-  <div id="sessions"></div>
+  <div v-show="mode === 'connection'">
+    <div id="sessions"></div>
+    <div id="newUsers"></div>
+  </div>
  </div>
 </div>
 </template>
@@ -40,16 +43,20 @@ export default {
     return {
       startDate: null,
       endDate: null,
+      by: 'day',
       mode: 'connection',
       sessions: { days:[], months: [], years: []},
+      newUsers: { days:{}, months: {}, years: {}},
+      userTypes: [],
       days:[],
       months:[],
       years: []
     }
   },
   created () {
-    this.initialize()
-    this.search()
+    this.getUserTypes()
+
+    
   },
   methods: {
     draw () {
@@ -58,6 +65,64 @@ export default {
           this.drawConnection()
           break
       }
+    },
+    drawNewUser () {
+      var categories = this[this.by + 's']
+      var data = this.newUsers[this.by + 's']
+      Highcharts.chart('sessions', {
+        chart: {
+          type: 'column'
+        },
+        title: {
+          text: 'Nombre de connexions'
+        },
+        credits: {
+          enabled:false
+        },
+        legend: {
+          enabled: false
+        },
+        subtitle: {
+          text: ''
+        },
+        xAxis: {
+          categories: categories,
+          crosshair: true
+        },
+        yAxis: {
+          min: 0,
+          title: {
+            text: ''
+          }
+        },
+        tooltip: {
+          headerFormat: '<span style="font-size:10px">{point.x}</span><table>',
+          pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+            '<td style="padding:0"><b>{point.y}</b></td></tr>',
+          footerFormat: '</table>',
+//           formatter (e) {
+//              if (!this.point) {
+//                return false
+//              }
+//              return this.point.x
+//           },
+          shared: true,
+          useHTML: true
+        },
+        plotOptions: {
+          column: {
+            pointPadding: 0,
+            borderWidth: 1,
+            groupPadding: 0,
+            shadow: false
+          }
+        },
+        series: [{
+          name: 'Total',
+          data: data
+
+        }]
+      });
     },
     drawConnection() {
       var categories = this[this.by + 's']
@@ -117,10 +182,21 @@ export default {
         }]
       });
     },
-    initialize () {
+    initialize (data) {
       this.by = 'day'
       this.startDate = moment().startOf('month').format('YYYY-MM-DD')
       this.endDate = moment().endOf('month').format('YYYY-MM-DD')
+      if (data.types) {
+        this.userTypes = data.types
+      }
+      this.search()
+    },
+    getUserTypes () {
+      var url = this.appUrl + '/auth/getOrganismTypes'
+      this.$http.get(url)
+      .then(function (response) {
+        this.initialize(response.body)
+      })
     },
     setMode (value) {
       this.mode = value
@@ -163,22 +239,29 @@ export default {
     searchCiest2 () {
       
     },
-    treatmentConnection (data) {
-      this.days = []
-      this.months = []
-      this.years = []
-      this.sessions =  {days: [], months: [], years: []}
+    extractSeriesFrom (data, first) {
+      console.log(first)
+      if (first) {
+        this.days = []
+        this.months = []
+        this.years = []
+        this.sessions = {days: [], months: [], years: []}
+      }
+      var date = moment(this.startDate, 'YYYY-MM-DD')
+      var results = {days: [], months: [], years: []}
       var date = moment(this.startDate, 'YYYY-MM-DD')
       var _this = this
       var year = date.year()
       var month = (date.month() + 1).toString().padStart(2, '0') + '-' + year
       var year2 = null
       var month2 = null
-      this.years.push(year)
-      this.months.push(month)
+      if (first) {
+        this.years.push(year)
+        this.months.push(month)
+      }
       var countMonth = 0
       var countYear = 0
-      data.sessions.forEach(function (day) {
+      data.forEach(function (day) {
         // day data
         var strDay = day['year'].toString() + day['month'].toString().padStart(2, '0') + day['day'].toString().padStart(2, '0')
         var date2 =  moment(strDay, 'YYYYMMDD')
@@ -186,38 +269,47 @@ export default {
         month2 = (date2.month() + 1).toString().padStart(2, '0') + '-' + year2
         console.log(month2)
         while (date2.diff(date, 'days') > 0) {
-          _this.days.push(date.format('DD-MM-YYYY'))
-          _this.sessions.days.push(0)
+          results.days.push(0)
           date.add(1, 'days')
           year2 = date.year()
           month2 = (date.month() + 1).toString().padStart(2, '0') + '-' + year2
           if (month2 !== month) {
-            _this.sessions.months.push(countMonth)
-            _this.months.push(month2)
+            results.months.push(countMonth)
+            if (first) {
+              _this.months.push(month2)
+            }
             month = month2
             countMonth = 0
           }
           if (year2 !== year) {
-            _this.sessions.years.push(countYear)
-            _this.years.push(year2)
+            results.years.push(countYear)
+            if (first) {
+              _this.years.push(year2)
+            }
             year = year2
             countYear = 0
           }
         }
        // date = date2
-        _this.days.push(date2.format('DD-MM-YYYY'))
-        _this.sessions.days.push(day['tot'])
+        if (first) {
+          _this.days.push(date2.format('DD-MM-YYYY'))
+        }
+        results.days.push(day['tot'])
         countMonth += day['tot']
         countYear += day['tot']
         if (month2 !== month) {
-          _this.sessions.months.push(countMonth)
-          _this.months.push(month2)
+          results.push(countMonth)
+          if (first) {
+            _this.months.push(month2)
+          }
           month = month2
           countMonth = 0
         }
         if (year2 !== year) {
-          _this.sessions.years.push(countYear)
-          _this.years.push(year2)
+          results.years.push(countYear)
+          if (first) {
+            _this.years.push(year2)
+          }
           year = year2
           countYear = 0
         }
@@ -225,36 +317,47 @@ export default {
       })
       var end = moment(this.endDate, 'YYYY-MM-DD')
       while(end.diff(date, 'days') >= 0) {
-        this.days.push(date.format('DD-MM-YYYY'))
-        this.sessions.days.push(0)
+        if (first) {
+          this.days.push(date.format('DD-MM-YYYY'))
+        }
+        results.days.push(0)
         year2 = date.year()
         month2 = (date.month() + 1).toString().padStart(2, '0') + '-' + year2
         if (month2 !== month) {
-          _this.sessions.months.push(countMonth)
+          results.months.push(countMonth)
+          if (first) {
           _this.months.push(month2)
-          month2 = month
+          }
+          month = month2
           countMonth = 0
         }
         if (year2 !== year) {
-          _this.sessions.years.push(countYear)
-          _this.years.push(year2)
-          year2 = month
+          results.years.push(countYear)
+          if (first) {
+            _this.years.push(year2)
+          }
+          year = year2
           countYear = 0
         }
         date.add(1, 'days')
       }
-      if (this.years.length > this.sessions.years.length) {
-        this.sessions.years.push(countYear)
+      if (this.years.length > results.length) {
+        results.years.push(countYear)
       }
-      if (this.months.length > this.sessions.months.length) {
-        this.sessions.months.push(countMonth)
+      if (this.months.length > results.months.length) {
+        results.months.push(countMonth)
       }
-      console.log(countMonth)
-      console.log(countYear)
-      console.log(this.years)
-      console.log(this.months)
-      console.log(this.sessions)
+      return results
+    },
+    treatmentConnection (data) {
+      this.sessions = this.extractSeriesFrom(data.sessions, true)
       this.drawConnection()
+      this.userTypes.forEach(function (tp) {
+        var tab = data.newUsers.filter(u => u.type === tp.t_id)
+        console.log(tab)
+      })
+      // this.drawNewUsers()
+
     }
   }
 }
