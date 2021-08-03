@@ -30,6 +30,18 @@
    <div v-show="mode === 'service'">
      <div id="services" style="margin-top:30px;"></div>
    </div>
+    <div v-show="mode === 'job'">
+     <div>
+         <h2>Coût moyen</h2>
+         <div v-for="service in services">
+           <span class="fa fa-circle" :style="{color: service.color}"></span>
+           <b>{{service.name}}</b>:
+           <span v-if="cost && cost[service.name]">{{cost[service.name]/countCost[service.name]}}</span>
+           <span v-else>---</span>
+         </div>
+     </div>
+     <div id="jobs" style="margin-top:30px;"></div>
+   </div>
  </div>
 </div>
 </template>
@@ -66,11 +78,17 @@ export default {
       mode: 'connection',
       sessions: { days:[], months: [], years: []},
       newUsers: { days:{}, months: {}, years: {}},
+      process: { days: {}, months: {}, years: {}},
       serviceUsers: [],
       userTypes: [],
       days:[],
       months:[],
-      years: []
+      years: [],
+      services: [],
+      cost:{},
+      countCost: 0,
+      duration: {},
+      countDuration: 0
     }
   },
   created () {
@@ -95,9 +113,17 @@ export default {
           break
         case 'services':
           this.drawServices()
+          break
+        case 'job':
+          this.drawJobs()
       }
     },
-    drawHistogram (id, title, categories, series ) {
+    drawHistogram (id, title, categories, series, options ) {
+      var colors = ['#2f7ed8', '#910000', '#8bbc21',   '#1aadce',
+        '#492970', '#f28f43', '#77a1e5', '#c42525', '#a6c96a', '#0d233a']
+      if (options && options.colors) {
+        colors = options.colors
+      }
       Highcharts.chart(id, {
         chart: {
           type: 'column'
@@ -110,8 +136,7 @@ export default {
         credits: {
           enabled:false
         },
-        colors: ['#2f7ed8', '#910000', '#8bbc21', '#0d233a',   '#1aadce',
-          '#492970', '#f28f43', '#77a1e5', '#c42525', '#a6c96a'],
+        colors: colors,
         legend: {
           labelFormatter: function() {
             return this.name
@@ -186,6 +211,21 @@ export default {
       }
       this.drawHistogram('sessions', 'Nombre de connexions', categories, series)
     },
+    drawJobs () {
+      var categories = this[this.by + 's']
+      var data = this.process[this.by + 's']
+      var series = []
+      var colors = []
+      for (var index in data) {
+        var find = this.services.find(s => s.name === index)
+        series.push({
+          name: index,
+          data: data[index]
+        })
+        colors.push(find.color)
+      }
+      this.drawHistogram('jobs', 'Nombre de jobs', categories, series, {colors: colors})
+    },
     initialize (data) {
       this.by = 'day'
       this.startDate = moment().startOf('month').format('YYYY-MM-DD')
@@ -240,6 +280,21 @@ export default {
         this.treatmentConnection(response.body)
       })
     },
+    searchJob () {
+      var url = this.appUrl + '/statistics/searchJobs?'
+      var params = [];
+          if (this.startDate) {
+        params.push('start=' + this.startDate)
+      }
+      if (this.endDate) {
+        params.push('end=' + this.endDate)
+      }
+      url += params.join('&')
+      this.$http.get(url)
+      .then(function (response) {
+        this.treatmentJobs(response.body)
+      })
+    },
     searchService () {
       this.$http.get(this.appUrl + '/statistics/serviceUsers')
       .then(function (response) {
@@ -249,13 +304,17 @@ export default {
     searchCiest2 () {
       
     },
-    extractSeriesFrom (data, first) {
+    extractSeriesFrom (data, cat, first) {
       if (first) {
         this.days = []
         this.months = []
         this.years = []
+        this.cost = {}
+        this.countCost = {}
        // this.sessions = {days: [], months: [], years: []}
       }
+      this.cost[cat] = 0
+      this.countCost[cat] = 0
       var date = moment(this.startDate, 'YYYY-MM-DD')
       var results = {days: [], months: [], years: []}
       var date = moment(this.startDate, 'YYYY-MM-DD')
@@ -306,6 +365,10 @@ export default {
           _this.days.push(date2.format('DD-MM-YYYY'))
         }
         results.days.push(day['tot'])
+        if (day['cost']) {
+          _this.cost[cat] = _this.cost[cat] + day['cost']
+          _this.countCost[cat]= _this.countCost[cat] + day['tot']
+        }
         countMonth += day['tot']
         countYear += day['tot']
         if (month2 !== month) {
@@ -366,7 +429,7 @@ export default {
       var first = true
       this.userTypes.forEach(function (tp) {
         var tab = data.sessions.filter(u => u.type === tp.t_id)
-        var results = _this.extractSeriesFrom(tab, true)
+        var results = _this.extractSeriesFrom(tab, tp.t_id, true)
         first = false
         _this.sessions.days[tp.t_id] = results.days
         _this.sessions.months[tp.t_id] = results.months
@@ -377,7 +440,7 @@ export default {
      
       this.userTypes.forEach(function (tp) {
         var tab = data.newUsers.filter(u => u.type === tp.t_id)
-        var results = _this.extractSeriesFrom(tab)
+        var results = _this.extractSeriesFrom(tab, tp.t_id)
         _this.newUsers.days[tp.t_id] = results.days
         _this.newUsers.months[tp.t_id] = results.months
         _this.newUsers.years[tp.t_id] = results.years
@@ -385,6 +448,23 @@ export default {
       })
       this.drawNewUsers()
 
+    },
+    treatmentJobs (data) {
+      this.services = data.services
+      this.process = {days: {}, months: {}, years: {}}
+      var first = true
+      var _this = this
+      this.services.forEach(function (service) {
+        var tab = data.process.filter(p => p.service === parseInt(service.id))
+        var results = _this.extractSeriesFrom(tab, service.name, first)
+        first = false
+        _this.process.days[service.name] = results.days
+        _this.process.months[service.name] = results.months
+        _this.process.years[service.name] = results.years 
+      })
+      console.log(this.cost)
+      console.log(this.countCost)
+      this.drawJobs()
     },
     treatmentServices(data) {
       var currentService = null
@@ -398,7 +478,6 @@ export default {
         if (obj.service !== currentService) {
           categories.push(obj.service)
           currentService = obj.service
-          console.log(obj.service)
           // search count for this service
           for (var type in aux) {
             var find = data.serviceUsers.find(el => el.type === type && el.service === currentService)
