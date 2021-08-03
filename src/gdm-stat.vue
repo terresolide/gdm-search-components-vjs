@@ -23,7 +23,7 @@
   </div>
   <div v-show="mode === 'connection'">
     <div id="sessions"></div>
-    <div id="newUsers"></div>
+    <div id="newUsers" style="margin-top:30px;"></div>
   </div>
  </div>
 </div>
@@ -89,28 +89,25 @@ export default {
           break
       }
     },
-    drawNewUsers () {
-      var categories = this[this.by + 's']
-      var data = this.newUsers[this.by + 's']
-      var series = []
-      for(var type in data) {
-        series.push({
-          name: this.userTypeName(type),
-          data: data[type]
-        })
-      }
-      Highcharts.chart('newUsers', {
+    drawHistogram (id, title, categories, series ) {
+      Highcharts.chart(id, {
         chart: {
           type: 'column'
         },
         title: {
-          text: 'Nouvels utilisateurs'
+          text: title,
+          align: 'left',
+          style: {'color': '#000000', 'fontSize': '20px', 'fontWeight': 700}
         },
         credits: {
           enabled:false
         },
+        colors: ['#2f7ed8', '#910000', '#8bbc21', '#0d233a',   '#1aadce',
+          '#492970', '#f28f43', '#77a1e5', '#c42525', '#a6c96a'],
         legend: {
-          enabled: false
+          labelFormatter: function() {
+            return this.name
+          }
         },
         subtitle: {
           text: ''
@@ -127,16 +124,21 @@ export default {
           }
         },
         tooltip: {
-          headerFormat: '<span style="font-size:10px">{point.x}</span><table>',
-          pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-            '<td style="padding:0"><b>{point.y}</b></td></tr>',
-          footerFormat: '</table>',
-//           formatter (e) {
-//              if (!this.point) {
-//                return false
-//              }
-//              return this.point.x
-//           },
+          formatter: function(e) {
+            var currentPoint = this
+            var tot = 0
+            var stackValues = '<b>' + this.x.replaceAll('-', '/') + '</b><br />'
+              currentPoint.points.forEach(function(point, i) {
+                  stackValues += '<span style="color: ' + point.color + '">\u25CF</span> ' + series[i].name + ': ' + point.y + '<br/>'
+                  tot += point.y
+              })
+            return stackValues +
+              '<span style="margin-left:10px;font-weight:700">Total: </span>' + tot;
+          },
+  //         headerFormat: '<span style="font-size:10px">{point.x}</span><table>',
+  //         pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+  //           '<td style="padding:0"><b>{point.y}</b></td></tr>',
+  //         footerFormat: '</table>',
           shared: true,
           useHTML: true
         },
@@ -152,64 +154,29 @@ export default {
         series: series
       });
     },
+    drawNewUsers () {
+      var categories = this[this.by + 's']
+      var data = this.newUsers[this.by + 's']
+      var series = []
+      for(var type in data) {
+        series.push({
+          name: this.userTypeName(type),
+          data: data[type]
+        })
+      }
+      this.drawHistogram('newUsers', 'Nouvels utilisateurs', categories, series)
+    },
     drawConnection() {
       var categories = this[this.by + 's']
       var data = this.sessions[this.by + 's']
-      Highcharts.chart('sessions', {
-        chart: {
-          type: 'column'
-        },
-        title: {
-          text: 'Nombre de connexions'
-        },
-        credits: {
-          enabled:false
-        },
-        legend: {
-          enabled: false
-        },
-        subtitle: {
-          text: ''
-        },
-        xAxis: {
-          categories: categories,
-          crosshair: true
-        },
-        yAxis: {
-          min: 0,
-          allowDecimals: false,
-          title: {
-            text: ''
-          }
-        },
-        tooltip: {
-          headerFormat: '<span style="font-size:10px">{point.x}</span><table>',
-          pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-            '<td style="padding:0"><b>{point.y}</b></td></tr>',
-          footerFormat: '</table>',
-//           formatter (e) {
-//              if (!this.point) {
-//                return false
-//              }
-//              return this.point.x
-//           },
-          shared: true,
-          useHTML: true
-        },
-        plotOptions: {
-          column: {
-            pointPadding: 0,
-            borderWidth: 1,
-            groupPadding: 0,
-            shadow: false
-          }
-        },
-        series: [{
-          name: 'Total',
-          data: data
-
-        }]
-      });
+      var series = []
+      for(var type in data) {
+        series.push({
+          name: this.userTypeName(type),
+          data: data[type]
+        })
+      }
+      this.drawHistogram('sessions', 'Nombre de connexions', categories, series)
     },
     initialize (data) {
       this.by = 'day'
@@ -274,7 +241,7 @@ export default {
         this.days = []
         this.months = []
         this.years = []
-        this.sessions = {days: [], months: [], years: []}
+       // this.sessions = {days: [], months: [], years: []}
       }
       var date = moment(this.startDate, 'YYYY-MM-DD')
       var results = {days: [], months: [], years: []}
@@ -285,7 +252,7 @@ export default {
       var year2 = null
       var month2 = null
       if (first) {
-        this.years.push(year)
+        this.years.push(year + '')
         this.months.push(month)
       }
       var countMonth = 0
@@ -315,7 +282,7 @@ export default {
           if (year2 !== year) {
             results.years.push(countYear)
             if (first) {
-              _this.years.push(year2)
+              _this.years.push(year2 + '')
             }
             year = year2
             countYear = 0
@@ -339,7 +306,7 @@ export default {
         if (year2 !== year) {
           results.years.push(countYear)
           if (first) {
-            _this.years.push(year2)
+            _this.years.push(year2 + '')
           }
           year = year2
           countYear = 0
@@ -365,7 +332,7 @@ export default {
         if (year2 !== year) {
           results.years.push(countYear)
           if (first) {
-            _this.years.push(year2)
+            _this.years.push(year2 + '')
           }
           year = year2
           countYear = 0
@@ -381,9 +348,20 @@ export default {
       return results
     },
     treatmentConnection (data) {
-      this.sessions = this.extractSeriesFrom(data.sessions, true)
+     // this.sessions = this.extractSeriesFrom(data.sessions, true)
+      var _this = this 
+     var first = true
+     this.userTypes.forEach(function (tp) {
+        var tab = data.sessions.filter(u => u.type === tp.t_id)
+        var results = _this.extractSeriesFrom(tab, true)
+        first = false
+        _this.sessions.days[tp.t_id] = results.days
+        _this.sessions.months[tp.t_id] = results.months
+        _this.sessions.years[tp.t_id] = results.years
+        
+      })
       this.drawConnection()
-      var _this = this
+     
       this.userTypes.forEach(function (tp) {
         var tab = data.newUsers.filter(u => u.type === tp.t_id)
         var results = _this.extractSeriesFrom(tab)
@@ -400,6 +378,7 @@ export default {
 }
 </script>
 <style>
+
 .user-search {
    margin:auto;
    margin-bottom:20px;
@@ -407,7 +386,7 @@ export default {
    display: inline-block;
    background: #F5f5f5;
    margin-bottom: 40px;
-   margin-left: calc(50% - 450px);
+   margin-left: calc(50% - 225px);
    padding: 10px;
    border: 1px solid grey;
    border-radius: 5px;
