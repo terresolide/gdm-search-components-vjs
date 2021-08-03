@@ -309,7 +309,7 @@ export default {
         countMonth += day['tot']
         countYear += day['tot']
         if (month2 !== month) {
-          results.push(countMonth)
+          results.months.push(countMonth)
           if (first) {
             _this.months.push(month2)
           }
