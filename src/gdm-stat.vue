@@ -30,6 +30,18 @@
 </template>
 <script>
 import * as Highcharts from 'highcharts'
+import HighchartsExporting from 'highcharts/modules/exporting'
+import ExportData from 'highcharts/modules/export-data'
+// import FullScreen from 'highcharts/modules/full-screen'
+
+import Accessibility from 'highcharts/modules/accessibility'
+
+if (typeof Highcharts === 'object') {
+  HighchartsExporting(Highcharts)
+  Accessibility(Highcharts)
+  ExportData(Highcharts)
+ // FullScreen(Highcharts)
+}
 import moment from 'moment'
 export default {
   name: 'GdmStat',
@@ -38,6 +50,8 @@ export default {
       type: String,
       default: null
     }
+  },
+  computed: {
   },
   data () {
     return {
@@ -59,22 +73,38 @@ export default {
     
   },
   methods: {
+    userTypeName (type) {
+      var find = this.userTypes.find(tp => tp.t_id === type)
+      if (find) {
+        return find.t_name_fr
+      } else {
+        'Inconnu'
+      }
+    },
     draw () {
       switch (this.mode) {
         case 'connection':
           this.drawConnection()
+          this.drawNewUsers()
           break
       }
     },
-    drawNewUser () {
+    drawNewUsers () {
       var categories = this[this.by + 's']
       var data = this.newUsers[this.by + 's']
-      Highcharts.chart('sessions', {
+      var series = []
+      for(var type in data) {
+        series.push({
+          name: this.userTypeName(type),
+          data: data[type]
+        })
+      }
+      Highcharts.chart('newUsers', {
         chart: {
           type: 'column'
         },
         title: {
-          text: 'Nombre de connexions'
+          text: 'Nouvels utilisateurs'
         },
         credits: {
           enabled:false
@@ -91,6 +121,7 @@ export default {
         },
         yAxis: {
           min: 0,
+          allowDecimals: false,
           title: {
             text: ''
           }
@@ -111,17 +142,14 @@ export default {
         },
         plotOptions: {
           column: {
+            stacking: 'normal',
             pointPadding: 0,
             borderWidth: 1,
             groupPadding: 0,
             shadow: false
           }
         },
-        series: [{
-          name: 'Total',
-          data: data
-
-        }]
+        series: series
       });
     },
     drawConnection() {
@@ -149,6 +177,7 @@ export default {
         },
         yAxis: {
           min: 0,
+          allowDecimals: false,
           title: {
             text: ''
           }
@@ -267,8 +296,10 @@ export default {
         var date2 =  moment(strDay, 'YYYYMMDD')
         year2 = date2.year()
         month2 = (date2.month() + 1).toString().padStart(2, '0') + '-' + year2
-        console.log(month2)
         while (date2.diff(date, 'days') > 0) {
+          if (first) {
+            _this.days.push(date2.format('DD-MM-YYYY'))
+          }
           results.days.push(0)
           date.add(1, 'days')
           year2 = date.year()
@@ -318,7 +349,7 @@ export default {
       var end = moment(this.endDate, 'YYYY-MM-DD')
       while(end.diff(date, 'days') >= 0) {
         if (first) {
-          this.days.push(date.format('DD-MM-YYYY'))
+          _this.days.push(date.format('DD-MM-YYYY'))
         }
         results.days.push(0)
         year2 = date.year()
@@ -341,7 +372,7 @@ export default {
         }
         date.add(1, 'days')
       }
-      if (this.years.length > results.length) {
+      if (this.years.length > results.years.length) {
         results.years.push(countYear)
       }
       if (this.months.length > results.months.length) {
@@ -352,11 +383,17 @@ export default {
     treatmentConnection (data) {
       this.sessions = this.extractSeriesFrom(data.sessions, true)
       this.drawConnection()
+      var _this = this
       this.userTypes.forEach(function (tp) {
         var tab = data.newUsers.filter(u => u.type === tp.t_id)
-        console.log(tab)
+        var results = _this.extractSeriesFrom(tab)
+        _this.newUsers.days[tp.t_id] = results.days
+        _this.newUsers.months[tp.t_id] = results.months
+        _this.newUsers.years[tp.t_id] = results.years
+        
       })
-      // this.drawNewUsers()
+      console.log(this.newUsers)
+      this.drawNewUsers()
 
     }
   }
