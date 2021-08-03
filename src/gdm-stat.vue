@@ -3,15 +3,14 @@
 <div style="padding: 10px;">
   <ul class="menu-content">
     <li class="{selected: mode === 'connection'}" @click="setMode('connection')">Connexion
-    </li><li class="{selected: mode === 'service'}" @click="setMode('service')">Par Service
+    </li><li class="{selected: mode === 'service'}" @click="setMode('service')">Services
+    </li><li class="{selected: mode === 'job'}" @click="setMode('job')">Jobs
     </li><li class="{selected: mode === 'ciest2'}" @click="setMode('ciest2')">CIEST2
     </li>
   </ul>
 </div>
 <div style="margin-left:20px;">
-  <h1 v-if="mode === 'service'">Utilisation des services</h1>
-  <h1 v-if="mode === 'connection'">Connection</h1>
-  <div class="user-search">
+  <div class="user-search" v-if="mode !== 'service'">
     <label>Du</label> <input v-model="startDate" type="date" @change="search()">
     <label>au</label> <input v-model="endDate" type="date" @change="search()">
     <label>Par</label> 
@@ -21,10 +20,16 @@
       <option value="year">Year</option>
     </select>
   </div>
+  <div v-else>
+  Il ne s'agit pas d'un historique. L'accès aux services d'un utilisateur peut changer au cours du temps et l'information historique n'est pas enregistrée.
+  </div>
   <div v-show="mode === 'connection'">
     <div id="sessions"></div>
     <div id="newUsers" style="margin-top:30px;"></div>
   </div>
+   <div v-show="mode === 'service'">
+     <div id="services" style="margin-top:30px;"></div>
+   </div>
  </div>
 </div>
 </template>
@@ -61,6 +66,7 @@ export default {
       mode: 'connection',
       sessions: { days:[], months: [], years: []},
       newUsers: { days:{}, months: {}, years: {}},
+      serviceUsers: [],
       userTypes: [],
       days:[],
       months:[],
@@ -87,6 +93,8 @@ export default {
           this.drawConnection()
           this.drawNewUsers()
           break
+        case 'services':
+          this.drawServices()
       }
     },
     drawHistogram (id, title, categories, series ) {
@@ -209,6 +217,9 @@ export default {
         case 'service':
           this.searchService()
           break
+        case 'job':
+          this.searchJob()
+          break
         case 'ciest2':
           this.searchCiest2()
           break
@@ -230,13 +241,15 @@ export default {
       })
     },
     searchService () {
-      
+      this.$http.get(this.appUrl + '/statistics/serviceUsers')
+      .then(function (response) {
+        this.treatmentServices(response.body)
+      })
     },
     searchCiest2 () {
       
     },
     extractSeriesFrom (data, first) {
-      console.log(first)
       if (first) {
         this.days = []
         this.months = []
@@ -350,8 +363,8 @@ export default {
     treatmentConnection (data) {
      // this.sessions = this.extractSeriesFrom(data.sessions, true)
       var _this = this 
-     var first = true
-     this.userTypes.forEach(function (tp) {
+      var first = true
+      this.userTypes.forEach(function (tp) {
         var tab = data.sessions.filter(u => u.type === tp.t_id)
         var results = _this.extractSeriesFrom(tab, true)
         first = false
@@ -370,9 +383,41 @@ export default {
         _this.newUsers.years[tp.t_id] = results.years
         
       })
-      console.log(this.newUsers)
       this.drawNewUsers()
 
+    },
+    treatmentServices(data) {
+      var currentService = null
+      var categories = []
+      var aux = {}
+      this.userTypes.forEach(function (tp) {
+        aux[tp.t_id] = []
+      })
+
+      data.serviceUsers.forEach(function (obj) {
+        if (obj.service !== currentService) {
+          categories.push(obj.service)
+          currentService = obj.service
+          console.log(obj.service)
+          // search count for this service
+          for (var type in aux) {
+            var find = data.serviceUsers.find(el => el.type === type && el.service === currentService)
+            if (find) {
+              aux[type].push(find.tot)
+            } else {
+              aux[type].push(0)
+            }
+          }
+        }
+      })
+      var series = []
+      for (var tp in aux) {
+        series.push({
+          name: this.userTypeName(tp),
+          data: aux[tp]
+        })
+      }
+      this.drawHistogram('services', "Nombre d'utilisateurs par service", categories, series)
     }
   }
 }
