@@ -10,7 +10,7 @@
   </ul>
 </div>
 <div style="margin-left:20px;">
-  <div class="user-search" v-if="mode !== 'service'">
+  <div class="user-search" :class="{'user-search-large': mode === 'job'}" v-if="mode !== 'service'">
     <label>Du</label> <input v-model="startDate" type="date" @change="search()">
     <label>au</label> <input v-model="endDate" type="date" @change="search()">
     <label>Par</label> 
@@ -19,6 +19,26 @@
       <option value="month">Mois</option>
       <option value="year">Year</option>
     </select>
+    <span v-if="mode === 'job'">
+      <label>Statut</label>
+      <select v-model="status" @change="search()">
+        <option value="" >---</option>
+        <option value="ended">Terminé</option>
+        <option value="success">Terminé avec succès</option>
+        <option value="failed">En échec</option>
+        <option value="aborted">Abandonné</option>
+      </select>
+      <label>Service</label>
+      <select v-model="selectedService" @change="search()">
+         <option value="">TOUS</option>
+         <option v-for="service in services" :value="service.id">
+            {{service.name}}
+         </option>
+      </select>
+      <label>Type utilisateur</label>
+      <input type="checkbox" v-model="userType" />
+    </span>
+   
   </div>
   <div v-else>
   Il ne s'agit pas d'un historique. L'accès aux services d'un utilisateur peut changer au cours du temps et l'information historique n'est pas enregistrée.
@@ -30,15 +50,53 @@
    <div v-show="mode === 'service'">
      <div id="services" style="margin-top:30px;"></div>
    </div>
-    <div v-show="mode === 'job'">
-     <div>
-         <h2>Coût moyen</h2>
-         <div v-for="service in services">
-           <span class="fa fa-circle" :style="{color: service.color}"></span>
-           <b>{{service.name}}</b>:
-           <span v-if="cost && cost[service.name]">{{cost[service.name]/countCost[service.name]}}</span>
-           <span v-else>---</span>
-         </div>
+    <div v-show="mode === 'job'" >
+    <div class="job-header" >
+       <div>
+          <h2>Total jobs</h2>
+           <div v-for="service in services" v-if="selectedService === '' || selectedService === service.id">
+             <span class="fa fa-circle" :style="{color: service.color}"></span>
+             <b>{{service.name}}</b>:
+             <span v-if="countCost && countCost[service.name]">{{countCost[service.name].toLocaleString()}}</span>
+             <span v-else>0</span>
+           </div>
+           <hr v-if="selectedService === '' || userType" style="width:60%;margin-left:5px;color:gray;">
+           <div v-if="selectedService === '' || userType">
+              <b>Total</b>: {{avg.count}}
+           </div>
+       </div>
+       <div>
+           <h2>Coût moyen</h2>
+           <div v-for="service in services" v-if="selectedService === '' || selectedService === service.id">
+             <span class="fa fa-circle" :style="{color: service.color}"></span>
+             <b>{{service.name}}</b>:
+             <span v-if="cost && cost[service.name]">{{Math.round(cost[service.name]/countCost[service.name]).toLocaleString()}} CPU secondes</span>
+             <span v-else>---</span>
+           </div>
+           <hr v-if="selectedService === '' || userType" style="width:60%;margin-left:5px;color:gray;">
+           <div v-if="selectedService === '' || userType">
+              <b v-if="userType">Tout type</b>
+              <b v-else>Tout service</b>:
+              <span v-if="avg && avg.cost">{{Math.round(avg.cost).toLocaleString()}} CPU Secondes</span>
+              <span v-else>---</span>
+           </div>
+       </div>
+       <div >
+           <h2>Durée moyenne</h2>
+           <div v-for="service in services" v-if="selectedService === '' || selectedService === service.id">
+             <span class="fa fa-circle" :style="{color: service.color}"></span>
+             <b>{{service.name}}</b>:
+             <span v-if="status === 'success' && duration && countDuration[service.name]">{{secondToStr(duration[service.name]/countDuration[service.name])}}</span>
+             <span v-else>---</span>
+           </div>
+           <hr v-if="selectedService === '' || userType" style="width:60%;margin-left:5px;color:gray;">
+            <div v-if="selectedService === '' || userType" >
+              <b v-if="userType">Tout type</b>
+              <b v-else>Tout service</b>:
+              <span v-if="status === 'success' && avg.duration">{{secondToStr(avg.duration)}}</span>
+              <span v-else>---</span>
+            </div>
+       </div>
      </div>
      <div id="jobs" style="margin-top:30px;"></div>
    </div>
@@ -88,7 +146,11 @@ export default {
       cost:{},
       countCost: 0,
       duration: {},
-      countDuration: 0
+      countDuration: 0,
+      status: '',
+      avg: {},
+      selectedService: '',
+      userType: false
     }
   },
   created () {
@@ -224,7 +286,15 @@ export default {
         })
         colors.push(find.color)
       }
+      
       this.drawHistogram('jobs', 'Nombre de jobs', categories, series, {colors: colors})
+    },
+    getUserTypes () {
+      var url = this.appUrl + '/auth/getOrganismTypes'
+      this.$http.get(url)
+      .then(function (response) {
+        this.initialize(response.body)
+      })
     },
     initialize (data) {
       this.by = 'day'
@@ -235,12 +305,34 @@ export default {
       }
       this.search()
     },
-    getUserTypes () {
-      var url = this.appUrl + '/auth/getOrganismTypes'
-      this.$http.get(url)
-      .then(function (response) {
-        this.initialize(response.body)
+    jobsAverage () {
+      var _this = this
+      var duration = 0
+      var countDuration = 0
+      var cost = 0
+      var countCost = 0
+      this.services.forEach(function (sv) {
+        countDuration += _this.countDuration[sv.name]
+        duration += _this.duration[sv.name]
+        cost += _this.cost[sv.name]
+        countCost += _this.countCost[sv.name]
       })
+      this.avg = {
+        count: countCost,
+        cost: countCost > 0 ? Math.round(cost / countCost) : 0,
+        duration: countDuration > 0 ? Math.round(duration / countDuration) : 0
+      }
+    },
+    secondToStr (totalSeconds) {
+      totalSeconds = Math.round(totalSeconds)
+      var days = Math.floor(totalSeconds / 86400)
+      totalSeconds %= 86400
+      var hours = Math.floor(totalSeconds / 3600);
+      totalSeconds %= 3600;
+      var minutes = Math.floor(totalSeconds / 60);
+      var seconds = totalSeconds % 60;
+      return (days > 0 ? days + 'j ' : '') + hours.toString().padStart(2, '0') +
+        ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0')
     },
     setMode (value) {
       this.mode = value
@@ -289,6 +381,12 @@ export default {
       if (this.endDate) {
         params.push('end=' + this.endDate)
       }
+      if (this.status !== '') {
+        params.push('status=' + this.status)
+      }
+      if (this.selectedService !== '') {
+        params.push('service=' + this.selectedService)
+      }
       url += params.join('&')
       this.$http.get(url)
       .then(function (response) {
@@ -311,10 +409,14 @@ export default {
         this.years = []
         this.cost = {}
         this.countCost = {}
+        this.duration = {}
+        this.countDuration = {}
        // this.sessions = {days: [], months: [], years: []}
       }
       this.cost[cat] = 0
       this.countCost[cat] = 0
+      this.duration[cat] = 0
+      this.countDuration[cat] = 0
       var date = moment(this.startDate, 'YYYY-MM-DD')
       var results = {days: [], months: [], years: []}
       var date = moment(this.startDate, 'YYYY-MM-DD')
@@ -337,7 +439,7 @@ export default {
         month2 = (date2.month() + 1).toString().padStart(2, '0') + '-' + year2
         while (date2.diff(date, 'days') > 0) {
           if (first) {
-            _this.days.push(date2.format('DD-MM-YYYY'))
+            _this.days.push(date.format('DD-MM-YYYY'))
           }
           results.days.push(0)
           date.add(1, 'days')
@@ -362,12 +464,16 @@ export default {
         }
        // date = date2
         if (first) {
-          _this.days.push(date2.format('DD-MM-YYYY'))
+          _this.days.push(date.format('DD-MM-YYYY'))
         }
         results.days.push(day['tot'])
         if (day['cost']) {
           _this.cost[cat] = _this.cost[cat] + day['cost']
           _this.countCost[cat]= _this.countCost[cat] + day['tot']
+        }
+        if (day['duration']) {
+          _this.duration[cat] = _this.duration[cat] + parseInt(day['duration'])
+          _this.countDuration[cat] = _this.countDuration[cat] + day['tot']
         }
         countMonth += day['tot']
         countYear += day['tot']
@@ -462,8 +568,7 @@ export default {
         _this.process.months[service.name] = results.months
         _this.process.years[service.name] = results.years 
       })
-      console.log(this.cost)
-      console.log(this.countCost)
+      this.jobsAverage()
       this.drawJobs()
     },
     treatmentServices(data) {
@@ -502,7 +607,18 @@ export default {
 }
 </script>
 <style>
-
+.job-header {
+  display:flex;
+}
+.job-header > div {
+  padding: 0 10px 0 0;
+  flex-grow:1;
+}
+.job-header h2 {
+  color:black;
+  font-size:20px;
+  font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+}
 .user-search {
    margin:auto;
    margin-bottom:20px;
@@ -514,6 +630,9 @@ export default {
    padding: 10px;
    border: 1px solid grey;
    border-radius: 5px;
+ }
+ .user-search-large {
+   margin-left:5px;
  }
  .user-search > div {
    display: inline-block;
