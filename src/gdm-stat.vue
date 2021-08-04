@@ -28,15 +28,22 @@
         <option value="failed">En échec</option>
         <option value="aborted">Abandonné</option>
       </select>
+       <label>Groupe</label>
+      <select v-model="selectedGroup" @change="changeGroup()">
+         <option value="">TOUS</option>
+         <option v-for="(group, key) in groups" :value="key">
+            {{key}}
+         </option>
+      </select>
       <label>Service</label>
       <select v-model="selectedService" @change="search()">
          <option value="">TOUS</option>
-         <option v-for="service in services" :value="service.id">
+         <option v-for="service in selectedServices" :value="service.id">
             {{service.name}}
          </option>
       </select>
       <label>Type utilisateur</label>
-      <input type="checkbox" v-model="userType" />
+      <input type="checkbox" v-model="userType" @change="search()"/>
     </span>
    
   </div>
@@ -50,14 +57,22 @@
    <div v-show="mode === 'service'">
      <div id="services" style="margin-top:30px;"></div>
    </div>
-    <div v-show="mode === 'job'" >
+    <div v-show="mode === 'job'" class="job-content" >
+    <h1>{{selectedName}}</h1>
     <div class="job-header" >
+
        <div>
           <h2>Total jobs</h2>
-           <div v-for="service in services" v-if="selectedService === '' || selectedService === service.id">
+           <div v-for="(type, index) in userTypes" v-if="userType">
+             <span class="fa fa-circle" :style="{color: colors[index]}"></span>
+             <b>{{type.t_name_fr}}</b>:
+             <span v-if="count && count[type.t_id]">{{count[type.t_id].toLocaleString()}}</span>
+             <span v-else>0</span>
+           </div>
+           <div v-for="service in selectedServices" v-if="!userType && (selectedService === '' || selectedService === service.id)">
              <span class="fa fa-circle" :style="{color: service.color}"></span>
              <b>{{service.name}}</b>:
-             <span v-if="countCost && countCost[service.name]">{{countCost[service.name].toLocaleString()}}</span>
+             <span v-if="count && count[service.name]">{{count[service.name].toLocaleString()}}</span>
              <span v-else>0</span>
            </div>
            <hr v-if="selectedService === '' || userType" style="width:60%;margin-left:5px;color:gray;">
@@ -67,7 +82,13 @@
        </div>
        <div>
            <h2>Coût moyen</h2>
-           <div v-for="service in services" v-if="selectedService === '' || selectedService === service.id">
+           <div v-for="(type, index) in userTypes" v-if="userType">
+             <span class="fa fa-circle" :style="{color: colors[index]}"></span>
+             <b>{{type.t_name_fr}}</b>:
+             <span v-if="cost && cost[type.t_id]">{{Math.round(cost[type.t_id]/countCost[type.t_id]).toLocaleString()}} CPU secondes</span>
+             <span v-else>---</span>
+           </div>
+           <div v-for="service in selectedServices" v-if="!userType && (selectedService === '' || selectedService === service.id)">
              <span class="fa fa-circle" :style="{color: service.color}"></span>
              <b>{{service.name}}</b>:
              <span v-if="cost && cost[service.name]">{{Math.round(cost[service.name]/countCost[service.name]).toLocaleString()}} CPU secondes</span>
@@ -83,7 +104,13 @@
        </div>
        <div >
            <h2>Durée moyenne</h2>
-           <div v-for="service in services" v-if="selectedService === '' || selectedService === service.id">
+           <div v-for="(type, index) in userTypes" v-if="userType">
+             <span class="fa fa-circle" :style="{color: colors[index]}"></span>
+             <b>{{type.t_name_fr}}</b>:
+             <span v-if="status === 'success' && duration && countDuration[type.t_id]">{{secondToStr(duration[type.t_id]/countDuration[type.t_id])}}</span>
+             <span v-else>---</span>
+           </div>
+           <div v-for="service in selectedServices" v-if="!userType && (selectedService === '' || selectedService === service.id)">
              <span class="fa fa-circle" :style="{color: service.color}"></span>
              <b>{{service.name}}</b>:
              <span v-if="status === 'success' && duration && countDuration[service.name]">{{secondToStr(duration[service.name]/countDuration[service.name])}}</span>
@@ -127,6 +154,26 @@ export default {
     }
   },
   computed: {
+    selectedServices () {
+      if (this.selectedGroup !== '') {
+        return this.groups[this.selectedGroup]
+      } else {
+        return this.services
+      }
+    },
+    selectedName () {
+      if (this.selectedService !== '') {
+        var find = this.services.find(s => s.id === this.selectedService)
+        if (find) {
+          return 'Résultats pour le service ' + find.name
+        }
+      }
+      if (this.selectedGroup !== '') {
+        return 'Résultats pour les services ' + this.selectedGroup
+      }
+      
+      return 'Résultats pour tous les services'
+    }
   },
   data () {
     return {
@@ -143,14 +190,19 @@ export default {
       months:[],
       years: [],
       services: [],
+      groups: {},
+      count: {},
       cost:{},
-      countCost: 0,
+      countCost: {},
       duration: {},
-      countDuration: 0,
+      countDuration: {},
       status: '',
       avg: {},
       selectedService: '',
-      userType: false
+      selectedGroup: '',
+      userType: false,
+      colors: ['#2f7ed8', '#910000', '#8bbc21',   '#1aadce',
+        '#492970', '#f28f43', '#77a1e5', '#c42525', '#a6c96a', '#0d233a']
     }
   },
   created () {
@@ -159,6 +211,12 @@ export default {
     
   },
   methods: {
+    changeGroup () {
+      if (this.selectedGroup !== '') {
+        this.selectedService = ''
+      }
+      this.search()
+    },
     userTypeName (type) {
       var find = this.userTypes.find(tp => tp.t_id === type)
       if (find) {
@@ -181,8 +239,7 @@ export default {
       }
     },
     drawHistogram (id, title, categories, series, options ) {
-      var colors = ['#2f7ed8', '#910000', '#8bbc21',   '#1aadce',
-        '#492970', '#f28f43', '#77a1e5', '#c42525', '#a6c96a', '#0d233a']
+      var colors = this.colors
       if (options && options.colors) {
         colors = options.colors
       }
@@ -278,16 +335,26 @@ export default {
       var data = this.process[this.by + 's']
       var series = []
       var colors = []
+      var name = ''
       for (var index in data) {
-        var find = this.services.find(s => s.name === index)
+        if (this.userType) {
+          name = this.userTypeName(index)
+        } else {
+          var find = this.services.find(s => s.name === index)
+          name = index
+          colors.push(find.color)
+        }
         series.push({
-          name: index,
+          name: name,
           data: data[index]
         })
-        colors.push(find.color)
+        
       }
-      
-      this.drawHistogram('jobs', 'Nombre de jobs', categories, series, {colors: colors})
+      var options = {}
+      if (colors.length > 0) {
+        options = {colors: colors}
+      }
+      this.drawHistogram('jobs', 'Nombre de jobs', categories, series, options)
     },
     getUserTypes () {
       var url = this.appUrl + '/auth/getOrganismTypes'
@@ -307,18 +374,30 @@ export default {
     },
     jobsAverage () {
       var _this = this
+      var count = 0
       var duration = 0
       var countDuration = 0
       var cost = 0
       var countCost = 0
-      this.services.forEach(function (sv) {
-        countDuration += _this.countDuration[sv.name]
-        duration += _this.duration[sv.name]
-        cost += _this.cost[sv.name]
-        countCost += _this.countCost[sv.name]
-      })
+      if (this.userType) {
+        this.userTypes.forEach(function (type) {
+          count += _this.count[type.t_id]
+          countDuration += _this.countDuration[type.t_id]
+          duration += _this.duration[type.t_id]
+          cost += _this.cost[type.t_id]
+          countCost += _this.countCost[type.t_id]
+        })
+      } else {
+	      this.selectedServices.forEach(function (sv) {
+	        count += _this.count[sv.name]
+	        countDuration += _this.countDuration[sv.name]
+	        duration += _this.duration[sv.name]
+	        cost += _this.cost[sv.name]
+	        countCost += _this.countCost[sv.name]
+	      })
+      }
       this.avg = {
-        count: countCost,
+        count: count,
         cost: countCost > 0 ? Math.round(cost / countCost) : 0,
         duration: countDuration > 0 ? Math.round(duration / countDuration) : 0
       }
@@ -386,6 +465,12 @@ export default {
       }
       if (this.selectedService !== '') {
         params.push('service=' + this.selectedService)
+      } else if (this.selectedGroup !== '') {
+        var services = this.selectedServices.map(sv => sv.id)
+        params.push('service=' + services.join(','))
+      }
+      if (this.userType) {
+        params.push('type=1')
       }
       url += params.join('&')
       this.$http.get(url)
@@ -408,11 +493,13 @@ export default {
         this.months = []
         this.years = []
         this.cost = {}
+        this.count = {}
         this.countCost = {}
         this.duration = {}
         this.countDuration = {}
        // this.sessions = {days: [], months: [], years: []}
       }
+      this.count[cat] = 0
       this.cost[cat] = 0
       this.countCost[cat] = 0
       this.duration[cat] = 0
@@ -467,6 +554,7 @@ export default {
           _this.days.push(date.format('DD-MM-YYYY'))
         }
         results.days.push(day['tot'])
+        _this.count[cat] = _this.count[cat] + day['tot']
         if (day['cost']) {
           _this.cost[cat] = _this.cost[cat] + day['cost']
           _this.countCost[cat]= _this.countCost[cat] + day['tot']
@@ -556,18 +644,42 @@ export default {
 
     },
     treatmentJobs (data) {
-      this.services = data.services
+      var _this = this
+      if (this.services.length === 0) {
+        this.services = data.services
+        this.services.forEach(function (sv) {
+          if (!_this.groups[sv.group]) {
+            _this.groups[sv.group] = [sv]
+          } else {
+            _this.groups[sv.group].push(sv)
+          }
+        })
+      }
+      
       this.process = {days: {}, months: {}, years: {}}
       var first = true
-      var _this = this
-      this.services.forEach(function (service) {
-        var tab = data.process.filter(p => p.service === parseInt(service.id))
-        var results = _this.extractSeriesFrom(tab, service.name, first)
-        first = false
-        _this.process.days[service.name] = results.days
-        _this.process.months[service.name] = results.months
-        _this.process.years[service.name] = results.years 
-      })
+
+      if (this.userType) {
+        this.userTypes.forEach(function (tp) {
+            var tab = data.process.filter(ps => ps.type === tp.t_id)
+            var results = _this.extractSeriesFrom(tab, tp.t_id, first)
+            first = false
+            _this.process.days[tp.t_id] = results.days
+            _this.process.months[tp.t_id] = results.months
+            _this.process.years[tp.t_id] = results.years 
+        })
+      } else {
+	      this.selectedServices.forEach(function (service) {
+	        if (_this.selectedService === '' || _this.selectedService === service.id) {
+		        var tab = data.process.filter(p => p.service === parseInt(service.id))
+		        var results = _this.extractSeriesFrom(tab, service.name, first)
+		        first = false
+		        _this.process.days[service.name] = results.days
+		        _this.process.months[service.name] = results.months
+		        _this.process.years[service.name] = results.years 
+	        }
+	      })
+      }
       this.jobsAverage()
       this.drawJobs()
     },
@@ -614,10 +726,15 @@ export default {
   padding: 0 10px 0 0;
   flex-grow:1;
 }
-.job-header h2 {
+
+.job-header h2,
+.job-content h1 {
   color:black;
   font-size:20px;
   font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+}
+.job-content h1 {
+  font-size: 24px;
 }
 .user-search {
    margin:auto;
