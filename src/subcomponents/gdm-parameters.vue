@@ -59,12 +59,12 @@
      <div v-if="parameter.type === 'select' || parameter.type === 'customTypeSelect'" 
      style="display:inline-block;">
         <select v-if="parameter.associative" :name="prefix + parameter.name" @change="change(parameter)" 
-        v-model="values[prefix + parameter.name]" :class="{disabled: parameter.type === 'customTypeSelect'}"
-        :disabled="mode === 'view'">
+        v-model="values[prefix + parameter.name]" :class="{disabled: (parameter.type === 'customTypeSelect' || parameter.disabled)}"
+        :disabled="mode === 'view' || parameter.disabled">
           <option v-for="(option, key) in parameter.options" :value="key">{{option}}</option>
         </select>
         <select v-else :name="prefix + parameter.name" v-model="values[prefix + parameter.name]"
-        :class="{disabled : parameter.type === 'customTypeSelect'}" :disabled="mode === 'view'"
+        :class="{disabled : (parameter.type === 'customTypeSelect' || parameter.disabled)}" :disabled="mode === 'view' || parameter.disabled"
         @change="change(parameter)">
           <option v-for="option in parameter.options" :value="option">{{option}}</option>
         </select>
@@ -73,13 +73,13 @@
        <span  v-for="option in parameter.options" style="margin-right:3px;">
          {{option}}
          <input  type="checkbox" :class="prefix + parameter.name" :name="prefix + parameter.name + '[]'" :value="option" 
-         v-model="values[prefix + parameter.name]" @change="change(parameter)" :disabled="mode === 'view'" />
+         v-model="values[prefix + parameter.name]" @change="change(parameter)" :disabled="mode === 'view'  || parameter.disabled" />
        </span>
      </div>
      <div v-if="parameter.type === 'datalist'">
         <input type="text" :list="'list_' + prefix + parameter.name" v-model="values[prefix + parameter.name]" 
         style="width:250px;min-width:250px" :pattern="parameter.pattern" :name="prefix + parameter.name" :regex="parameter.regex"
-         :disabled="mode === 'view'">
+         :disabled="mode === 'view' || parameter.disabled">
 				<datalist v-if="parameter.associative" :id="'list_' + prefix + parameter.name">
 				    <option v-for="(option, key) in parameter.options" :value="key">{{key}} - {{option}}</option>
 				</datalist>
@@ -90,19 +90,19 @@
      </div>
      <input v-if="parameter.type === 'date'" type="date"  :name="prefix + parameter.name" v-model="values[prefix + parameter.name]" 
          style="max-width:135px;"   :required="parameter.required" :min="parameter.min" :max="parameter.max" 
-         :disabled="mode === 'view'" @change="change(parameter)"/>
+         :disabled="mode === 'view' || parameter.disabled" @change="change(parameter)"/>
    
      <div v-if="parameter.type === 'text'">
           <input type="text" :required="parameter.required" :name="prefix + parameter.name" v-model="values[prefix + parameter.name]" 
-          :placeholder="parameter.placeholder" :disabled="mode === 'view'" @change="change(parameter)"/>
+          :placeholder="parameter.placeholder" :disabled="mode === 'view' || parameter.disabled" @change="change(parameter)"/>
      </div>
      <input v-if="parameter.type === 'number'"
        type="number" :name="prefix + parameter.name" :min="parameter.min" :max="parameter.max" :step="parameter.step"
         v-model="values[prefix + parameter.name]"  @change="change(parameter)" 
-        :disabled="mode === 'view'" :class="{disabled:(parameter.type === 'customTypeNumber') || parameter.disabled}"/>
+        :disabled="mode === 'view' || parameter.disabled" :class="{disabled:(parameter.type === 'customTypeNumber') || parameter.disabled}"/>
      
      <input v-if="parameter.type === 'customTypeNumber'" type="text" :name="prefix + parameter.name" style="max-width:80px;"
-        v-model="values[prefix + parameter.name]" :disabled="mode === 'view'"
+        v-model="values[prefix + parameter.name]" :disabled="mode === 'view' || parameter.disabled"
          @change="change(parameter)" class="disabled"/>
   
      <span v-if="parameter.type === 'checkbox'">
@@ -113,7 +113,7 @@
     </span>
      <div v-if="parameter.type === 'customTypeText'">
         <input type="text" class="disabled" :name="prefix + parameter.name" v-model="values[prefix + parameter.name]"
-        :disabled="mode === 'view'"  placeholder="automatically filled" />
+        :disabled="mode === 'view' || parameter.disabled"  placeholder="automatically filled" />
      </div>
      <span v-if="parameter.type === 'customInputImages' && mode !== 'view'"><b>{{parameter.count}}</b>
 	     <i v-if="parameter.min || parameter.max" style="font-size:0.9em;margin-left:10px;">
