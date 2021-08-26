@@ -96,7 +96,11 @@
                   </div>
                </div>
              </div>
+             <div v-for="prop in ['sub_swath', 'relative_orbit']" >
+                  <div v-if="process.properties.parameters.hasOwnProperty(prop)"><b>{{$hypens2camel(prop)}}:</b> {{process.properties.parameters[prop]}}</div>
            </div>
+       </div>
+           
    </div>  
    <div class="gdm-process-column-6">
      <div class="infos" >

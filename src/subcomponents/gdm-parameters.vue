@@ -39,6 +39,10 @@
  style="margin-top:5px;font-size:0.9em;text-align:center;">
    <span class="button fa fa-edit" @click="triggerDrawBbox"> &nbsp;Draw a bbox</span>
 </div>
+<div v-if="mode !== 'view' && name === 'dsmopt_use_roi'"
+ style="margin-top:5px;font-size:0.9em;text-align:center;">
+   <span class="button fa fa-search" @click="triggerSearchBbox"> &nbsp;Search a bbox</span>
+</div>
  <div v-for="(parameter, key) in parameters" style="overflow: visible;position:relative;" :style="{marginTop:'5px'}" :key="key" 
   v-if="!(mode === 'view' && parameter.type === 'customInputImages')">
    <gdm-parameters :ref="parameter.name" :mode="mode" v-if="parameter.type === 'complexe' || parameter.type === 'complexeReturn'" 
@@ -417,6 +421,10 @@ export default {
     },
     triggerDrawBbox () {
       var event = new CustomEvent('DrawBbox')
+      document.dispatchEvent(event)
+    },
+    triggerSearchBbox () {
+      var event = new CustomEvent('SearchBbox')
       document.dispatchEvent(event)
     },
     extractChildValues () {
