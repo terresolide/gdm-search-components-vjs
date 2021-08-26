@@ -92,7 +92,7 @@
              <div v-for="type in ['provider', 'position']" >
                 <div v-if="process.properties[type]" >
                   <div v-for="(value, prop) in process.properties[type]" 
-                  v-if="prop !== 'bbox' && prop !== 'providerName' && prop !== 'platform'">
+                  v-if="prop !== 'bbox' && prop !== 'providerName' && value">
                     <div><b>{{prop}}:</b> {{value}}</div>
                   </div>
                </div>
