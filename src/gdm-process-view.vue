@@ -463,6 +463,9 @@ export default {
   position:fixed;
   z-index:3000;
 }
+div[id="view"] .gdm-process-view div.gdm-process-header {
+  max-height:none;
+}
 .gdm-process-view .gdm-process-header a.button{
    display: inline-block;
 
