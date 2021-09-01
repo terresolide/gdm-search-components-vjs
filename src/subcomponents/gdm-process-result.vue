@@ -41,15 +41,43 @@ DRAW SVG
          <i class="fa fa-folder"></i> {{$t('folder')}}
       </a>
     </div>
-    <div v-if="images && images.length > 0" style="width:100%;margin-bottom:5px;">
-      <h4 :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h4>
+    <div v-if="series" style="display:block;">
+       <h3 :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h3>
+    </div>
+    <div v-if="images && images.length > 0" :style="{width: series ? '50%' : '100%'}" style="margin-bottom:5px;">
+      <h4 v-if="series" :style="{color:color}" style="margin:0;vertical-align:top;">{{$t('common')}}</h4>
+      <h4 v-else :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h4>
+      
       <div style="font-size:0.9rem;">
-		    <div class="gdm-image-layer" v-if="images" v-for="(image, index) in images" @click="toggleImage(index)">
-		      <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'"></i> 
+		    <div class="gdm-image-layer" v-if="images" v-for="(image, index) in images" >
+		      <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'" @click="toggleImage(index)"></i> 
+		      <a v-if="image.tif" :href="image.tif" class="fa fa-download" :title="$t('download')" style="padding:0 5px;color:black;"></a>
 		      <div style="display:inline-block;margin:0;max-width:calc(100% - 20px);">{{image.title}}</div>
 		    </div>
 	    </div>
     </div>
+    <div v-if="series">
+       <h4 :style="{color:color}" style="margin:0;vertical-align:top;">{{$t('series')}}</h4>
+      <div>
+        Date:
+        <span class="serie-navigation" :class="{disabled: serieIndex === 0}">
+          <span class="fa fa-angle-double-left" :style="{backgroundColor:color}"></span>
+          <span class="fa fa-angle-left" :style="{backgroundColor:color}"></span>
+        </span>
+        {{serieDate}}
+        <span class="serie-navigation" :class="{disabled: serieIndex === lastIndex}">
+          <span class="fa fa-angle-right" :style="{backgroundColor:color}"></span>
+          <span class="fa fa-angle-double-right" :style="{backgroundColor:color}"></span>
+        </span>
+      </div>
+      <div style="font-size:0.9rem;">
+        <div class="gdm-image-layer" v-for="(serie, name) in series"">
+          <i class="fa" :class="serie.checked ?'fa-eye':'fa-eye-slash'" @click="toggleSerie(name)"></i>
+          <div style="display:inline-block;margin:0;max-width:50%;">{{name}}</div>
+        </div>
+      </div>
+    </div>
+    
 
 </div>
 </template>
@@ -69,6 +97,14 @@ export default {
       type: Array,
       default: null
     },
+    series: {
+      type: Object,
+      default: null
+    },
+    serieIndex: {
+      type: Number,
+      default: 0
+    }
     color: {
       type: String,
       default: null
@@ -77,10 +113,25 @@ export default {
   data(){
     return {
       cmdCurl: null,
-      showTooltip: false
+      showTooltip: false,
+      list: null
     }
   },
   computed: {
+    serieDate () {
+      if (!this.series) {
+        return ''
+      }
+      var name = Object.keys(this.series)[0]
+      return this.series[name].images[0].date
+    },
+    lastIndex () {
+      if (!this.series) {
+        return ''
+      }
+      var name = Object.keys(this.series)[0]
+      return this.series[name].images[0].length - 1
+    }
   },
   watch: {
     result (newvalue) {
@@ -119,6 +170,9 @@ export default {
 //        this.$set(this.layers, e, layer)
          // this.result.layers[index].checked = !this.result.layers[index].checked
          this.$emit('toggleImage', index)
+     },
+     toggleSerie (name) {
+       this.$emit('toggleSerie', name)
      }
   }
 }
@@ -150,5 +204,27 @@ export default {
   left:150px;
   -webkit-box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
   box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
+}
+span.serie-navigation span{
+  font-size: 1.3em;
+  cursor: pointer;
+  margin: 0 1px;
+  padding:5px;
+ cursor:pointer;
+ border-radius:3px;
+ /*background:#8c0209;*/
+ background:grey;
+ padding:3px 5px;
+ color:white;
+  vertical-align:middle;
+  opacity:0.9;
+}
+span.serie-navigation.disabled span{
+  opacity:0.3;
+  cursor:not-allowed;
+}
+span.serie-navigation:not(.disabled) span:hover{
+  opacity:1;
+  font-size:1.31em;
 }
 </style>

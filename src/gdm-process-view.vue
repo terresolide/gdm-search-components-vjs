@@ -126,7 +126,7 @@
 	    
 	    <div v-if="process && process.result && process.status === 'TERMINATED'" :class="{highlight:seeResult}" style="margin-top:15px;"
 	    :style="{background: seeResult ? $shadeColor(color,0.92): 'none'}">
-       <gdm-process-result  :result="process.result" 
+       <gdm-process-result  :result="process.result" :series="series"
         :lang="lang" :color="color" :images="imageLayers" @toggleImage="toggleImage" >
        </gdm-process-result>
        </div>
@@ -255,6 +255,7 @@ export default {
       headerHeight: null,
       // RESULT
       imageLayers: null,
+      series: null,
       log: null,
       token: null,
       type: 'PEPS',
@@ -305,6 +306,77 @@ export default {
           image.checked = false
         })
         this.imageLayers = imageLayers
+      } else {
+        // treatment result SAR
+        var imageLayers = []
+        var series = null
+        var bbox = result.bbox
+        // @todo footrpint à effacer, uniquement pour les tests
+        var footprint = {
+            type: 'Feature',
+            geometry: {
+              type: 'Polygon',
+              coordinates: result.footprint
+            }
+        }
+        for(var key in result) {
+         if (key.indexOf('iw') >= 0) {
+           for (var prop in result[key]) {
+		         if (prop === 'Common_Product') {
+		           // search for each geo product the png image
+		           for (var name in result[key][prop]) {
+		             if (name.indexOf('geo') >= 0) {
+			             var image = {}
+		               image.title = name
+		               image.bbox = bbox
+		               image.footprint = footprint
+		               image.checked = false
+		               for(var file in result[key][prop][name]) {
+				             if (result[key][prop][name][file].substr(-3) === 'png') {
+				               image.png = result.dir + key + '/' + result[key][prop][name][file]
+				             }
+				             if (result[key][prop][name][file].substr(-4) === 'tiff') {
+		                   image.tif = result.dir + key + '/' + result[key][prop][name][file]
+		                 }
+		               }
+			             imageLayers.push(image)
+		             }
+		           }
+		         }  else {
+               // serie extract date and geo product identifier
+               var date = prop
+               for (var name in result[key][prop]) {
+                 if (!series) {
+                   series = {}
+                 }
+                 if (name.indexOf('geo') >= 0) {
+                   if (!series[name]) {
+                     series[name] = {
+                         checked: false,
+                         images: []
+                     }
+                   }
+                   var image = {}
+                   image.date = date
+                   image.bbox = bbox
+                  // image.footprint = footprint
+                   for(var file in result[key][prop][name]) {
+                     if (result[key][prop][name][file].substr(-3) === 'png') {
+                       image.png = result.dir + key + '/' + result[key][prop][name][file]
+                     }
+                     if (result[key][prop][name][file].substr(-4) === 'tiff') {
+                       image.tif = result.dir + key + '/' + result[key][prop][name][file]
+                     }
+                   }
+                   series[name].images.push(image)
+                 }
+               }
+             }
+           }
+         }
+        }
+        this.imageLayers = imageLayers
+        this.series = series
       }
     },
     display (response) {
