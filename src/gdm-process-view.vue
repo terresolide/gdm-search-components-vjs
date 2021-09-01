@@ -39,7 +39,7 @@
 	   <div class="header-1">
 	     <div class="gdm-map-container">
 	      <gdm-map ref="map" :bbox="process.feature" :images="imageLayers" :tile="feature.properties.bboxTile"
-	      :service-name="process.serviceName"
+	      :service-name="process.serviceName" :series="series" :serie-index="serieIndex" @toggleSerie="toggleSerie" @dateChange="dateSerieChange"
 	      fullscreen="fmtLargeMap" :remove-height="8" @imageAdded="imageAdded" @imageRemoved="imageRemoved"></gdm-map>
 	     </div>
 	      <div style="text-align:center;margin-top:10px;">
@@ -127,7 +127,8 @@
 	    <div v-if="process && process.result && process.status === 'TERMINATED'" :class="{highlight:seeResult}" style="margin-top:15px;"
 	    :style="{background: seeResult ? $shadeColor(color,0.92): 'none'}">
        <gdm-process-result  :result="process.result" :series="series"
-        :lang="lang" :color="color" :images="imageLayers" @toggleImage="toggleImage" >
+        :lang="lang" :color="color" :images="imageLayers" :serie-index="serieIndex"
+        @toggleImage="toggleImage" @toggleSerie="toggleSerie" @dateChange="dateSerieChange" >
        </gdm-process-result>
        </div>
 		 </div>
@@ -256,6 +257,7 @@ export default {
       // RESULT
       imageLayers: null,
       series: null,
+      serieIndex: 0,
       log: null,
       token: null,
       type: 'PEPS',
@@ -265,6 +267,9 @@ export default {
     }
   },
   methods: {
+    dateSerieChange (index) {
+      this.serieIndex = index
+    },
     getToken () {
       this.$http.get(this.api + '/getToken', {credentials: true})
       .then(
@@ -277,6 +282,12 @@ export default {
       image.checked = !image.checked
       this.$set(this.imageLayers, e, image)
       this.$refs.map.toggleImageLayer(e, image.checked)
+    },
+    toggleSerie (name) {
+      var serie = this.series[name]
+      serie.checked = !serie.checked
+      this.$set(this.series, name, serie)
+      this.$refs.map.toggleSerieLayer(name, serie.checked)
     },
     imageAdded (index) {
       var image = this.imageLayers[index]

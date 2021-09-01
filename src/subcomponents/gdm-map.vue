@@ -39,6 +39,14 @@ export default {
       type: Array,
       default: null
     },
+    series: {
+      type: Object,
+      default: null
+    },
+    serieIndex: {
+      type: Number,
+      default: 0
+    },
     serviceName: {
       type: String,
       default: null
@@ -68,7 +76,8 @@ export default {
       selectedLayer: null,
       fullscreenLayer: null,
       imageLayers: [],
-      countImages: 0
+      countImages: 0,
+      serieLayers: {}
     }
   },
   watch: {
@@ -84,6 +93,9 @@ export default {
     images (newImages, old) {
        this.initImageLayers(newImages)
     },
+    serieIndex (index) {
+      this.serieDateChange(index)
+    }
   },
   created () {
     if (this.tile) {
@@ -116,6 +128,26 @@ export default {
      } else {
        this.imageLayers[index].remove()
      }
+   },
+   serieDateChange (index) {
+     for (var name in this.serieLayers) {
+       var image = this.series[name].images[index]
+       this.serieLayers[name].setUrl(image.png)
+     }
+   },
+   toggleSerieLayer (name, checked) {
+     if (this.serieLayers[name]) {
+       this.serieLayers[name].remove()
+       this.serieLayers[name] = null
+     }
+     var image = this.series[name].images[this.serieIndex]
+     if (checked) {
+       var bounds = [
+         [image.bbox[1], image.bbox[0]],
+         [image.bbox[3], image.bbox[2]]]
+       this.serieLayers[name] = L.imageOverlay(image.png, bounds, {opacity: this.controlOpacity.getValue()})
+       this.serieLayers[name].addTo(this.map)
+     }  
    },
    changeHighlightedLayer (event) {
       var id = event.detail.id
