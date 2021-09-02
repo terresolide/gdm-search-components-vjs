@@ -1,30 +1,32 @@
 <i18n>
 {
    "en":{
+     "common": "Common products",
      "copied_to_clipboard": "The curl command has been copied to clipboard",
      "copy_curl": "Curl cmd",
      "copy_in_clipboard": "Copy the curl command\nin clipboard",
      "download": "Download",
      "folder": "Folder",
-     "results": "Results" ,
-     "preview": "Preview"  
+     "preview": "Preview",
+     "results": "Results",
+     "series": "Series"
    },
    "fr":{
+   
+     "common": "Produits communs",
      "copied_to_clipboard": "La commande Curl a été copiée dans le presse-papier",
      "copy_curl": "Cmd Curl",
      "copy_in_clipboard": "Copier la commande curl\ndans le presse-papier",
      "download": "Télécharger",
      "folder": "Répertoire",
+     "preview": "Visualisation",
      "results": "Résultats",
-     "preview": "Visualisation"   
+     "series": "Séries"
+
    }
 }
 </i18n>
 <template>
-<!--  <span v-if="stepId">
-DRAW SVG
-</span>
-<span v-else> -->
 <div class="gdm-process-result">
      <div style="position:relative;">
       <h3 :style="{color:color}" style="margin-bottom:10px;">{{$t('results')}}</h3>
@@ -59,17 +61,9 @@ DRAW SVG
     <div v-if="series" style="width:calc(60% -5px);">
        <h4 :style="{color:color}" style="margin:0;vertical-align:top;">{{$t('series')}}</h4>
       <div>
-        Date:
-        <span class="serie-navigation" :class="{disabled: serieIndex === 0}">
-          <span class="fa fa-angle-double-left" :style="{backgroundColor:color}" @click="goToFirst()"></span>
-          <span class="fa fa-angle-left" :style="{backgroundColor:color}" @click="previous()"></span>
-        </span>
-        <span v-html="serieDate" style="display:inline-block;vertical-align:middle;"></span>
-        <span class="serie-navigation" :class="{disabled: serieIndex === lastIndex}">
-          <span class="fa fa-angle-right" :style="{backgroundColor:color}" @click="next()"></span>
-          <span class="fa fa-angle-double-right" :style="{backgroundColor:color}" @click="goToLast()"></span>
-        </span>
-      </div>
+      <gdm-serie-navigation :series="series" :serie-index="serieIndex" :color="color" :lang="lang"
+      @dateChange="dateSerieChange"></gdm-serie-navigation>
+      </div> 
       <div style="font-size:0.9rem;">
         <div class="gdm-image-layer" v-for="(serie, name) in series"">
           <i class="fa" :class="serie.checked ?'fa-eye':'fa-eye-slash'" @click="toggleSerie(name)"></i>
@@ -82,9 +76,12 @@ DRAW SVG
 </div>
 </template>
 <script>
-import moment from 'moment'
+import GdmSerieNavigation from './gdm-serie-navigation.vue'
 export default {
   name: 'GdmProcessResult',
+  components: {
+    GdmSerieNavigation
+  },
   props:{
     result: {
       type: Object,
@@ -115,61 +112,21 @@ export default {
     return {
       cmdCurl: null,
       showTooltip: false,
-      list: null,
-      serieDate: ''
-    }
-  },
-  computed: {
-//     serieDate () {
-//       if (!this.series) {
-//         return ''
-//       }
-//       console.log(this.serieIndex)
-//       var name = Object.keys(this.series)[0]
-//       var date = this.series[name].images[this.serieIndex].date.substring(0, 8)
-//       return moment(date, 'YYYYMMDD').format('ll')
-//     },
-    lastIndex () {
-      if (!this.series) {
-        return ''
-      }
-      var name = Object.keys(this.series)[0]
-      return this.series[name].images.length - 1
+      list: null
     }
   },
   watch: {
     result (newvalue) {
       this.initCmdCurl(newvalue)
-    },
-    serieIndex (newvalue) {
-      console.log(newvalue)
-      this.computeSerieDate(newvalue)
-      
     }
   },
   destroyed: function() {
   },
   created: function () {
     this.$i18n.locale = this.lang
-    moment.locale(this.lang)
     this.initCmdCurl(this.result)
   },
-  mounted: function(){
-    this.computeSerieDate(0)
-  },
   methods:{
-     computeSerieDate (index) {
-       if (!this.series) {
-         return ''
-       }
-       var name = Object.keys(this.series)[0]
-       console.log(this.series[name].images[index])
-       var date = this.series[name].images[index].date.substring(0, 8)
-       var date2 = this.series[name].images[index].date.substring(8)
-       console.log(date2)
-       this.serieDate = moment(date, 'YYYYMMDD').format('ll') + '<br />' +
-       moment(date2, 'YYYYMMDD').format('ll')
-     },
      copyCmd (url) {
        this.$refs.areaCmd.select()
        // node.setSelectionRange(0, 99999);
@@ -180,12 +137,8 @@ export default {
          _this.showTooltip = false
        }, 2000)
      },
-     goToFirst () {
-       this.$emit('dateChange', 0)
-     },
-     goToLast () {
-       console.log(this.lastIndex)
-       this.$emit('dateChange', this.lastIndex)
+     dateSerieChange (value) {
+       this.$emit('dateSerieChange', value)
      },
      initCmdCurl (result) {
        if (result.results) {
@@ -193,18 +146,8 @@ export default {
          this.cmdCurl = 'curl "' + result.results + '" -o ' + filename
        }
      },
-     next () {
-       this.$emit('dateChange', this.serieIndex + 1)
-     },
-     previous () {
-       this.$emit('dateChange', this.serieIndex - 1)
-     },
      toggleImage (index) {
-//        var layer = this.layers[e]
-//        layer.checked = !layer.checked
-//        this.$set(this.layers, e, layer)
-         // this.result.layers[index].checked = !this.result.layers[index].checked
-         this.$emit('toggleImage', index)
+       this.$emit('toggleImage', index)
      },
      toggleSerie (name) {
        this.$emit('toggleSerie', name)
@@ -239,27 +182,5 @@ export default {
   left:150px;
   -webkit-box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
   box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
-}
-span.serie-navigation span{
-  font-size: 1.3em;
-  cursor: pointer;
-  margin: 0 1px;
-  padding:5px;
- cursor:pointer;
- border-radius:3px;
- /*background:#8c0209;*/
- background:grey;
- padding:3px 5px;
- color:white;
-  vertical-align:middle;
-  opacity:0.9;
-}
-span.serie-navigation.disabled span{
-  opacity:0.3;
-  cursor:not-allowed;
-}
-span.serie-navigation:not(.disabled) span:hover{
-  opacity:1;
-  font-size:1.31em;
 }
 </style>

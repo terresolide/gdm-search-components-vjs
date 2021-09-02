@@ -5,7 +5,7 @@
 </template>
 <script>
 var L = require("leaflet");
-L.Control.Fmtlayer = require('formater-metadata-vjs/src/modules/leaflet.control.fmtlayer.js')
+L.Control.Gdmlayer = require('../modules/leaflet.control.gdmlayer.js')
 L.Control.Fullscreen = require('formater-metadata-vjs/src/modules/leaflet.control.fullscreen.js')
 L.Control.Legend = require('formater-metadata-vjs/src/modules/leaflet.control.legend.js')
 L.Control.Legend = require('../modules/leaflet.control.opacity.js')
@@ -158,7 +158,7 @@ export default {
     initialize () {
       var container = this.$el.querySelector('#fmtMap');
       this.map = L.map( container, {scrollWheelZoom: false}).setView([51.505, -0.09], 1);
-      this.controlLayer = new L.Control.Fmtlayer(null, null,{position: 'topleft'})
+      this.controlLayer = new L.Control.Gdmlayer(null, null,{position: 'topleft'})
       this.controlLayer.tiles.arcgisTopo.layer.addTo(this.map)
       if (this.serviceName && (this.serviceName === 'GDM-OPT-ICE' || this.serviceName === 'MPIC-OPT-ICE')) {
           var options = {

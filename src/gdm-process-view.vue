@@ -128,7 +128,7 @@
 	    :style="{background: seeResult ? $shadeColor(color,0.92): 'none'}">
        <gdm-process-result  :result="process.result" :series="series"
         :lang="lang" :color="color" :images="imageLayers" :serie-index="serieIndex"
-        @toggleImage="toggleImage" @toggleSerie="toggleSerie" @dateChange="dateSerieChange" >
+        @toggleImage="toggleImage" @toggleSerie="toggleSerie" @dateSerieChange="dateSerieChange" >
        </gdm-process-result>
        </div>
 		 </div>
