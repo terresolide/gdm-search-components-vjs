@@ -139,6 +139,7 @@ export default {
      if (this.serieLayers[name]) {
        this.serieLayers[name].remove()
        this.serieLayers[name] = null
+       delete this.serieLayers[name]
      }
      var image = this.series[name].images[this.serieIndex]
      if (checked) {
