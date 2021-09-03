@@ -1,7 +1,8 @@
 /**
  * L control tiles with given default tiles
  */
-/* eslint no-undef: 0 */
+ /* eslint no-undef: 0 */
+
 
  L.Control.Gdmlayer = L.Control.Layers.extend({
    options: {
@@ -30,7 +31,8 @@
        attribution: 'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer">ArcGIS</a>'
      }
    },
-   initialize: function (baseLayers, overlays, options) {
+   initialize: function ( baseLayers, overlays, options) {
+     
      L.Control.Layers.prototype.initialize.call(this, baseLayers, overlays, options)
      // Default tiles allready in control
      for (var key in this.tiles) {
@@ -40,11 +42,13 @@
      }
    },
    addBboxLayer () {
+     return
      this.bbox = L.layerGroup()
      this.bbox.addTo(this._map)
      this.addOverlay(this.bbox, 'bbox', true)
    },
    setBboxLayer (bboxLayer) {
+     return
      if (this.bbox) {
         this.bbox.clearLayers()
      } else {
@@ -55,9 +59,19 @@
      }
    },
    removeBboxLayer () {
+     return
      if (this.bbox) {
        this.bbox.clearLayers()
      }
+   },
+   _addItem: function (obj) {
+     console.log(obj)
+      if (obj.layer.first) {
+        var div = document.createElement('b')
+        div.innerHTML = obj.layer.first
+        this._overlaysList.appendChild(div)
+      }
+      L.Control.Layers.prototype._addItem.call(this, obj)
    }
  })
  module.exports = L.Control.Gdmlayer

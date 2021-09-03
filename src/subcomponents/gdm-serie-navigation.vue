@@ -1,6 +1,6 @@
 <template>
  <div>
-        Date:
+        Dates:
         <span class="serie-navigation" :class="{disabled: serieIndex === 0}">
           <span class="fa fa-angle-double-left" :style="{backgroundColor:color}" @click="goToFirst()"></span>
           <span class="fa fa-angle-left" :style="{backgroundColor:color}" @click="previous()"></span>
@@ -68,7 +68,6 @@ export default {
         return ''
       }
       var name = Object.keys(this.series)[0]
-      console.log(this.series[name].images[index])
       var date = this.series[name].images[index].date.substring(0, 8)
       var date2 = this.series[name].images[index].date.substring(8)
       console.log(date2)

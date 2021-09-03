@@ -1,6 +1,8 @@
 <template>
 <span class="gdm-map">
-<div id="fmtMap" class="mtdt-small"></div>
+<div id="fmtMap" class="mtdt-small">
+
+</div>
 </span>
 </template>
 <script>
@@ -9,10 +11,11 @@ L.Control.Gdmlayer = require('../modules/leaflet.control.gdmlayer.js')
 L.Control.Fullscreen = require('formater-metadata-vjs/src/modules/leaflet.control.fullscreen.js')
 L.Control.Legend = require('formater-metadata-vjs/src/modules/leaflet.control.legend.js')
 L.Control.Legend = require('../modules/leaflet.control.opacity.js')
-
+import GdmSerieNavigation from './gdm-serie-navigation.vue'
 export default {
   name: 'GdmMap',
   components: {
+    GdmSerieNavigation
   },
   props: {
     featureCollection: {
@@ -130,9 +133,13 @@ export default {
      }
    },
    serieDateChange (index) {
-     for (var name in this.serieLayers) {
-       var image = this.series[name].images[index]
-       this.serieLayers[name].setUrl(image.png)
+     for (var i in this.imageLayers) {
+      
+       if (this.imageLayers[i].type === 'serie') {
+         var image = this.series[this.imageLayers[i].name].images[index]
+         this.imageLayers[i].setUrl(image.png)
+       }
+      // this.serieLayers[name].setUrl(image.png)
      }
    },
    toggleSerieLayer (name, checked) {
@@ -280,8 +287,13 @@ export default {
         var layer = L.videoOverlay(image.mp4, bounds, {interactive: true, opacity:this.controlOpacity.getValue()})
         
       } else if (image.png) {
-        var layer = L.imageOverlay(image.png, bounds, {opacity: this.controlOpacity.getValue()})
+          var layer = L.imageOverlay(image.png, bounds, {opacity: this.controlOpacity.getValue()})
       }
+      if (image.first) {
+        layer.first = image.first
+      }
+      layer.type = image.type ? image.type : 'image'
+      layer.name = image.title
       var _this = this
       layer.on('add', function () {
         if (image.mp4) {
@@ -313,7 +325,7 @@ export default {
       })
       this.imageLayers.push(layer)
       // layer.addTo(_this.map)
-      this.controlLayer.addOverlay(layer, image.title)
+      this.controlLayer.addOverlay(layer, image.title, 'common')
     },
     highlightLayer (id)
     {

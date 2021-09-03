@@ -283,6 +283,7 @@ export default {
       this.$set(this.imageLayers, e, image)
       this.$refs.map.toggleImageLayer(e, image.checked)
     },
+    // @toRemove
     toggleSerie (name) {
       var serie = this.series[name]
       serie.checked = !serie.checked
@@ -314,7 +315,8 @@ export default {
         })
         var imageLayers = result.thumbnails
         imageLayers.forEach(function (image) {
-          image.checked = false
+          image.checked = false,
+          image.type = 'image'
         })
         this.imageLayers = imageLayers
       } else {
@@ -335,11 +337,17 @@ export default {
            for (var prop in result[key]) {
 		         if (prop === 'Common_Product') {
 		           // search for each geo product the png image
+		           var text = this.$i18n.t('common')
 		           for (var name in result[key][prop]) {
 		             if (name.indexOf('geo') >= 0) {
 			             var image = {}
 		               image.title = name
 		               image.bbox = bbox
+		               image.type = 'image'
+		               if (text) {
+		                 image.first = text
+		                 text = null
+		               }
 		               image.footprint = footprint
 		               image.checked = false
 		               for(var file in result[key][prop][name]) {
@@ -356,6 +364,7 @@ export default {
 		         }  else {
                // serie extract date and geo product identifier
                var date = prop
+               
                for (var name in result[key][prop]) {
                  if (!series) {
                    series = {}
@@ -363,28 +372,50 @@ export default {
                  if (name.indexOf('geo') >= 0) {
                    if (!series[name]) {
                      series[name] = {
-                         checked: false,
                          images: []
                      }
+                     
+                     
                    }
-                   var image = {}
-                   image.date = date
-                   image.bbox = bbox
+                   var imageInside = {}
+                   imageInside.date = date
+                   imageInside.bbox = bbox
+                  
                   // image.footprint = footprint
                    for(var file in result[key][prop][name]) {
                      if (result[key][prop][name][file].substr(-3) === 'png') {
-                       image.png = result.dir + key + '/' + result[key][prop][name][file]
+                       imageInside.png = result.dir + key + '/' + result[key][prop][name][file]
                      }
                      if (result[key][prop][name][file].substr(-4) === 'tiff') {
-                       image.tif = result.dir + key + '/' + result[key][prop][name][file]
+                       imageInside.tif = result.dir + key + '/' + result[key][prop][name][file]
                      }
                    }
-                   series[name].images.push(image)
+                   series[name].images.push(imageInside)
                  }
+                 
                }
+              
              }
-           }
+   
          }
+         }
+         var text = this.$i18n.t('series')
+        for (var name in series) {
+          image = {
+              checked: false,
+              title: name,
+              bbox: bbox,
+              type: 'serie',
+              png: series[name].images[this.serieIndex].png
+          }
+          console.log(text)
+          if (text) {
+            console.log('first')
+            image.first = text
+            text = null
+          }
+          imageLayers.push(image)
+       }
         }
         this.imageLayers = imageLayers
         this.series = series

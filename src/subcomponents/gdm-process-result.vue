@@ -9,7 +9,7 @@
      "folder": "Folder",
      "preview": "Preview",
      "results": "Results",
-     "series": "Series"
+     "series": "Interferogram list"
    },
    "fr":{
    
@@ -21,7 +21,7 @@
      "folder": "Répertoire",
      "preview": "Visualisation",
      "results": "Résultats",
-     "series": "Séries"
+     "series": "Liste d'interférogrammes"
 
    }
 }

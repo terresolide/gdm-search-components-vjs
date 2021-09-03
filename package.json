@@ -22,8 +22,10 @@
   "dependencies": {
     "formater-metadata-vjs": "github:terresolide/formater-metadata-vjs",
     "highcharts": "^6.2.0",
+    "install": "^0.13.0",
     "leaflet": "^1.7.1",
     "leaflet-draw": "^1.0.4",
+    "leaflet-groupedlayercontrol": "^0.6.1",
     "moment": "^2.29.1",
     "vue": "^2.6.12",
     "vue-custom-element": "^3.2.14",
