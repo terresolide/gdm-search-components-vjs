@@ -65,7 +65,6 @@
      }
    },
    _addItem: function (obj) {
-     console.log(obj)
       if (obj.layer.first) {
         var div = document.createElement('b')
         div.innerHTML = obj.layer.first

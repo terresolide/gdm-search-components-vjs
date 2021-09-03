@@ -354,6 +354,7 @@ export default {
 		               image.title = name
 		               image.bbox = bbox
 		               image.type = 'image'
+		               image.legend = result.dir + key + '/legend_' + name + '_runw.png' 
 		               if (text) {
 		                 image.first = text
 		                 text = null
@@ -409,7 +410,8 @@ export default {
              title: name,
              bbox: bbox,
              type: 'serie',
-             png: series[name].images[this.serieIndex].png
+             png: series[name].images[this.serieIndex].png,
+             legend: result.dir + key + '/legend_' + name + '_runw.png' 
            }
            console.log(text)
            if (text) {
