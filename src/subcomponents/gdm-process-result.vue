@@ -51,7 +51,7 @@
       <h4 v-else :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h4>
       
       <div style="font-size:0.9rem;">
-		    <div class="gdm-image-layer" v-if="images" v-for="(image, index) in images" >
+		    <div class="gdm-image-layer" v-if="image.type !== 'serie'" v-for="(image, index) in images" >
 		      <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'" @click="toggleImage(index)"></i> 
 		      <a v-if="image.tif" :href="image.tif" class="fa fa-download" :title="$t('download')" style="padding:0 5px;color:black;"></a>
 		      <div style="display:inline-block;margin:0;max-width:calc(100% - 20px);">{{image.title}}</div>
@@ -64,13 +64,18 @@
       <gdm-serie-navigation :series="series" :serie-index="serieIndex" :color="color" :lang="lang"
       @dateChange="dateSerieChange"></gdm-serie-navigation>
       </div> 
-      <div style="font-size:0.9rem;">
+      <div class="gdm-image-layer" v-if="image.type === 'serie'" v-for="(image, index) in images" >
+          <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'" @click="toggleImage(index)"></i> 
+          <a v-if="image.tif" :href="image.tif" class="fa fa-download" :title="$t('download')" style="padding:0 5px;color:black;"></a>
+          <div style="display:inline-block;margin:0;max-width:calc(100% - 20px);">{{image.title}}</div>
+        </div>
+     <!--  <div style="font-size:0.9rem;">
         <div class="gdm-image-layer" v-for="(serie, name) in series"">
           <i class="fa" :class="serie.checked ?'fa-eye':'fa-eye-slash'" @click="toggleSerie(name)"></i>
           <div style="display:inline-block;margin:0;max-width:50%;">{{name}}</div>
         </div>
-      </div>
-    </div>
+      </div> -->
+    </div>  
     
 
 </div>

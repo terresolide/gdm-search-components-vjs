@@ -1,5 +1,6 @@
 <i18n>{
    "en":{
+    "common": "Common products",
      "status_informations": "Job status",
      "clear_data": "All results will be deleted on this date",
      "owner": "Owner",
@@ -10,10 +11,12 @@
      "owner_credit": "Actual credit",
      "process_time": "Process time",
      "parameters": "Parameters",
-     "seconds": "seconds"
+     "seconds": "seconds",
+     "series": "Interferogram list"
    },
    "fr":{
-      "status_informations": "Etat du calcul",
+     "common": "Produits communs",
+     "status_informations": "Etat du calcul",
       "clear_data": "Tous les résultats seront effacés à cette date",
      "owner": "Propriétaire",
      "cost": "Coût",
@@ -23,13 +26,17 @@
      "owner_credit": "Crédit actuel",
      "parameters": "Paramètres",
      "process_time": "Calcul",
-      "seconds": "secondes"
+     "seconds": "secondes",
+     "series": "Liste d'interférogrammes"
    }
 }
 </i18n>
 <template>
  <span class="gdm-process-view" v-if="process">
- <div id="fmtLargeMap"></div>
+ <div id="fmtLargeMap">
+   <gdm-serie-navigation v-if="series" :series="series" :serie-index="serieIndex" :color="color" :lang="lang"
+     :fullscreen="true"   @dateChange="dateSerieChange"></gdm-serie-navigation>
+ </div>
  <div style="position:relative;">
 	 <gdm-service-status  :name="process.serviceName" :status="process.serviceStatus" :top="5" :right="10" :lang="lang" ></gdm-service-status>
 	 <div class="gdm-process-header" :style="{background: $shadeColor(color,0.95)}">
@@ -174,6 +181,7 @@ import GdmProcessProgress from './subcomponents/gdm-process-progress.vue'
 import GdmProcessResult from './subcomponents/gdm-process-result.vue'
 import GdmImage from './subcomponents/gdm-image.vue'
 import GdmParameters from './subcomponents/gdm-parameters.vue'
+import GdmSerieNavigation from './subcomponents/gdm-serie-navigation.vue'
 import hs from './modules/howstereo.js'
 export default {
   name: 'GdmProcessView',
@@ -185,7 +193,8 @@ export default {
     GdmProcessProgress,
     GdmProcessResult,
     GdmImage,
-    GdmParameters
+    GdmParameters,
+    GdmSerieNavigation
   },
   props: {
     id: {
@@ -263,6 +272,7 @@ export default {
       type: 'PEPS',
       describe: null,
       stereo: null,
+      fullscreen: false,
       defaultParameters: null
     }
   },
@@ -364,7 +374,7 @@ export default {
 		         }  else {
                // serie extract date and geo product identifier
                var date = prop
-               
+               // array of dates
                for (var name in result[key][prop]) {
                  if (!series) {
                    series = {}
@@ -374,48 +384,41 @@ export default {
                      series[name] = {
                          images: []
                      }
-                     
-                     
                    }
                    var imageInside = {}
                    imageInside.date = date
-                   imageInside.bbox = bbox
-                  
                   // image.footprint = footprint
                    for(var file in result[key][prop][name]) {
                      if (result[key][prop][name][file].substr(-3) === 'png') {
                        imageInside.png = result.dir + key + '/' + result[key][prop][name][file]
                      }
-                     if (result[key][prop][name][file].substr(-4) === 'tiff') {
-                       imageInside.tif = result.dir + key + '/' + result[key][prop][name][file]
-                     }
+//                      if (result[key][prop][name][file].substr(-4) === 'tiff') {
+//                        imageInside.tif = result.dir + key + '/' + result[key][prop][name][file]
+//                      }
                    }
                    series[name].images.push(imageInside)
                  }
-                 
                }
-              
              }
-   
-         }
+           }
          }
          var text = this.$i18n.t('series')
-        for (var name in series) {
-          image = {
-              checked: false,
-              title: name,
-              bbox: bbox,
-              type: 'serie',
-              png: series[name].images[this.serieIndex].png
-          }
-          console.log(text)
-          if (text) {
-            console.log('first')
-            image.first = text
-            text = null
-          }
-          imageLayers.push(image)
-       }
+         for (var name in series) {
+           image = {
+             checked: false,
+             title: name,
+             bbox: bbox,
+             type: 'serie',
+             png: series[name].images[this.serieIndex].png
+           }
+           console.log(text)
+           if (text) {
+             console.log('first')
+             image.first = text
+             text = null
+           }
+           imageLayers.push(image)
+        }
         }
         this.imageLayers = imageLayers
         this.series = series
@@ -577,6 +580,13 @@ export default {
   position:fixed;
   z-index:3000;
 }
+ .gdm-process-view div[id="fmtLargeMap"] .gdm-serie-navigation {
+   position: absolute;
+   bottom: 5px;
+   left: 50%;
+   transform: translate(-50%, 0);
+   z-index: 10000;
+   } *
 div[id="view"] .gdm-process-view div.gdm-process-header {
   max-height:none;
 }

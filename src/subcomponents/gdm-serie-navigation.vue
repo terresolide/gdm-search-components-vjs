@@ -1,16 +1,16 @@
 <template>
- <div>
-        Dates:
-        <span class="serie-navigation" :class="{disabled: serieIndex === 0}">
-          <span class="fa fa-angle-double-left" :style="{backgroundColor:color}" @click="goToFirst()"></span>
-          <span class="fa fa-angle-left" :style="{backgroundColor:color}" @click="previous()"></span>
-        </span>
-        <span v-html="serieDate" style="display:inline-block;vertical-align:middle;"></span>
-        <span class="serie-navigation" :class="{disabled: serieIndex === lastIndex}">
-          <span class="fa fa-angle-right" :style="{backgroundColor:color}" @click="next()"></span>
-          <span class="fa fa-angle-double-right" :style="{backgroundColor:color}" @click="goToLast()"></span>
-        </span>
-      </div>
+<div class="gdm-serie-navigation">
+     Dates:
+     <span class="serie-navigation" :class="{disabled: serieIndex === 0}">
+       <span class="fa fa-angle-double-left" :style="{backgroundColor:color}" @click="goToFirst()"></span>
+       <span class="fa fa-angle-left" :style="{backgroundColor:color}" @click="previous()"></span>
+     </span>
+     <span v-html="serieDate" style="display:inline-block;vertical-align:middle;"></span>
+     <span class="serie-navigation" :class="{disabled: serieIndex === lastIndex}">
+       <span class="fa fa-angle-right" :style="{backgroundColor:color}" @click="next()"></span>
+       <span class="fa fa-angle-double-right" :style="{backgroundColor:color}" @click="goToLast()"></span>
+     </span>
+ </div>
 </template>
 <script>
 import moment from 'moment'
@@ -20,6 +20,10 @@ export default {
     lang: {
       type: String,
       default: 'en'
+    },
+    fullscreen: {
+      type: Boolean,
+      default: false
     },
     series: {
       type: Object,
@@ -50,7 +54,6 @@ export default {
   },
   watch: {
     serieIndex (newvalue) {
-      console.log(newvalue)
       this.computeSerieDate(newvalue)
       
     }
@@ -71,8 +74,12 @@ export default {
       var date = this.series[name].images[index].date.substring(0, 8)
       var date2 = this.series[name].images[index].date.substring(8)
       console.log(date2)
-      this.serieDate = moment(date, 'YYYYMMDD').format('ll') + '<br />' +
-      moment(date2, 'YYYYMMDD').format('ll')
+      this.serieDate = moment(date, 'YYYYMMDD').format('ll') 
+      if (this.fullscreen) {
+        this.serieDate += ' &rarr; ' + moment(date2, 'YYYYMMDD').format('ll')
+      } else {
+        this.serieDate += '<br />' + moment(date2, 'YYYYMMDD').format('ll')
+      }
     },
     goToFirst () {
       this.$emit('dateChange', 0)
