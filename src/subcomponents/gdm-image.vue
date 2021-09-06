@@ -183,7 +183,7 @@
       </span>
     </div>
      <div>
-      <span class="gdm-action" style="margin-top:5px;" v-if="image.satellitePosition"  @click="showSatellite" :title="$t('display_satellite')">
+      <span class="gdm-action" style="margin-top:5px;" v-if="image.satellitePositions"  @click="showSatellite" :title="$t('display_satellite')">
           <!--  <span >{{$t('remove')}}</span>-->
           <img src="../assets/images/satellite-32.png" width="24" />
        </span>
