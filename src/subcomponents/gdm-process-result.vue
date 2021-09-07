@@ -46,7 +46,7 @@
     <div v-if="series" style="display:block;">
        <h3 :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h3>
     </div>
-    <div v-if="images && images.length > 0" :style="{width: series ? '40%' : '100%'}" style="margin-bottom:5px;">
+    <div v-if="images && images.length > 0" :style="{width: series ? '35%' : '100%'}" style="margin-bottom:5px;">
       <h4 v-if="series" :style="{color:color}" style="margin:0;vertical-align:top;">{{$t('common')}}</h4>
       <h4 v-else :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h4>
       
@@ -58,10 +58,10 @@
 		    </div>
 	    </div>
     </div>
-    <div v-if="series" style="width:calc(60% -5px);">
+    <div v-if="series" style="width:calc(65% -5px);">
        <h4 :style="{color:color}" style="margin:0;vertical-align:top;">{{$t('series')}}</h4>
       <div>
-      <gdm-serie-navigation :series="series" :serie-index="serieIndex" :color="color" :lang="lang"
+      <gdm-serie-navigation :series="series" :serie-index="serieIndex" :color="color" :lang="lang" :main="true"
       @dateChange="dateSerieChange"></gdm-serie-navigation>
       </div> 
       <div class="gdm-image-layer" v-if="image.type === 'serie'" v-for="(image, index) in images" >

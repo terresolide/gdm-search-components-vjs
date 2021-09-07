@@ -1,11 +1,14 @@
 <template>
-<div class="gdm-serie-navigation">
+<div class="gdm-serie-navigation" :style="{background: fullscreen ? '#fff' : $shadeColor(color,0.85)}">
      Dates:
      <span class="serie-navigation" :class="{disabled: serieIndex === 0}">
        <span class="fa fa-angle-double-left" :style="{backgroundColor:color}" @click="goToFirst()"></span>
        <span class="fa fa-angle-left" :style="{backgroundColor:color}" @click="previous()"></span>
      </span>
-     <span v-html="serieDate" style="display:inline-block;vertical-align:middle;"></span>
+     <span class="serie-navigation" style="display:inline-block;vertical-align:top;text-align:center;"  :class="{disabled: serieIndex === lastIndex}">
+        <div v-html="serieDate"></div>
+        <span class="fa" :class="timer ? 'fa-pause' : 'fa-play'"  :style="{backgroundColor:color}" @click="togglePlay"></span>
+     </span>
      <span class="serie-navigation" :class="{disabled: serieIndex === lastIndex}">
        <span class="fa fa-angle-right" :style="{backgroundColor:color}" @click="next()"></span>
        <span class="fa fa-angle-double-right" :style="{backgroundColor:color}" @click="goToLast()"></span>
@@ -17,6 +20,10 @@ import moment from 'moment'
 export default {
   name: 'GdmSerieNavigation',
   props: {
+    main: {
+      type: Boolean,
+      default: false
+    },
     lang: {
       type: String,
       default: 'en'
@@ -49,7 +56,9 @@ export default {
   },
   data () {
     return {
-      serieDate: ''
+      serieDate: '',
+      timer: null,
+      playerChangeListener: null
     }
   },
   watch: {
@@ -61,9 +70,19 @@ export default {
   created () {
     this.$i18n.locale = this.lang
     moment.locale(this.lang)
+    this.playerChangeListener = this.changePlayer.bind(this)
+    document.addEventListener('SeriePlayerChange', this.playerChangeListener)
   },
-  mounted: function(){
+  mounted (){
     this.computeSerieDate(0)
+  },
+  destroyed () {
+    if (this.main && this.timer) {
+      clearInterval(this.timer)
+      this.timer = false
+    }
+    document.removeEventListener('SeriePlayerChange', this.playerChangeListener)
+    this.playerChangeListener = null
   },
   methods: {
     computeSerieDate (index) {
@@ -75,11 +94,11 @@ export default {
       var date2 = this.series[name].images[index].date.substring(8)
       console.log(date2)
       this.serieDate = moment(date, 'YYYYMMDD').format('ll') 
-      if (this.fullscreen) {
+      //if (this.fullscreen) {
         this.serieDate += ' &rarr; ' + moment(date2, 'YYYYMMDD').format('ll')
-      } else {
-        this.serieDate += '<br />' + moment(date2, 'YYYYMMDD').format('ll')
-      }
+//       } else {
+//         this.serieDate += '<br />' + moment(date2, 'YYYYMMDD').format('ll')
+//       }
     },
     goToFirst () {
       this.$emit('dateChange', 0)
@@ -89,16 +108,45 @@ export default {
       this.$emit('dateChange', this.lastIndex)
     },
     next () {
-      this.$emit('dateChange', this.serieIndex + 1)
+      if (this.serieIndex < this.lastIndex) {
+        this.$emit('dateChange', this.serieIndex + 1)
+      }
+    },
+    play () {
+      if (this.timer) {
+        return
+      }
+      this.timer = setInterval(this.next, 1000)
     },
     previous () {
       this.$emit('dateChange', this.serieIndex - 1)
     },
-    
+    togglePlay () {
+      var event = new CustomEvent('SeriePlayerChange')
+      document.dispatchEvent(event)
+    },
+    changePlayer () {
+      if (this.main) {
+        if (this.timer) {
+          clearInterval(this.timer)
+          this.timer = false
+        } else {
+          this.play()
+        }
+      } else {
+        this.timer = !this.timer
+      }
+    }
   }
 }
 </script>
 <style scoped>
+.gdm-serie-navigation {
+  background: #fff;
+  border-radius: 5px;
+  padding: 8px;
+  border: 2px solid rgba(0,0,0,0.2);
+}
 span.serie-navigation span{
   font-size: 1.3em;
   cursor: pointer;

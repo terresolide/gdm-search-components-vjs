@@ -374,6 +374,7 @@ export default {
   }
 }
 </script>
+<style src="leaflet/dist/leaflet.css"></style>
 <style src="formater-metadata-vjs/src/assets/css/fontello.css"></style>
 
 <style src="formater-commons-components-vjs/src/assets/css/formater-icon.css"></style>
