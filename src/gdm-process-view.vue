@@ -46,7 +46,7 @@
 	   <div class="header-1">
 	     <div class="gdm-map-container">
 	      <gdm-map ref="map" :bbox="process.feature" :images="imageLayers" :tile="feature.properties.bboxTile"
-	      :service-name="process.serviceName" :series="series" :serie-index="serieIndex" @toggleSerie="toggleSerie" @dateChange="dateSerieChange"
+	      :service-name="process.serviceName" :series="series" :serie-index="serieIndex"  @dateChange="dateSerieChange"
 	      fullscreen="fmtLargeMap" :remove-height="8" @imageAdded="imageAdded" @imageRemoved="imageRemoved"></gdm-map>
 	     </div>
 	      <div style="text-align:center;margin-top:10px;">
@@ -294,12 +294,12 @@ export default {
       this.$refs.map.toggleImageLayer(e, image.checked)
     },
     // @toRemove
-    toggleSerie (name) {
-      var serie = this.series[name]
-      serie.checked = !serie.checked
-      this.$set(this.series, name, serie)
-      this.$refs.map.toggleSerieLayer(name, serie.checked)
-    },
+//     toggleSerie (name) {
+//       var serie = this.series[name]
+//       serie.checked = !serie.checked
+//       this.$set(this.series, name, serie)
+//       this.$refs.map.toggleSerieLayer(name, serie.checked)
+//     },
     imageAdded (index) {
       var image = this.imageLayers[index]
       image.checked = true
@@ -310,7 +310,7 @@ export default {
       image.checked = false
       this.$set(this.imageLayers, index, image)
     },
-    date2str(  date, small){
+    date2str(date, small){
       var format = small ? 'll': 'lll'
       if (date === 'now') {
         return moment().format(format)

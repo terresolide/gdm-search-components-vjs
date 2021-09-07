@@ -153,10 +153,10 @@ export default {
      },
      toggleImage (index) {
        this.$emit('toggleImage', index)
-     },
-     toggleSerie (name) {
-       this.$emit('toggleSerie', name)
-     }
+     } // ,
+//      toggleSerie (name) {
+//        this.$emit('toggleSerie', name)
+//      }
   }
 }
 </script>
