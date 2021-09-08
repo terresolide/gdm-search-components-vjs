@@ -30,7 +30,7 @@ ljs.addAliases({
      'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css', 
      // leaflet
     // 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.css',
-    // 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment-with-locales.min.js'
+     'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment-with-locales.min.js'
      
    ]
 })
