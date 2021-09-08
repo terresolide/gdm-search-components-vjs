@@ -1,7 +1,7 @@
 <template>
 <div class="gdm-serie-navigation" :style="{background: fullscreen ? '#fff' : $shadeColor(color,0.85)}">
      Dates:
-     <span class="serie-navigation" :class="{disabled: serieIndex === 0}">
+     <span class="serie-navigation" :class="{disabled: serieIndex === 0 }">
        <span class="fa fa-angle-double-left" :style="{backgroundColor:color}" @click="goToFirst()"></span>
        <span class="fa fa-angle-left" :style="{backgroundColor:color}" @click="previous()"></span>
      </span>
@@ -9,7 +9,7 @@
         <div v-html="serieDate"></div>
         <span class="fa" :class="timer ? 'fa-pause' : 'fa-play'"  :style="{backgroundColor:color}" @click="togglePlay"></span>
      </span>
-     <span class="serie-navigation" :class="{disabled: serieIndex === lastIndex}">
+     <span class="serie-navigation" :class="{disabled: serieIndex === lastIndex }">
        <span class="fa fa-angle-right" :style="{backgroundColor:color}" @click="next()"></span>
        <span class="fa fa-angle-double-right" :style="{backgroundColor:color}" @click="goToLast()"></span>
      </span>

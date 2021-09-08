@@ -147,6 +147,7 @@ export default {
       
        if (this.imageLayers[i].type === 'serie') {
          var image = this.series[this.imageLayers[i].name].images[index]
+         this.$emit('loadingLayer', true)
          this.imageLayers[i].setUrl(image.png)
        }
       // this.serieLayers[name].setUrl(image.png)
@@ -305,6 +306,9 @@ export default {
       layer.type = image.type ? image.type : 'image'
       layer.name = image.title
       var _this = this
+      layer.on('load', function (e) {
+        _this.$emit('loadingLayer', false)
+      })
       layer.on('add', function () {
         if (image.mp4) {
 	        layer.getElement().currentTime = 0

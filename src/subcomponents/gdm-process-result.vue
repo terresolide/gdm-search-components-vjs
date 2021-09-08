@@ -61,7 +61,7 @@
     <div v-if="series" style="width:calc(65% -5px);">
        <h4 :style="{color:color}" style="margin:0;vertical-align:top;">{{$t('series')}}</h4>
       <div>
-      <gdm-serie-navigation :series="series" :serie-index="serieIndex" :color="color" :lang="lang" :main="true"
+      <gdm-serie-navigation :series="series" :serie-index="serieIndex" :color="color" :lang="lang" :main="true" 
       @dateChange="dateSerieChange"></gdm-serie-navigation>
       </div> 
       <div class="gdm-image-layer" v-if="image.type === 'serie'" v-for="(image, index) in images" >

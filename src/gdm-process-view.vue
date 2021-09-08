@@ -35,7 +35,7 @@
  <span class="gdm-process-view" v-if="process">
  <div id="fmtLargeMap">
    <gdm-serie-navigation v-if="series" :series="series" :serie-index="serieIndex" :color="color" :lang="lang"
-     :fullscreen="true"   @dateChange="dateSerieChange"></gdm-serie-navigation>
+     :fullscreen="true" :loading="loadingLayer"  @dateChange="dateSerieChange"></gdm-serie-navigation>
  </div>
  <div style="position:relative;">
 	 <gdm-service-status  :name="process.serviceName" :status="process.serviceStatus" :top="5" :right="10" :lang="lang" ></gdm-service-status>
@@ -46,8 +46,8 @@
 	   <div class="header-1">
 	     <div class="gdm-map-container">
 	      <gdm-map ref="map" :bbox="process.feature" :images="imageLayers" :tile="feature.properties.bboxTile"
-	      :service-name="process.serviceName" :series="series" :serie-index="serieIndex"  @dateChange="dateSerieChange"
-	      fullscreen="fmtLargeMap" :remove-height="8" @imageAdded="imageAdded" @imageRemoved="imageRemoved"></gdm-map>
+	      :service-name="process.serviceName" :series="series" :serie-index="serieIndex" @dateChange="dateSerieChange"
+	      fullscreen="fmtLargeMap" :remove-height="8" @loadingLayer="loadingChange" @imageAdded="imageAdded" @imageRemoved="imageRemoved"></gdm-map>
 	     </div>
 	      <div style="text-align:center;margin-top:10px;">
 	         {{date2str(process.tempStart, true)}}
@@ -273,12 +273,18 @@ export default {
       describe: null,
       stereo: null,
       fullscreen: false,
-      defaultParameters: null
+      defaultParameters: null,
+      loadingLayer: false
     }
   },
   methods: {
     dateSerieChange (index) {
-      this.serieIndex = index
+      if (!this.loadingLayer) {
+        this.serieIndex = index
+      }
+    },
+    loadingChange (value) {
+      this.loadingLayer = value
     },
     getToken () {
       this.$http.get(this.api + '/getToken', {credentials: true})
