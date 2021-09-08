@@ -91,8 +91,7 @@ export default {
       }
       var name = Object.keys(this.series)[0]
       var date = this.series[name].images[index].date.substring(0, 8)
-      var date2 = this.series[name].images[index].date.substring(8)
-      console.log(date2)
+      var date2 = this.series[name].images[index].date.substring(9)
       this.serieDate = moment(date, 'YYYYMMDD').format('ll') 
       //if (this.fullscreen) {
         this.serieDate += ' &rarr; ' + moment(date2, 'YYYYMMDD').format('ll')

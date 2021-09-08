@@ -135,7 +135,7 @@
 	    :style="{background: seeResult ? $shadeColor(color,0.92): 'none'}">
        <gdm-process-result  :result="process.result" :series="series"
         :lang="lang" :color="color" :images="imageLayers" :serie-index="serieIndex"
-        @toggleImage="toggleImage" @toggleSerie="toggleSerie" @dateSerieChange="dateSerieChange" >
+        @toggleImage="toggleImage"  @dateSerieChange="dateSerieChange" >
        </gdm-process-result>
        </div>
 		 </div>
@@ -304,6 +304,11 @@ export default {
       var image = this.imageLayers[index]
       image.checked = true
       this.$set(this.imageLayers, index, image)
+//       var _this = this
+//       this.imageLayers.forEach(function (image, i) {
+//         image.checked = (i === index)
+//         _this.$set(_this.imageLayers, i, image)
+//       })
     },
     imageRemoved (index) {
       var image = this.imageLayers[index]
@@ -413,9 +418,7 @@ export default {
              png: series[name].images[this.serieIndex].png,
              legend: result.dir + key + '/legend_' + name + '_runw.png' 
            }
-           console.log(text)
            if (text) {
-             console.log('first')
              image.first = text
              text = null
            }

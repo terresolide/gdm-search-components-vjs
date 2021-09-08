@@ -64,13 +64,63 @@
        this.bbox.clearLayers()
      }
    },
+   /**
+    * Overwrite _addItem to insert title before group of images
+    * (single image or serie image)
+    */
    _addItem: function (obj) {
       if (obj.layer.first) {
+        // insert the title if there is a first attribute (containing title)
         var div = document.createElement('b')
         div.innerHTML = obj.layer.first
         this._overlaysList.appendChild(div)
       }
       L.Control.Layers.prototype._addItem.call(this, obj)
+   },
+   /**
+    * Overwrite _onInputClick to remove the other layers (serie or image)
+    * when add a layer with type (serie or image)
+    */
+   _onInputClick: function (e) {
+     // get 'layerId' clicked and  if it is an exclusive layer (with type property)
+     var layerId = e.target.layerId
+     var layer = this._getLayer(layerId).layer
+     var isExclusive = layer.hasOwnProperty('type')
+     var inputs = this._layerControlInputs,
+         input, layer;
+     var addedLayers = [],
+         removedLayers = [];
+     this._handlingClick = true;
+
+     for (var i = inputs.length - 1; i >= 0; i--) {
+       input = inputs[i];
+       layer = this._getLayer(input.layerId).layer;
+ 
+       if (input.checked && (input.layerId === layerId || !isExclusive)) {
+         addedLayers.push(layer);
+//       } else if (!input.checked) {
+//         removedLayers.push(layer);
+       } else if (!input.checked || (layer.type && isExclusive)) {
+         input.checked = false
+         removedLayers.push(layer);
+       }
+     }
+
+     // Bugfix issue 2318: Should remove all old layers before readding new ones
+     for (i = 0; i < removedLayers.length; i++) {
+       if (this._map.hasLayer(removedLayers[i])) {
+         this._map.removeLayer(removedLayers[i]);
+       }
+     }
+     for (i = 0; i < addedLayers.length; i++) {
+       if (!this._map.hasLayer(addedLayers[i])) {
+         this._map.addLayer(addedLayers[i]);
+       }
+     }
+
+     this._handlingClick = false;
+
+     this._refocusOnMap();
    }
  })
  module.exports = L.Control.Gdmlayer

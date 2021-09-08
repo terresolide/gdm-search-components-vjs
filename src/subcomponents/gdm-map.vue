@@ -127,7 +127,17 @@ export default {
   methods: {
    toggleImageLayer (index, checked) {
      if (checked) {
-       this.imageLayers[index].addTo(this.map)
+      // this.imageLayers[index].addTo(this.map)
+       var _this = this
+       this.imageLayers.forEach(function (image, i) {
+         if (i === index) {
+           image.addTo(_this.map)
+         } else {
+           if (_this.map.hasLayer(image)) {
+             image.remove()
+           }
+         }
+       })
      } else {
        this.imageLayers[index].remove()
      }
@@ -142,21 +152,21 @@ export default {
       // this.serieLayers[name].setUrl(image.png)
      }
    },
-   toggleSerieLayer (name, checked) {
-     if (this.serieLayers[name]) {
-       this.serieLayers[name].remove()
-       this.serieLayers[name] = null
-       delete this.serieLayers[name]
-     }
-     var image = this.series[name].images[this.serieIndex]
-     if (checked) {
-       var bounds = [
-         [image.bbox[1], image.bbox[0]],
-         [image.bbox[3], image.bbox[2]]]
-       this.serieLayers[name] = L.imageOverlay(image.png, bounds, {opacity: this.controlOpacity.getValue()})
-       this.serieLayers[name].addTo(this.map)
-     }  
-   },
+//    toggleSerieLayer (name, checked) {
+//      if (this.serieLayers[name]) {
+//        this.serieLayers[name].remove()
+//        this.serieLayers[name] = null
+//        delete this.serieLayers[name]
+//      }
+//      var image = this.series[name].images[this.serieIndex]
+//      if (checked) {
+//        var bounds = [
+//          [image.bbox[1], image.bbox[0]],
+//          [image.bbox[3], image.bbox[2]]]
+//        this.serieLayers[name] = L.imageOverlay(image.png, bounds, {opacity: this.controlOpacity.getValue()})
+//        this.serieLayers[name].addTo(this.map)
+//      }  
+//    },
    changeHighlightedLayer (event) {
       var id = event.detail.id
       this.unHighlightLayer()
@@ -303,6 +313,12 @@ export default {
         if (_this.images[index].legend) {
           _this.controlLegend.addLegend(0, index, _this.images[index].legend)
         }
+        // remove the others
+//         _this.imageLayers.forEach(function (image, i) {
+//           if (i !== index && _this.map.hasLayer(image)) {
+//             image.remove()
+//           }
+//         })
         _this.countImages = _this.countImages + 1
         if (_this.countImages > 0) {
           _this.controlOpacity.setVisible(true)
