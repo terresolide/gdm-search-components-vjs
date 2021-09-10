@@ -46,9 +46,9 @@
 	         <div v-if="process.properties.log">{{process.properties.log}}</div>
 	       </div>
         </div>
-   </div> 
+   </div>
    <div class="gdm-process-column-3">
-        <div >
+         <div>
            <b>{{$t('created')}}: </b>
            <span style="white-space:nowrap;">
              {{printDate(process.properties.start, true)}}
