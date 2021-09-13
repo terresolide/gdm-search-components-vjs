@@ -133,20 +133,54 @@
      <div id="jobs" style="margin-top:30px;"></div>
    </div>
    <div v-if="mode === 'product'">
+    <h1>{{selectedName}}</h1>
+    <div class="job-header" >
+       <div>
+          <h2>Nombre de jobs</h2>
+          
+           <div v-for="service in selectedServices" v-if="!userType && (selectedService === '' || selectedService === service.id)">
+             <span class="fa fa-circle" :style="{color: service.color}"></span>
+             <b>{{service.name}}</b>:
+             <span v-if="countJobs && countJobs[service.name]">{{countJobs[service.name].toLocaleString()}}</span>
+             <span v-else>0</span>
+           </div>
+           <hr v-if="selectedService === '' || userType" style="width:60%;margin-left:5px;color:gray;">
+           <div v-if="selectedService === '' || userType">
+              <b>Total</b>: {{avgProduct.countJobs}}
+           </div>
+       </div>
        <div>
           <h2>Total produits générés</h2>
           
            <div v-for="service in selectedServices" v-if="!userType && (selectedService === '' || selectedService === service.id)">
              <span class="fa fa-circle" :style="{color: service.color}"></span>
              <b>{{service.name}}</b>:
-             <span v-if="countProduct && countProduct[service.name]">{{count[service.name].toLocaleString()}}</span>
+             <span v-if="countJobs && countJobs[service.name]">{{count[service.name].toLocaleString()}}</span>
              <span v-else>0</span>
            </div>
            <hr v-if="selectedService === '' || userType" style="width:60%;margin-left:5px;color:gray;">
            <div v-if="selectedService === '' || userType">
-              <b>Total</b>: {{avgProduct.count}}
+              <b>Total</b>: {{avgProduct.countProducts}}
            </div>
        </div>
+       <div>
+          <h2>Nombre moyen de produits générés</h2>
+          
+           <div v-for="service in selectedServices" v-if="!userType && (selectedService === '' || selectedService === service.id)">
+             <span class="fa fa-circle" :style="{color: service.color}"></span>
+             <b>{{service.name}}</b>:
+             <span v-if="countJobs && countJobs[service.name]">{{(count[service.name]/countJobs[service.name]).toLocaleString()}}</span>
+             <span v-else>0</span>
+           </div>
+           <hr v-if="selectedService === '' || userType" style="width:60%;margin-left:5px;color:gray;">
+           <div v-if="selectedService === '' || userType">
+              <b>Total</b>: 
+              <span v-if="avgProduct.countJobs">{{Math.round(avgProduct.countProducts / avgProduct.countJobs).toLocaleString()}}</span>
+              <span v-else>---</span>
+           </div>
+       </div>
+       </div>
+       <div id="products" style="margin-top:30px;"></div>
    </div>
  </div>
 </div>
@@ -218,7 +252,7 @@ export default {
       countCost: {},
       duration: {},
       countDuration: {},
-      countProduct: {},
+      countJobs: {},
       status: '',
       avg: {},
       avgProduct: {},
@@ -385,7 +419,33 @@ export default {
       this.drawHistogram('jobs', 'Nombre de jobs', categories, series, options)
     },
     drawProducts () {
-      
+      var categories = this[this.by + 's']
+      var data = this.products[this.by + 's']
+      console.log(data)
+      console.log(this.count)
+      var series = []
+      var colors = []
+      var name = ''
+      console.log(this.countJobs)
+      for (var index in data) {
+        if (this.userType) {
+          name = this.userTypeName(index)
+        } else {
+          var find = this.services.find(s => s.name === index)
+          name = index
+          colors.push(find.color)
+        }
+        series.push({
+          name: name,
+          data: data[index]
+        })
+        
+      }
+      var options = {}
+      if (colors.length > 0) {
+        options = {colors: colors}
+      }
+      this.drawHistogram('products', 'Nombre de produits', categories, series, options)
     },
     getServices () {
       var url = this.appUrl + '/auth/getServices'
@@ -448,6 +508,20 @@ export default {
         cost: countCost > 0 ? Math.round(cost / countCost) : 0,
         duration: countDuration > 0 ? Math.round(duration / countDuration) : 0
       }
+    },
+    productsAverage () {
+      var _this = this
+      var countProducts = 0
+      var countJobs = 0
+      this.selectedServices.forEach(function (sv) {
+        countJobs += _this.countJobs[sv.name]
+        countProducts += _this.count[sv.name]
+      })
+      this.avgProduct = {
+        countJobs: countJobs,
+        countProducts: countProducts
+      }
+      console.log(this.avgProduct)
     },
     secondToStr (totalSeconds) {
       totalSeconds = Math.round(totalSeconds)
@@ -567,7 +641,7 @@ export default {
         this.countCost = {}
         this.duration = {}
         this.countDuration = {}
-        this.countProducts = {}
+        this.countJobs = {}
        // this.sessions = {days: [], months: [], years: []}
       }
       this.count[cat] = 0
@@ -575,7 +649,7 @@ export default {
       this.countCost[cat] = 0
       this.duration[cat] = 0
       this.countDuration[cat] = 0
-      this.countProducts[cat] = 0
+      this.countJobs[cat] = 0
      // this.countProductJobs[cat] = 0
       var date = moment(this.startDate, 'YYYY-MM-DD')
       var results = {days: [], months: [], years: []}
@@ -631,6 +705,9 @@ export default {
         if (day['cost']) {
           _this.cost[cat] = _this.cost[cat] + day['cost']
           _this.countCost[cat]= _this.countCost[cat] + day['tot']
+        }
+        if (day['count']) {
+          _this.countJobs[cat] = _this.countJobs[cat] + day['count']
         }
         if (day['duration']) {
           _this.duration[cat] = _this.duration[cat] + parseInt(day['duration'])
@@ -770,7 +847,8 @@ export default {
           _this.products.years[service.name] = results.years 
         }
       })
-      console.log(this.products)
+      this.productsAverage()
+      this.drawProducts()
     },
     treatmentServices(data) {
       var currentService = null
