@@ -8,6 +8,7 @@
      "download": "Download",
      "folder": "Folder",
      "preview": "Preview",
+     "product_license": "The products resulting from the DSM-OPT service are made available under a <a class='gdm-link'  href='https://creativecommons.org/licenses/by-nc/4.0/legalcode.fr' target='_blank'>CC-BY-NC</a> license, excluding any commercial use.",
      "results": "Results",
      "series": "Interferogram list"
    },
@@ -20,6 +21,7 @@
      "download": "Télécharger",
      "folder": "Répertoire",
      "preview": "Visualisation",
+     "product_license": "Les produits issus du service DSM-OPT sont mis à disposition sous licence <a class='gdm-link' href='https://creativecommons.org/licenses/by-nc/4.0/legalcode.fr' target='_blank'>CC-BY-NC</a> excluant toute exploitation commerciale.",
      "results": "Résultats",
      "series": "Liste d'interférogrammes"
 
@@ -43,6 +45,7 @@
          <i class="fa fa-folder"></i> {{$t('folder')}}
       </a>
     </div>
+    <div v-if="serviceName === 'DSM-OPT'" class="gdm-comment" v-html="$t('product_license')"></div>
     <div v-if="series" style="display:block;">
        <h3 :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h3>
     </div>
@@ -108,6 +111,10 @@ export default {
       type: Number,
       default: 0
     },
+    serviceName: {
+      type: String,
+      default: null
+    },
     color: {
       type: String,
       default: null
@@ -171,6 +178,14 @@ export default {
   display:inline-block;
   padding-left:5px;
   vertical-align:top;
+}
+.gdm-comment {
+  margin-top:5px;
+  font-style:italic;
+  font-size: 0.8rem;
+  line-height: 1;
+  color: #333;
+  text-align:justify;
 }
 .gdm-process-result h3 {
   margin-top:0; 

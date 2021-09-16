@@ -133,7 +133,7 @@
 	    
 	    <div v-if="process && process.result && process.status === 'TERMINATED'" :class="{highlight:seeResult}" style="margin-top:15px;"
 	    :style="{background: seeResult ? $shadeColor(color,0.92): 'none'}">
-       <gdm-process-result  :result="process.result" :series="series"
+       <gdm-process-result  :result="process.result" :series="series" :service-name="process.serviceName"
         :lang="lang" :color="color" :images="imageLayers" :serie-index="serieIndex"
         @toggleImage="toggleImage"  @dateSerieChange="dateSerieChange" >
        </gdm-process-result>
