@@ -340,7 +340,7 @@ export default {
           image.type = 'image'
         })
         this.imageLayers = imageLayers
-      } else {
+      } else if (result){
         // treatment result SAR
         var imageLayers = []
         var series = null
