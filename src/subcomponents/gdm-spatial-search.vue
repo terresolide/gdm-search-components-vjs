@@ -139,10 +139,10 @@ export default {
     },
     createGeometry () {
       if (this.validForm()) {
-        var north = Math.round(this.north * 1000) / 1000
-        var south = Math.round(this.south * 1000) / 1000
-        var east = Math.round(this.east * 1000) / 1000
-        var west = Math.round(this.west * 1000) / 1000
+        var north = Math.round(this.north * 10000) / 10000
+        var south = Math.round(this.south * 10000) / 10000
+        var east = Math.round(this.east * 10000) / 10000
+        var west = Math.round(this.west * 10000) / 10000
         var box = 'POLYGON((' + west + ' ' + north + ','
           box += east + ' ' + north + ',';
           box += east + ' ' + south + ',';
@@ -198,10 +198,10 @@ export default {
       document.dispatchEvent(event)
     },
     handleBounds: function(e){
-      this.north = e.detail.north;
-      this.south = e.detail.south;
-      this.east = e.detail.east;
-      this.west = e.detail.west;
+      this.north = Math.round(e.detail.north * 10000) / 10000;
+      this.south = Math.round(e.detail.south * 10000) / 10000;
+      this.east = Math.round(e.detail.east * 10000) / 10000;
+      this.west = Math.round(e.detail.west * 10000) / 10000;
      
        var event = new CustomEvent('fmt:spatialChangeEvent')
        document.dispatchEvent(event)
@@ -248,7 +248,7 @@ export default {
      /* Default color from aeris */
     background-color: rgba(172,220,238,0.3); 
 }
-
+div[id="app"] .formater-spatial-search  form .formater-input-group input,
 .formater-spatial-search .formater-input-group input {
      border: none;
      background-color: transparent;
