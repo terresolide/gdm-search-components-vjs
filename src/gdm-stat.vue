@@ -71,18 +71,18 @@
            <div v-for="(type, index) in userTypes" v-if="userType">
              <span class="fa fa-circle" :style="{color: colors[index]}"></span>
              <b>{{type.t_name_fr}}</b>:
-             <span v-if="count && count[type.t_id]">{{count[type.t_id].toLocaleString()}}</span>
+             <span v-if="jobs.count && jobs.count[type.t_id]">{{jobs.count[type.t_id].toLocaleString()}}</span>
              <span v-else>0</span>
            </div>
            <div v-for="service in selectedServices" v-if="!userType && (selectedService === '' || selectedService === service.id)">
              <span class="fa fa-circle" :style="{color: service.color}"></span>
              <b>{{service.name}}</b>:
-             <span v-if="count && count[service.name]">{{count[service.name].toLocaleString()}}</span>
+             <span v-if="jobs.count && jobs.count[service.name]">{{jobs.count[service.name].toLocaleString()}}</span>
              <span v-else>0</span>
            </div>
            <hr v-if="selectedService === '' || userType" style="width:60%;margin-left:5px;color:gray;">
            <div v-if="selectedService === '' || userType">
-              <b>Total</b>: {{avg.count}}
+              <b>Total</b>: {{jobs.avg.count}}
            </div>
        </div>
        <div>
@@ -90,20 +90,20 @@
            <div v-for="(type, index) in userTypes" v-if="userType">
              <span class="fa fa-circle" :style="{color: colors[index]}"></span>
              <b>{{type.t_name_fr}}</b>:
-             <span v-if="cost && cost[type.t_id]">{{Math.round(cost[type.t_id]/countCost[type.t_id]).toLocaleString()}} CPU secondes</span>
+             <span v-if="jobs.cost && jobs.cost[type.t_id]">{{Math.round(jobs.cost[type.t_id]/jobs.countCost[type.t_id]).toLocaleString()}} CPU secondes</span>
              <span v-else>---</span>
            </div>
            <div v-for="service in selectedServices" v-if="!userType && (selectedService === '' || selectedService === service.id)">
              <span class="fa fa-circle" :style="{color: service.color}"></span>
              <b>{{service.name}}</b>:
-             <span v-if="cost && cost[service.name]">{{Math.round(cost[service.name]/countCost[service.name]).toLocaleString()}} CPU secondes</span>
+             <span v-if="jobs.cost && jobs.cost[service.name]">{{Math.round(jobs.cost[service.name]/jobs.countCost[service.name]).toLocaleString()}} CPU secondes</span>
              <span v-else>---</span>
            </div>
            <hr v-if="selectedService === '' || userType" style="width:60%;margin-left:5px;color:gray;">
            <div v-if="selectedService === '' || userType">
               <b v-if="userType">Tout type</b>
               <b v-else>Tout service</b>:
-              <span v-if="avg && avg.cost">{{Math.round(avg.cost).toLocaleString()}} CPU Secondes</span>
+              <span v-if="jobs.avg && jobs.avg.cost">{{Math.round(jobs.avg.cost).toLocaleString()}} CPU Secondes</span>
               <span v-else>---</span>
            </div>
        </div>
@@ -112,20 +112,20 @@
            <div v-for="(type, index) in userTypes" v-if="userType">
              <span class="fa fa-circle" :style="{color: colors[index]}"></span>
              <b>{{type.t_name_fr}}</b>:
-             <span v-if="status === 'success' && duration && countDuration[type.t_id]">{{secondToStr(duration[type.t_id]/countDuration[type.t_id])}}</span>
+             <span v-if="status === 'success' && jobs.duration && jobs.countDuration[type.t_id]">{{secondToStr(jobs.duration[type.t_id]/jobs.countDuration[type.t_id])}}</span>
              <span v-else>---</span>
            </div>
            <div v-for="service in selectedServices" v-if="!userType && (selectedService === '' || selectedService === service.id)">
              <span class="fa fa-circle" :style="{color: service.color}"></span>
              <b>{{service.name}}</b>:
-             <span v-if="status === 'success' && duration && countDuration[service.name]">{{secondToStr(duration[service.name]/countDuration[service.name])}}</span>
+             <span v-if="status === 'success' && jobs.duration && jobs.countDuration[service.name]">{{secondToStr(jobs.duration[service.name]/jobs.countDuration[service.name])}}</span>
              <span v-else>---</span>
            </div>
            <hr v-if="selectedService === '' || userType" style="width:60%;margin-left:5px;color:gray;">
             <div v-if="selectedService === '' || userType" >
               <b v-if="userType">Tout type</b>
               <b v-else>Tout service</b>:
-              <span v-if="status === 'success' && avg.duration">{{secondToStr(avg.duration)}}</span>
+              <span v-if="status === 'success' && jobs.avg.duration">{{secondToStr(jobs.avg.duration)}}</span>
               <span v-else>---</span>
             </div>
        </div>
@@ -141,12 +141,12 @@
            <div v-for="service in selectedServices" v-if="!userType && (selectedService === '' || selectedService === service.id)">
              <span class="fa fa-circle" :style="{color: service.color}"></span>
              <b>{{service.name}}</b>:
-             <span v-if="countJobs && countJobs[service.name]">{{countJobs[service.name].toLocaleString()}}</span>
+             <span v-if="products.countJobs && products.countJobs[service.name]">{{products.countJobs[service.name].toLocaleString()}}</span>
              <span v-else>0</span>
            </div>
            <hr v-if="selectedService === '' || userType" style="width:60%;margin-left:5px;color:gray;">
            <div v-if="selectedService === '' || userType">
-              <b>Total</b>: {{avgProduct.countJobs}}
+              <b>Total</b>: {{products.avg.countJobs}}
            </div>
        </div>
        <div>
@@ -155,12 +155,12 @@
            <div v-for="service in selectedServices" v-if="!userType && (selectedService === '' || selectedService === service.id)">
              <span class="fa fa-circle" :style="{color: service.color}"></span>
              <b>{{service.name}}</b>:
-             <span v-if="countJobs && countJobs[service.name]">{{count[service.name].toLocaleString()}}</span>
+             <span v-if="products.countJobs && products.countJobs[service.name]">{{products.count[service.name].toLocaleString()}}</span>
              <span v-else>0</span>
            </div>
            <hr v-if="selectedService === '' || userType" style="width:60%;margin-left:5px;color:gray;">
            <div v-if="selectedService === '' || userType">
-              <b>Total</b>: {{avgProduct.countProducts}}
+              <b>Total</b>: {{products.avg.countProducts}}
            </div>
        </div>
        <div>
@@ -169,13 +169,13 @@
            <div v-for="service in selectedServices" v-if="!userType && (selectedService === '' || selectedService === service.id)">
              <span class="fa fa-circle" :style="{color: service.color}"></span>
              <b>{{service.name}}</b>:
-             <span v-if="countJobs && countJobs[service.name]">{{(count[service.name]/countJobs[service.name]).toLocaleString()}}</span>
+             <span v-if="products.countJobs && products.countJobs[service.name]">{{(products.count[service.name] / products.countJobs[service.name]).toLocaleString()}}</span>
              <span v-else>0</span>
            </div>
            <hr v-if="selectedService === '' || userType" style="width:60%;margin-left:5px;color:gray;">
            <div v-if="selectedService === '' || userType">
               <b>Total</b>: 
-              <span v-if="avgProduct.countJobs">{{Math.round(avgProduct.countProducts / avgProduct.countJobs).toLocaleString()}}</span>
+              <span v-if="products.avg.countJobs">{{Math.round(products.avg.countProducts / products.avg.countJobs).toLocaleString()}}</span>
               <span v-else>---</span>
            </div>
        </div>
@@ -230,7 +230,7 @@
             </div>
        </div>
      </div>
-     <div id="jobs" style="margin-top:30px;"></div>
+     <div id="ciest2" style="margin-top:30px;"></div>
    </div>
  </div>
 </div>
@@ -286,10 +286,9 @@ export default {
       endDate: null,
       by: 'day',
       mode: 'connection',
-      sessions: { days:[], months: [], years: []},
-      newUsers: { days:{}, months: {}, years: {}},
-      process: { days: {}, months: {}, years: {}},
-      products: { days: {}, months: {}, years: {}},
+//       newUsers: { days:{}, months: {}, years: {}},
+//       process: { days: {}, months: {}, years: {}},
+     // products: { days: {}, months: {}, years: {}},
       serviceUsers: [],
       userTypes: [],
       days:[],
@@ -297,23 +296,64 @@ export default {
       years: [],
       services: [],
       groups: {},
-      count: {},
-      cost:{},
-      ciest2: {
-        process: { days: {}, months: {}, years: {}},
+//       count: {},
+//       cost:{},
+      sessions: {
+        data: { days: {}, months: {}, years: {}},
         count: {},
         cost:{},
         countCost: {},
         duration: {},
         countDuration: {},
+        countJobs: {},
         avg: {}
       },
-      countCost: {},
-      duration: {},
-      countDuration: {},
-      countJobs: {},
+      products: {
+        data: { days: {}, months: {}, years: {}},
+        count: {},
+        cost:{},
+        countCost: {},
+        duration: {},
+        countDuration: {},
+        countJobs: {},
+        avg: {}
+      },
+      newUsers: {
+        data: { days: {}, months: {}, years: {}},
+        count: {},
+        cost:{},
+        countCost: {},
+        duration: {},
+        countDuration: {},
+        countJobs: {},
+        avg: {}
+      },
+      ciest2: {
+        data: { days: {}, months: {}, years: {}},
+        count: {},
+        cost:{},
+        countCost: {},
+        duration: {},
+        countDuration: {},
+        countJobs: {},
+        avg: {}
+      },
+      jobs: {
+        data: { days: {}, months: {}, years: {}},
+        count: {},
+        cost:{},
+        countCost: {},
+        duration: {},
+        countDuration: {},
+        countJobs: {},
+        avg: {}
+      },
+//       countCost: {},
+//       duration: {},
+//       countDuration: {},
+//       countJobs: {},
       status: '',
-      avg: {},
+     // avg: {},
       avgProduct: {},
       selectedService: '',
       selectedGroup: '',
@@ -357,6 +397,8 @@ export default {
         case 'product':
           this.drawProducts()
           break;
+        case 'ciest2':
+          this.drawCiest2()
       }
     },
     drawHistogram (id, title, categories, series, options ) {
@@ -429,7 +471,7 @@ export default {
     },
     drawNewUsers () {
       var categories = this[this.by + 's']
-      var data = this.newUsers[this.by + 's']
+      var data = this.newUsers.data[this.by + 's']
       var series = []
       for(var type in data) {
         series.push({
@@ -441,7 +483,7 @@ export default {
     },
     drawConnection() {
       var categories = this[this.by + 's']
-      var data = this.sessions[this.by + 's']
+      var data = this.sessions.data[this.by + 's']
       var series = []
       for(var type in data) {
         series.push({
@@ -453,7 +495,7 @@ export default {
     },
     drawJobs () {
       var categories = this[this.by + 's']
-      var data = this.process[this.by + 's']
+      var data = this.jobs.data[this.by + 's']
       var series = []
       var colors = []
       var name = ''
@@ -479,13 +521,11 @@ export default {
     },
     drawProducts () {
       var categories = this[this.by + 's']
-      var data = this.products[this.by + 's']
-      console.log(data)
-      console.log(this.count)
+      var data = this.products.data[this.by + 's']
       var series = []
       var colors = []
       var name = ''
-      console.log(this.countJobs)
+      console.log(this.products.countJobs)
       for (var index in data) {
         if (this.userType) {
           name = this.userTypeName(index)
@@ -505,6 +545,30 @@ export default {
         options = {colors: colors}
       }
       this.drawHistogram('products', 'Nombre de produits', categories, series, options)
+    },
+    drawCiest2 () {
+      var categories = this[this.by + 's']
+      var data = this.ciest2.data[this.by + 's']
+      var series = []
+      var colors = []
+      var name = ''
+     // console.log(this.countJobs)
+      for (var index in data) {
+         var find = this.services.find(s => s.name === index)
+         name = index
+         colors.push(find.color)
+       
+        series.push({
+          name: name,
+          data: data[index]
+        })
+        
+      }
+      var options = {}
+      if (colors.length > 0) {
+        options = {colors: colors}
+      }
+      this.drawHistogram('ciest2', 'Activité CIEST2', categories, series, options)
     },
     getServices () {
       var url = this.appUrl + '/auth/getServices'
@@ -538,7 +602,38 @@ export default {
       this.getServices()
       this.search()
     },
+    average (content, userType) {
+      var count = 0
+      var duration = 0
+      var countDuration = 0
+      var cost = 0
+      var countCost = 0
+      if (userType) {
+        this.userTypes.forEach(function (type) {
+          count += content.count[type.t_id]
+          countDuration += content.countDuration[type.t_id]
+          duration += content.duration[type.t_id]
+          cost += content.cost[type.t_id]
+          countCost += content.countCost[type.t_id]
+        })
+      } else {
+        this.selectedServices.forEach(function (sv) {
+          count += content.count[sv.name]
+          countDuration += content.countDuration[sv.name]
+          duration += content.duration[sv.name]
+          cost += content.cost[sv.name]
+          countCost += content.countCost[sv.name]
+        })
+      }
+      content.avg = {
+        count: count,
+        cost: countCost > 0 ? Math.round(cost / countCost) : 0,
+        duration: countDuration > 0 ? Math.round(duration / countDuration) : 0
+      }
+    },
     jobsAverage () {
+      this.average(this.jobs, this.userType)
+      return
       var _this = this
       var count = 0
       var duration = 0
@@ -547,19 +642,19 @@ export default {
       var countCost = 0
       if (this.userType) {
         this.userTypes.forEach(function (type) {
-          count += _this.count[type.t_id]
-          countDuration += _this.countDuration[type.t_id]
+          count += _this.jobs.count[type.t_id]
+          countDuration += _this.jobs.countDuration[type.t_id]
           duration += _this.duration[type.t_id]
-          cost += _this.cost[type.t_id]
-          countCost += _this.countCost[type.t_id]
+          cost += _this.jobs.cost[type.t_id]
+          countCost += _this.jobs.countCost[type.t_id]
         })
       } else {
 	      this.selectedServices.forEach(function (sv) {
-	        count += _this.count[sv.name]
-	        countDuration += _this.countDuration[sv.name]
-	        duration += _this.duration[sv.name]
-	        cost += _this.cost[sv.name]
-	        countCost += _this.countCost[sv.name]
+	        count += _this.jobs.count[sv.name]
+	        countDuration += _this.jobs.countDuration[sv.name]
+	        duration += _this.jobs.duration[sv.name]
+	        cost += _this.jobs.cost[sv.name]
+	        countCost += _this.jobs.countCost[sv.name]
 	      })
       }
       this.avg = {
@@ -573,14 +668,14 @@ export default {
       var countProducts = 0
       var countJobs = 0
       this.selectedServices.forEach(function (sv) {
-        countJobs += _this.countJobs[sv.name]
-        countProducts += _this.count[sv.name]
+        countJobs += _this.products.countJobs[sv.name]
+        countProducts += _this.products.count[sv.name]
       })
-      this.avgProduct = {
+      this.products.avg = {
         countJobs: countJobs,
         countProducts: countProducts
       }
-      console.log(this.avgProduct)
+      // console.log(this.avgProduct)
     },
     secondToStr (totalSeconds) {
       totalSeconds = Math.round(totalSeconds)
@@ -688,27 +783,60 @@ export default {
       })
     },
     searchCiest2 () {
-      
+      var url = this.appUrl + '/statistics/ciest?'
+      var params = [];
+          if (this.startDate) {
+        params.push('start=' + this.startDate)
+      }
+      if (this.endDate) {
+        params.push('end=' + this.endDate)
+      }
+      if (this.status !== '') {
+        params.push('status=' + this.status)
+      }
+      if (this.selectedService !== '') {
+        params.push('service=' + this.selectedService)
+      } else if (this.selectedGroup !== '') {
+        var services = this.selectedServices.map(sv => sv.id)
+        params.push('service=' + services.join(','))
+      }
+      url += params.join('&')
+      this.$http.get(url)
+      .then(function (response) {
+        this.treatmentCiest2(response.body)
+      })
     },
-    extractSeriesFrom (data, cat, first) {
+    extractSeriesFrom (data, cat, content, first) {
       if (first) {
         this.days = []
         this.months = []
         this.years = []
-        this.cost = {}
-        this.count = {}
-        this.countCost = {}
-        this.duration = {}
-        this.countDuration = {}
-        this.countJobs = {}
+        content.cost = {}
+        content.count = {}
+        content.countCost = {}
+        content.duration = {}
+        content.countDuration = {}
+        content.countJobs = {}
+//         this.cost = {}
+//         this.count = {}
+//         this.countCost = {}
+//         this.duration = {}
+//         this.countDuration = {}
+//         this.countJobs = {}
        // this.sessions = {days: [], months: [], years: []}
       }
-      this.count[cat] = 0
-      this.cost[cat] = 0
-      this.countCost[cat] = 0
-      this.duration[cat] = 0
-      this.countDuration[cat] = 0
-      this.countJobs[cat] = 0
+//       this.count[cat] = 0
+//       this.cost[cat] = 0
+//       this.countCost[cat] = 0
+//       this.duration[cat] = 0
+//       this.countDuration[cat] = 0
+//       this.countJobs[cat] = 0
+      content.count[cat] = 0
+      content.cost[cat] = 0
+      content.countCost[cat] = 0
+      content.duration[cat] = 0
+      content.countDuration[cat] = 0
+      content.countJobs[cat] = 0
      // this.countProductJobs[cat] = 0
       var date = moment(this.startDate, 'YYYY-MM-DD')
       var results = {days: [], months: [], years: []}
@@ -760,17 +888,22 @@ export default {
           _this.days.push(date.format('DD-MM-YYYY'))
         }
         results.days.push(day['tot'])
-        _this.count[cat] = _this.count[cat] + day['tot']
+        content.count[cat] = content.count[cat] + day['tot']
         if (day['cost']) {
-          _this.cost[cat] = _this.cost[cat] + day['cost']
-          _this.countCost[cat]= _this.countCost[cat] + day['tot']
+//           _this.cost[cat] = _this.cost[cat] + day['cost']
+//           _this.countCost[cat]= _this.countCost[cat] + day['tot']
+          content.cost[cat] = content.cost[cat] + day['cost']
+          content.countCost[cat]= content.countCost[cat] + day['tot']
         }
         if (day['count']) {
-          _this.countJobs[cat] = _this.countJobs[cat] + day['count']
+//           _this.countJobs[cat] = _this.countJobs[cat] + day['count']
+             content.countJobs[cat] = content.countJobs[cat] + day['count']
         }
         if (day['duration']) {
-          _this.duration[cat] = _this.duration[cat] + parseInt(day['duration'])
-          _this.countDuration[cat] = _this.countDuration[cat] + day['tot']
+//           _this.duration[cat] = _this.duration[cat] + parseInt(day['duration'])
+//           _this.countDuration[cat] = _this.countDuration[cat] + day['tot']
+           content.duration[cat] = content.duration[cat] + parseInt(day['duration'])
+           content.countDuration[cat] = content.countDuration[cat] + day['tot']
         }
         countMonth += day['tot']
         countYear += day['tot']
@@ -832,21 +965,21 @@ export default {
       var first = true
       this.userTypes.forEach(function (tp) {
         var tab = data.sessions.filter(u => u.type === tp.t_id)
-        var results = _this.extractSeriesFrom(tab, tp.t_id, true)
+        var results = _this.extractSeriesFrom(tab, tp.t_id, _this.sessions, true)
         first = false
-        _this.sessions.days[tp.t_id] = results.days
-        _this.sessions.months[tp.t_id] = results.months
-        _this.sessions.years[tp.t_id] = results.years
+        _this.sessions.data.days[tp.t_id] = results.days
+        _this.sessions.data.months[tp.t_id] = results.months
+        _this.sessions.data.years[tp.t_id] = results.years
         
       })
       this.drawConnection()
      
       this.userTypes.forEach(function (tp) {
         var tab = data.newUsers.filter(u => u.type === tp.t_id)
-        var results = _this.extractSeriesFrom(tab, tp.t_id)
-        _this.newUsers.days[tp.t_id] = results.days
-        _this.newUsers.months[tp.t_id] = results.months
-        _this.newUsers.years[tp.t_id] = results.years
+        var results = _this.extractSeriesFrom(tab, tp.t_id, _this.newUsers)
+        _this.newUsers.data.days[tp.t_id] = results.days
+        _this.newUsers.data.months[tp.t_id] = results.months
+        _this.newUsers.data.years[tp.t_id] = results.years
         
       })
       this.drawNewUsers()
@@ -864,46 +997,74 @@ export default {
 //           }
 //         })
 //       }
-      
-      this.process = {days: {}, months: {}, years: {}}
+      this.jobs.data = {days: {}, months: {}, years: {}}
       var first = true
-
       if (this.userType) {
         this.userTypes.forEach(function (tp) {
             var tab = data.process.filter(ps => ps.type === tp.t_id)
-            var results = _this.extractSeriesFrom(tab, tp.t_id, first)
+            var results = _this.extractSeriesFrom(tab, tp.t_id, _this.jobs, first)
             first = false
-            _this.process.days[tp.t_id] = results.days
-            _this.process.months[tp.t_id] = results.months
-            _this.process.years[tp.t_id] = results.years 
+            _this.jobs.data.days[tp.t_id] = results.days
+            _this.jobs.data.months[tp.t_id] = results.months
+            _this.jobs.data.years[tp.t_id] = results.years 
         })
       } else {
 	      this.selectedServices.forEach(function (service) {
 	        if (_this.selectedService === '' || _this.selectedService === service.id) {
 		        var tab = data.process.filter(p => p.service === parseInt(service.id))
-		        var results = _this.extractSeriesFrom(tab, service.name, first)
+		        var results = _this.extractSeriesFrom(tab, service.name, _this.jobs, first)
 		        first = false
-		        _this.process.days[service.name] = results.days
-		        _this.process.months[service.name] = results.months
-		        _this.process.years[service.name] = results.years 
+		        _this.jobs.data.days[service.name] = results.days
+		        _this.jobs.data.months[service.name] = results.months
+		        _this.jobs.data.years[service.name] = results.years 
 	        }
 	      })
       }
       this.jobsAverage()
       this.drawJobs()
     },
+    treatmentCiest2 (data) {
+      var _this = this
+//       if (this.services.length === 0) {
+//         this.services = data.services
+//         this.services.forEach(function (sv) {
+//           if (!_this.groups[sv.group]) {
+//             _this.groups[sv.group] = [sv]
+//           } else {
+//             _this.groups[sv.group].push(sv)
+//           }
+//         })
+//       }
+      
+      this.ciest2.data = {days: {}, months: {}, years: {}}
+      var first = true
+
+        this.selectedServices.forEach(function (service) {
+          if (_this.selectedService === '' || _this.selectedService === service.id) {
+            var tab = data.process.filter(p => p.service === parseInt(service.id))
+            var results = _this.extractSeriesFrom(tab, service.name, _this.ciest2, first)
+            first = false
+            _this.ciest2.data.days[service.name] = results.days
+            _this.ciest2.data.months[service.name] = results.months
+            _this.ciest2.data.years[service.name] = results.years 
+          }
+        })
+
+      this.average(this.ciest2, false)
+      this.drawCiest2()
+    },
     treatmentProducts (data) {
-      this.products = {days: {}, months: {}, years: {}}
+      this.products.data = {days: {}, months: {}, years: {}}
       var first = true
       var _this = this
       this.selectedServices.forEach(function (service) {
         if (_this.selectedService === '' || _this.selectedService === service.id) {
           var tab = data.products.filter(p => p.service === parseInt(service.id))
-          var results = _this.extractSeriesFrom(tab, service.name, first)
+          var results = _this.extractSeriesFrom(tab, service.name, _this.products, first)
           first = false
-          _this.products.days[service.name] = results.days
-          _this.products.months[service.name] = results.months
-          _this.products.years[service.name] = results.years 
+          _this.products.data.days[service.name] = results.days
+          _this.products.data.months[service.name] = results.months
+          _this.products.data.years[service.name] = results.years 
         }
       })
       this.productsAverage()
