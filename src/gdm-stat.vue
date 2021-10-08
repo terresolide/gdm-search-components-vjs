@@ -2,16 +2,16 @@
 <div>
 <div style="padding: 10px;">
   <ul class="menu-content">
-    <li class="{selected: mode === 'connection'}" @click="setMode('connection')">Connexion
-    </li><li class="{selected: mode === 'service'}" @click="setMode('service')">Services
-    </li><li class="{selected: mode === 'job'}" @click="setMode('job')">Jobs
-    </li><li class="{selected: mode === 'product'}" @click="setMode('product')">Produits
-    </li><li class="{selected: mode === 'ciest2'}" @click="setMode('ciest2')">CIEST2
+    <li :class="{selected: mode === 'connection'}" @click="setMode('connection')"><span>Connexion</span>
+    </li><li :class="{selected: mode === 'service'}" @click="setMode('service')"><span>Services</span>
+    </li><li :class="{selected: mode === 'job'}" @click="setMode('job')"><span>Jobs</span>
+    </li><li :class="{selected: mode === 'product'}" @click="setMode('product')"><span>Produits</span>
+    </li><li :class="{selected: mode === 'ciest2'}" @click="setMode('ciest2')"><span>CIEST2</span>
     </li>
   </ul>
 </div>
 <div style="margin-left:20px;">
-  <div class="user-search" :class="{'user-search-large': mode === 'job' || mode === 'product'}" v-if="mode !== 'service'">
+  <div class="user-search" :class="{'user-search-large': mode === 'job' || mode === 'product' || mode === 'ciest2'}" v-if="mode !== 'service'">
     <label>Du</label> <input v-model="startDate" type="date" @change="search()">
     <label>au</label> <input v-model="endDate" type="date" @change="search()">
     <label>Par</label> 
@@ -20,7 +20,7 @@
       <option value="month">Mois</option>
       <option value="year">Year</option>
     </select>
-    <span v-if="mode === 'job'">
+    <span v-if="mode === 'job' || mode === 'ciest2'">
       <label>Statut</label>
       <select v-model="status" @change="search()">
         <option value="" >---</option>
@@ -30,7 +30,7 @@
         <option value="aborted">Abandonné</option>
       </select>
       </span>
-     <span v-if="mode === 'job' || mode === 'product'">
+     <span v-if="mode === 'job' || mode === 'product' || mode === 'ciest2'">
        <label>Groupe</label>
       <select v-model="selectedGroup" @change="changeGroup()">
          <option value="">TOUS</option>
@@ -182,6 +182,56 @@
        </div>
        <div id="products" style="margin-top:30px;"></div>
    </div>
+   <div v-show="mode === 'ciest2'" class="job-content" >
+    <h1>{{selectedName}}</h1>
+    <div class="job-header" >
+
+       <div>
+          <h2>Total jobs</h2>
+           <div v-for="service in selectedServices" v-if="(selectedService === '' || selectedService === service.id)">
+             <span class="fa fa-circle" :style="{color: service.color}"></span>
+             <b>{{service.name}}</b>:
+             <span v-if="ciest2.count && ciest2.count[service.name]">{{ciest2.count[service.name].toLocaleString()}}</span>
+             <span v-else>0</span>
+           </div>
+           <hr v-if="selectedService === ''" style="width:60%;margin-left:5px;color:gray;">
+           <div v-if="selectedService === ''">
+              <b>Total</b>: {{ciest2.avg.count}}
+           </div>
+       </div>
+       <div>
+           <h2>Coût moyen</h2>
+           <div v-for="service in selectedServices" v-if="(selectedService === '' || selectedService === service.id)">
+             <span class="fa fa-circle" :style="{color: service.color}"></span>
+             <b>{{service.name}}</b>:
+             <span v-if="ciest2.cost && ciest2.cost[service.name]">{{Math.round(ciest2.cost[service.name]/ciest2.countCost[service.name]).toLocaleString()}} CPU secondes</span>
+             <span v-else>---</span>
+           </div>
+           <hr v-if="selectedService === ''" style="width:60%;margin-left:5px;color:gray;">
+           <div v-if="selectedService === ''">
+              <b >Tout service</b>:
+              <span v-if="ciest2.avg && ciest2.avg.cost">{{Math.round(ciest2.avg.cost).toLocaleString()}} CPU Secondes</span>
+              <span v-else>---</span>
+           </div>
+       </div>
+       <div >
+           <h2>Durée moyenne</h2>
+           <div v-for="service in selectedServices" v-if="(selectedService === '' || selectedService === service.id)">
+             <span class="fa fa-circle" :style="{color: service.color}"></span>
+             <b>{{service.name}}</b>:
+             <span v-if="status === 'success' && ciest2.duration && ciest2.countDuration[service.name]">{{secondToStr(ciest2.duration[service.name]/ciest2.countDuration[service.name])}}</span>
+             <span v-else>---</span>
+           </div>
+           <hr v-if="selectedService === ''" style="width:60%;margin-left:5px;color:gray;">
+            <div v-if="selectedService === ''" >
+              <b>Tout service</b>:
+              <span v-if="status === 'success' && ciest2.avg.duration">{{secondToStr(ciest2.avg.duration)}}</span>
+              <span v-else>---</span>
+            </div>
+       </div>
+     </div>
+     <div id="jobs" style="margin-top:30px;"></div>
+   </div>
  </div>
 </div>
 </template>
@@ -249,6 +299,15 @@ export default {
       groups: {},
       count: {},
       cost:{},
+      ciest2: {
+        process: { days: {}, months: {}, years: {}},
+        count: {},
+        cost:{},
+        countCost: {},
+        duration: {},
+        countDuration: {},
+        avg: {}
+      },
       countCost: {},
       duration: {},
       countDuration: {},
@@ -930,20 +989,30 @@ export default {
  }
  ul.menu-content li {
   display: inline-block;
-   min-width: 50px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  border: 1px solid #adadad;
-  border-bottom: none;
-  text-align: center;
-  color: black;
-  height: 30px;
-  vertical-align: middle;
-  margin: 0;
-  background: #efefef;
-  cursor: pointer;
+	min-width: 50px;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	border: 1px solid #adadad;
+	border-bottom: none;
+	text-align: center;
+	color: black;
+	height: 30px;
+	vertical-align: middle;
+	margin: 0;
+	background: #efefef;
+	cursor:pointer;
 }
-
-ul.menu-content li{
+ ul.menu-content li span {
+   text-transform: capitalize;
+vertical-align: middle;
+font-size: 1.1rem;
+height: 30px;
+min-width: 50px;
+color: black;
+padding: 5px 10px 0 10px;
+text-decoration: none;
+display: inline-block;
+ }
+/* ul.menu-content li{
     text-transform: capitalize;
     vertical-align: middle;
     font-size: 1.1rem;
@@ -953,11 +1022,11 @@ ul.menu-content li{
     padding: 5px 10px 0 10px;
     text-decoration: none;
     display:inline-block;
-}
+} */
 ul.menu-content li:hover {
   color:#b8412c;
 }
-ul.menu-content li.selected {
+ul.menu-content li.selected  span {
   background:white;
   color:#b8412c;
 }
