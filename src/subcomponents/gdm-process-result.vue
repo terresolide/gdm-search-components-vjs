@@ -51,7 +51,7 @@
 	      <a  :href="result.results" class="button" >
 	       <i class="fa fa-download"></i> {{$t('download')}}
 	      </a>
-	       <a  @click="copyCmd(result.results)" class="button" :title="$t('copy_in_clipboard')">
+	       <a  @click="copyCmd(result.results)" class="button" :title="$t('copy_in_clipboard')" style="position:relative;">
 	        <i class="fa fa-clipboard"></i> {{$t('copy_curl')}}
 	        <div class="result-tooltip" v-show="showTooltip">{{$t('copied_to_clipboard')}}</div>
 	        <textarea ref="areaCmd" v-model="cmdCurl" v-show="false">{{cmdCurl}}</textarea>
