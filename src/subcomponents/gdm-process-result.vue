@@ -10,7 +10,8 @@
      "preview": "Preview",
      "product_license": "The products resulting from the DSM-OPT service are made available under a <a class='gdm-link'  href='https://creativecommons.org/licenses/by-nc/4.0/legalcode.fr' target='_blank'>CC-BY-NC</a> license, excluding any commercial use.",
      "results": "Results",
-     "series": "Interferogram list"
+     "series": "Interferogram list",
+     "unauthorized_clipboard": "Your browser does not allow copying to the clipboard"
    },
    "fr":{
    
@@ -23,25 +24,40 @@
      "preview": "Visualisation",
      "product_license": "Les produits issus du service DSM-OPT sont mis à disposition sous licence <a class='gdm-link' href='https://creativecommons.org/licenses/by-nc/4.0/legalcode.fr' target='_blank'>CC-BY-NC</a> excluant toute exploitation commerciale.",
      "results": "Résultats",
-     "series": "Liste d'interférogrammes"
+     "series": "Liste d'interférogrammes",
+     "unauthorized_clipboard": "Votre navigateur ne permet la copie dans le presse-papier"
 
    }
 }
 </i18n>
 <template>
 <div class="gdm-process-result">
-     <div style="position:relative;">
-      <h3 :style="{color:color}" style="margin-bottom:10px;">{{$t('results')}}</h3>
-  
-      <a v-if="result.results" :href="result.results" class="button" >
-       <i class="fa fa-download"></i> {{$t('download')}}
-      </a>
-       <a v-if="result.results" @click="copyCmd(result.results)" class="button" :title="$t('copy_in_clipboard')">
-        <i class="fa fa-clipboard"></i> {{$t('copy_curl')}}
-        <div class="result-tooltip" v-show="showTooltip">{{$t('copied_to_clipboard')}}</div>
-        <textarea ref="areaCmd" v-model="cmdCurl" v-show="false">{{cmdCurl}}</textarea>
-      </a>
-      <a v-if="result.dir" :href="result.dir" class="button" target="_blank" style="margin-bottom:20px;">
+     <div>
+      <h3 :style="{color:color}" >{{$t('results')}}</h3>
+      <div v-if="result['partial results']">
+      <div v-for="link, name in result['partial results']"  class="partial-result">
+        <a class="button" :href="link">
+           <i class="fa fa-download"></i> 
+           <span>{{name}}</span>
+        </a>
+         <div  @click="copyPartialCmd(name)" class="cmd-curl" :title="$t('copy_in_clipboard')">
+           (<i class="fa fa-clipboard"></i> <span>{{$t('copy_curl')}})</span> 
+          <div class="result-tooltip" v-show="showTooltip[name]"  @click="close($event, name)">{{$t('copied_to_clipboard')}}</div>
+       
+        </div>
+       </div>
+      </div>
+      <div v-else-if="result.results" style="margin-top:10px;">
+	      <a  :href="result.results" class="button" >
+	       <i class="fa fa-download"></i> {{$t('download')}}
+	      </a>
+	       <a  @click="copyCmd(result.results)" class="button" :title="$t('copy_in_clipboard')">
+	        <i class="fa fa-clipboard"></i> {{$t('copy_curl')}}
+	        <div class="result-tooltip" v-show="showTooltip">{{$t('copied_to_clipboard')}}</div>
+	        <textarea ref="areaCmd" v-model="cmdCurl" v-show="false">{{cmdCurl}}</textarea>
+	      </a>
+      </div>
+      <a v-if="result.dir" :href="result.dir" class="button" target="_blank" style="margin:10px 0 20px 0;">
          <i class="fa fa-folder"></i> {{$t('folder')}}
       </a>
     </div>
@@ -56,7 +72,7 @@
       <div style="font-size:0.9rem;">
 		    <div class="gdm-image-layer" v-if="image.type !== 'serie'" v-for="(image, index) in images" >
 		      <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'" @click="toggleImage(index)"></i> 
-		      <a v-if="image.tif" :href="image.tif" class="fa fa-download" :title="$t('download')" style="padding:0 5px;color:black;"></a>
+		      <a v-if="image.tif && serviceName.indexOf('SAR') >= 0" :href="image.tif" class="fa fa-download" :title="$t('download')" style="padding:0 5px;color:black;"></a>
 		      <div style="display:inline-block;margin:0;max-width:calc(100% - 20px);">{{image.title}}</div>
 		    </div>
 	    </div>
@@ -123,6 +139,7 @@ export default {
   data(){
     return {
       cmdCurl: null,
+      partialCurl: {},
       showTooltip: false,
       list: null
     }
@@ -139,6 +156,11 @@ export default {
     this.initCmdCurl(this.result)
   },
   methods:{
+     close (e, name) {
+       this.showTooltip[name] = false
+       console.log(e)
+       e.stopPropagation()
+     },
      copyCmd (url) {
        this.$refs.areaCmd.select()
        // node.setSelectionRange(0, 99999);
@@ -149,13 +171,43 @@ export default {
          _this.showTooltip = false
        }, 2000)
      },
+     copyPartialCmd (key) {
+       var _this = this
+       navigator.clipboard.writeText(this.partialCurl[key]).then(function() {
+         /* clipboard successfully set */
+         _this.$set(_this.showTooltip, key, true)
+         setTimeout(function () {
+           _this.$set(_this.showTooltip, key, false)
+         }, 2000)
+       }, function() {
+         alert(_this.$i18n.t('unauthorized_clipboard'))
+       });
+//        this.$el.querySelector('#areaCmd' + key).select()
+//        // console.log(node)
+//        node.select()
+//       // node.setSelectionRange(0, 99999);
+//        document.execCommand("copy");
+//        this.showTooltip[key] = true
+//        var _this = this
+//        setTimeout(function () {
+//          _this.showTooltip = false
+//        }, 2000)
+     },
      dateSerieChange (value) {
        this.$emit('dateSerieChange', value)
      },
      initCmdCurl (result) {
+       var filename = '';
        if (result.results) {
-         var filename = result.results.split('/').pop().split('#')[0].split('?')[0]
+         filename = result.results.split('/').pop().split('#')[0].split('?')[0]
          this.cmdCurl = 'curl "' + result.results + '" -o ' + filename
+       } if (result['partial results']) {
+        var partials = result['partial results']
+        this.showTooltip = {}
+        for (var key in partials) {
+          filename = partials[key].split('/').pop().split('#')[0].split('?')[0]
+          this.partialCurl[key] =  'curl "' + partials[key] + '" -o ' + filename
+        }
        }
      },
      toggleImage (index) {
@@ -168,6 +220,30 @@ export default {
 }
 </script>
 <style scoped>
+div.partial-result {
+  max-width:150px;
+  display:inline-block;
+  margin-top:10px;
+}
+div.partial-result a.button {
+ min-width:145px;
+}
+div.partial-result div.cmd-curl {
+  position:relative;
+  cursor:pointer;
+  font-size:0.8em;
+  text-align:center;
+  color:#555;
+}
+div.partial-result div.cmd-curl:hover {
+  color:black;
+}
+div.partial-result div.cmd-curl span {
+ text-decoration: underline;
+}
+div.partial-result a.button span {
+  text-transform: capitalize;
+}
 .gdm-image-layer {
   cursor: pointer;
 }
@@ -180,7 +256,8 @@ export default {
   vertical-align:top;
 }
 .gdm-comment {
-  margin-top:5px;
+  display:block;
+  margin-top:10px;
   font-style:italic;
   font-size: 0.8rem;
   line-height: 1;
@@ -200,7 +277,14 @@ export default {
   width: 160px;
   text-align: left;
   left:150px;
+  color:black;
+  z-index:100;
   -webkit-box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
   box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
+}
+span div.result-tooltip  {
+  cursor: pointer;
+  font-size:0.8rem;
+  left:0;
 }
 </style>
