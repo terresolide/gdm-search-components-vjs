@@ -56,7 +56,65 @@
   Il ne s'agit pas d'un historique. L'accès aux services d'un utilisateur peut changer au cours du temps et l'information historique n'est pas enregistrée.
   </div>
   <div v-show="mode === 'connection'">
-    <div id="sessions"></div>
+    <h1>Suivi des authentifications</h1>
+    <div class="job-header" >
+	    <div>
+	      <h2>Total connexions aux services de calcul</h2>
+	       <div v-for="(type, index) in userTypes" >
+	             <span class="fa fa-circle" :style="{color: colors[index]}"></span>
+	             <b>{{type.t_name_fr}}</b>:
+	             <span v-if="sessions.count && sessions.count[type.t_id]">{{sessions.count[type.t_id].toLocaleString()}}</span>
+	             <span v-else>0</span>
+	       </div>
+	        <hr  style="width:60%;margin-left:5px;color:gray;">
+           <div >
+              <b>Total</b>: {{sessions.avg.count}}
+           </div>
+	    </div>
+	    <div>
+        <h2>Visiteurs par jour</h2>
+         <div v-for="(type, index) in userTypes" >
+               <span class="fa fa-circle" :style="{color: colors[index]}"></span>
+               <b>{{type.t_name_fr}}</b>:
+               <span v-if="sessions.count && sessions.count[type.t_id]">{{(sessions.count[type.t_id] / days.length).toLocaleString()}}</span>
+               <span v-else>0</span>
+         </div>
+          <hr  style="width:60%;margin-left:5px;color:gray;">
+           <div >
+              <b>Total</b>: {{(sessions.avg.count / days.length).toLocaleString()}}
+           </div>
+      </div>
+	  </div>
+    <div id="sessions" style="margin-top:30px;"></div>
+    <h1>Suivi des créations de comptes</h1>
+     <div class="job-header" >
+      <div>
+        <h2>Total nouvels utilisateurs</h2>
+         <div v-for="(type, index) in userTypes" >
+               <span class="fa fa-circle" :style="{color: colors[index]}"></span>
+               <b>{{type.t_name_fr}}</b>:
+               <span v-if="newUsers.count && newUsers.count[type.t_id]">{{newUsers.count[type.t_id].toLocaleString()}}</span>
+               <span v-else>0</span>
+         </div>
+          <hr  style="width:60%;margin-left:5px;color:gray;">
+           <div >
+              <b>Total</b>: {{newUsers.avg.count}}
+           </div>
+      </div>
+      <div>
+        <h2>Nouveaux comptes par jour</h2>
+         <div v-for="(type, index) in userTypes" >
+               <span class="fa fa-circle" :style="{color: colors[index]}"></span>
+               <b>{{type.t_name_fr}}</b>:
+               <span v-if="newUsers.count && newUsers.count[type.t_id]">{{(newUsers.count[type.t_id] / days.length).toLocaleString()}}</span>
+               <span v-else>0</span>
+         </div>
+          <hr  style="width:60%;margin-left:5px;color:gray;">
+           <div >
+              <b>Total</b>: {{(newUsers.avg.count / days.length).toLocaleString()}}
+           </div>
+      </div>
+    </div>
     <div id="newUsers" style="margin-top:30px;"></div>
   </div>
    <div v-show="mode === 'service'">
@@ -464,7 +522,7 @@ export default {
           data: data[type]
         })
       }
-      this.drawHistogram('newUsers', 'Nouvels utilisateurs', categories, series)
+      this.drawHistogram('newUsers', 'Histogramme des Nouveaux comptes', categories, series)
     },
     drawConnection() {
       var categories = this[this.by + 's']
@@ -476,7 +534,7 @@ export default {
           data: data[type]
         })
       }
-      this.drawHistogram('sessions', 'Nombre de connexions', categories, series)
+      this.drawHistogram('sessions', 'Histogramme de connexions', categories, series)
     },
     drawJobs () {
       var categories = this[this.by + 's']
@@ -979,23 +1037,27 @@ export default {
       var first = true
       this.userTypes.forEach(function (tp) {
         var tab = data.sessions.filter(u => u.type === tp.t_id)
-        var results = _this.extractSeriesFrom(tab, tp.t_id, _this.sessions, true)
+        var results = _this.extractSeriesFrom(tab, tp.t_id, _this.sessions, first)
         first = false
         _this.sessions.data.days[tp.t_id] = results.days
         _this.sessions.data.months[tp.t_id] = results.months
         _this.sessions.data.years[tp.t_id] = results.years
         
       })
+      this.average(this.sessions, true)
+      // this.sessions.avg.average = this.sessions.avg.count / this.days.length
+      console.log(this.sessions.avg)
       this.drawConnection()
      
       this.userTypes.forEach(function (tp) {
         var tab = data.newUsers.filter(u => u.type === tp.t_id)
-        var results = _this.extractSeriesFrom(tab, tp.t_id, _this.newUsers)
+        var results = _this.extractSeriesFrom(tab, tp.t_id, _this.newUsers, false)
         _this.newUsers.data.days[tp.t_id] = results.days
         _this.newUsers.data.months[tp.t_id] = results.months
         _this.newUsers.data.years[tp.t_id] = results.years
         
       })
+      this.average(this.newUsers, true)
       this.drawNewUsers()
 
     },
