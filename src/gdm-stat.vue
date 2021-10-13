@@ -231,6 +231,13 @@
        </div>
      </div>
      <div id="ciest2" style="margin-top:30px;"></div>
+      <div style="margin-top:30px;">
+      <h1>Images téléchargées</h1>
+      <div class="job-header" >
+          <h2>Total: {{download.count}}</h2>
+       </div>
+      <div id="download"></div>
+      </div>
    </div>
  </div>
 </div>
@@ -270,14 +277,14 @@ export default {
       if (this.selectedService !== '') {
         var find = this.services.find(s => s.id === this.selectedService)
         if (find) {
-          return 'Résultats pour le service ' + find.name
+          return 'Jobs pour le service ' + find.name
         }
       }
       if (this.selectedGroup !== '') {
-        return 'Résultats pour les services ' + this.selectedGroup
+        return 'Jobs pour les services ' + this.selectedGroup
       }
       
-      return 'Résultats pour tous les services'
+      return 'Jobs pour tous les services'
     }
   },
   data () {
@@ -298,63 +305,23 @@ export default {
       groups: {},
 //       count: {},
 //       cost:{},
-      sessions: {
-        data: { days: {}, months: {}, years: {}},
-        count: {},
-        cost:{},
-        countCost: {},
-        duration: {},
-        countDuration: {},
-        countJobs: {},
-        avg: {}
-      },
-      products: {
-        data: { days: {}, months: {}, years: {}},
-        count: {},
-        cost:{},
-        countCost: {},
-        duration: {},
-        countDuration: {},
-        countJobs: {},
-        avg: {}
-      },
-      newUsers: {
-        data: { days: {}, months: {}, years: {}},
-        count: {},
-        cost:{},
-        countCost: {},
-        duration: {},
-        countDuration: {},
-        countJobs: {},
-        avg: {}
-      },
-      ciest2: {
-        data: { days: {}, months: {}, years: {}},
-        count: {},
-        cost:{},
-        countCost: {},
-        duration: {},
-        countDuration: {},
-        countJobs: {},
-        avg: {}
-      },
-      jobs: {
-        data: { days: {}, months: {}, years: {}},
-        count: {},
-        cost:{},
-        countCost: {},
-        duration: {},
-        countDuration: {},
-        countJobs: {},
-        avg: {}
-      },
+      // tab connexion
+      sessions: null,
+      newUsers: null,
+      // tab jobs
+      jobs: null,
+      // tab products
+      products: null,
+      // tab ciest2
+      ciest2: null,
+      download: null,
 //       countCost: {},
 //       duration: {},
 //       countDuration: {},
 //       countJobs: {},
       status: '',
      // avg: {},
-      avgProduct: {},
+   //   avgProduct: {},
       selectedService: '',
       selectedGroup: '',
       userType: false,
@@ -364,10 +331,27 @@ export default {
   },
   created () {
     this.getUserTypes()
-
+    this.sessions = this.defaultData()
+    this.newUsers = this.defaultData()
+    this.jobs = this.defaultData()
+    this.products = this.defaultData()
+    this.ciest2 = this.defaultData()
+    this.download = this.jobs = this.defaultData()
     
   },
   methods: {
+    defaultData () {
+      return {
+        data: { days: {}, months: {}, years: {}},
+        count: {},
+        cost:{},
+        countCost: {},
+        duration: {},
+        countDuration: {},
+        countJobs: {},
+        avg: {}
+      }
+    },
     changeGroup () {
       if (this.selectedGroup !== '') {
         this.selectedService = ''
@@ -399,6 +383,7 @@ export default {
           break;
         case 'ciest2':
           this.drawCiest2()
+          this.drawDownload()
       }
     },
     drawHistogram (id, title, categories, series, options ) {
@@ -525,7 +510,6 @@ export default {
       var series = []
       var colors = []
       var name = ''
-      console.log(this.products.countJobs)
       for (var index in data) {
         if (this.userType) {
           name = this.userTypeName(index)
@@ -569,6 +553,21 @@ export default {
         options = {colors: colors}
       }
       this.drawHistogram('ciest2', 'Activité CIEST2', categories, series, options)
+    },
+    drawDownload () {
+      var categories = this[this.by + 's']
+      var data = this.download.data[this.by + 's']
+      var series = []
+      var colors = []
+      var name = ''
+        series.push({
+          name: 'Téléchargements',
+          data: data
+        })
+    
+      var options = {}
+      
+      this.drawHistogram('download', 'Téléchargement FTP', categories, series, options)
     },
     getServices () {
       var url = this.appUrl + '/auth/getServices'
@@ -811,12 +810,14 @@ export default {
         this.days = []
         this.months = []
         this.years = []
-        content.cost = {}
-        content.count = {}
-        content.countCost = {}
-        content.duration = {}
-        content.countDuration = {}
-        content.countJobs = {}
+        if (cat) {
+	        content.cost = {}
+	        content.count = {}
+	        content.countCost = {}
+	        content.duration = {}
+	        content.countDuration = {}
+	        content.countJobs = {}
+        }
 //         this.cost = {}
 //         this.count = {}
 //         this.countCost = {}
@@ -831,12 +832,21 @@ export default {
 //       this.duration[cat] = 0
 //       this.countDuration[cat] = 0
 //       this.countJobs[cat] = 0
-      content.count[cat] = 0
-      content.cost[cat] = 0
-      content.countCost[cat] = 0
-      content.duration[cat] = 0
-      content.countDuration[cat] = 0
-      content.countJobs[cat] = 0
+      if (cat) {
+	      content.count[cat] = 0
+	      content.cost[cat] = 0
+	      content.countCost[cat] = 0
+	      content.duration[cat] = 0
+	      content.countDuration[cat] = 0
+	      content.countJobs[cat] = 0
+      } else {
+        content.count = 0
+        content.cost = 0
+        content.countCost = 0
+        content.duration = 0
+        content.countDuration = 0
+        content.countJobs = 0
+      }
      // this.countProductJobs[cat] = 0
       var date = moment(this.startDate, 'YYYY-MM-DD')
       var results = {days: [], months: [], years: []}
@@ -888,18 +898,22 @@ export default {
           _this.days.push(date.format('DD-MM-YYYY'))
         }
         results.days.push(day['tot'])
-        content.count[cat] = content.count[cat] + day['tot']
-        if (day['cost']) {
+        if (cat) {
+          content.count[cat] = content.count[cat] + day['tot']
+        } else {
+          content.count = content.count + day['tot']
+        }
+        if (day['cost'] && cat) {
 //           _this.cost[cat] = _this.cost[cat] + day['cost']
 //           _this.countCost[cat]= _this.countCost[cat] + day['tot']
           content.cost[cat] = content.cost[cat] + day['cost']
           content.countCost[cat]= content.countCost[cat] + day['tot']
         }
-        if (day['count']) {
+        if (day['count'] && cat) {
 //           _this.countJobs[cat] = _this.countJobs[cat] + day['count']
              content.countJobs[cat] = content.countJobs[cat] + day['count']
         }
-        if (day['duration']) {
+        if (day['duration'] && cat) {
 //           _this.duration[cat] = _this.duration[cat] + parseInt(day['duration'])
 //           _this.countDuration[cat] = _this.countDuration[cat] + day['tot']
            content.duration[cat] = content.duration[cat] + parseInt(day['duration'])
@@ -1039,19 +1053,20 @@ export default {
       this.ciest2.data = {days: {}, months: {}, years: {}}
       var first = true
 
-        this.selectedServices.forEach(function (service) {
-          if (_this.selectedService === '' || _this.selectedService === service.id) {
-            var tab = data.process.filter(p => p.service === parseInt(service.id))
-            var results = _this.extractSeriesFrom(tab, service.name, _this.ciest2, first)
-            first = false
-            _this.ciest2.data.days[service.name] = results.days
-            _this.ciest2.data.months[service.name] = results.months
-            _this.ciest2.data.years[service.name] = results.years 
-          }
-        })
-
+      this.selectedServices.forEach(function (service) {
+        if (_this.selectedService === '' || _this.selectedService === service.id) {
+          var tab = data.process.filter(p => p.service === parseInt(service.id))
+          var results = _this.extractSeriesFrom(tab, service.name, _this.ciest2, first)
+          first = false
+          _this.ciest2.data.days[service.name] = results.days
+          _this.ciest2.data.months[service.name] = results.months
+          _this.ciest2.data.years[service.name] = results.years 
+        }
+      })
+      this.download.data = this.extractSeriesFrom(data.download, null, this.download)
       this.average(this.ciest2, false)
       this.drawCiest2()
+      this.drawDownload()
     },
     treatmentProducts (data) {
       this.products.data = {days: {}, months: {}, years: {}}
