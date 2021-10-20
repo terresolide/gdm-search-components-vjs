@@ -5,6 +5,7 @@
     "created": "Created",
     "consult": "Consult",
     "end": "Job end",
+    "remove_process": "Remove the job",
     "start": "Job start"
 }, 
   "fr": {
@@ -12,6 +13,7 @@
     "created": "Création",
     "consult": "Consulter",
     "end": "Fin",
+    "remove_process": "Supprimer le job",
     "start": "Début"
   }
 }
@@ -40,7 +42,7 @@
           <a v-if="url" :href="url + process.properties.id" class="button">{{$t('consult')}}</a>
        </div>
        <div style="position:relative;">
-	       <i v-if="back && (process.properties.status === 'RUNNING' || process.properties.status === 'FAILED')" class="gdm-log fa fa-question-circle"  ></i>
+	       <i v-if="(back || group === 'SAR') && (process.properties.status === 'RUNNING' || process.properties.status === 'FAILED')" class="gdm-log fa fa-question-circle"  ></i>
 	       <div  class="gdm-tooltip">
 	         <span>{{process.properties.progress}} %</span>
 	         <div v-if="process.properties.log">{{process.properties.log}}</div>
@@ -122,7 +124,11 @@
                 </div>
              </div>
            </div>
-   </div>     
+   </div>
+   <div class="gdm-process-column-7">
+      <div v-if="['DEBUG', 'PRE-RUN', 'RUNNING', 'ACCEPTED'].indexOf(process.properties.status) < 0">
+       <span class="fa fa-close" :title="$t('remove_process')" @click="remove($event)"></span></div>  
+     </div>
 </div>
 </template>
 <script>
@@ -202,6 +208,10 @@ export default {
     highlight () {
       this.$emit('highlight', this.process.properties.id)
     },
+    remove (e) {
+      this.$emit('removeProcess', this.process.properties.id)
+       e.stopPropagation()
+    },
     selectProcess () {
       this.$emit('selectProcess', this.process.properties.id)
     },
@@ -219,7 +229,7 @@ export default {
 <style>
 .gdm-process-row {
 display: grid;
-  grid-template-columns: minmax(180px,1fr) 110px minmax(190px,1fr) minmax(100px, 1fr) minmax(150px, 1fr) minmax(150px, 1fr);
+  grid-template-columns: minmax(180px,1fr) 110px minmax(190px,1fr) minmax(100px, 1fr) minmax(150px, 1fr) minmax(150px, 1fr) 30px;
   grid-gap: 5px;
   grid-template-rows: 10px 100px; 
   /*grid-auto-rows: minmax(100px, auto);*/
@@ -270,8 +280,20 @@ display: grid;
   grid-row:2;
   font-size: 0.9em;
 }
+.gdm-process-column-7 {
+  grid-column: 7;
+  grid-row:2;
+}
 .gdm-process-column-1 div {
   line-height:1;
+}
+.gdm-process-column-7 span {
+  padding: 3px;
+  border: 1px dotted rgba(0,0,0,0);
+  cursor: pointer;
+}
+.gdm-process-column-7 span:hover {
+  border: 1px dotted grey;
 }
 div.toSelect {
  cursor: pointer;

@@ -34,7 +34,7 @@
       </div>
       </span>
   </div>
-  <div class="gdm-tooltip" v-if="back && log && (status === 'RUNNING' || status === 'FAILED')"><b>Logs:</b> {{log}}</div>
+  <div class="gdm-tooltip" v-if="log"><b>Logs:</b> {{log}}</div>
 </div>
 </template>
 <script>

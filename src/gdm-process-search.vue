@@ -62,7 +62,7 @@
        :process="feature" :selected="selectedProcessId" :back="back" :selected-service="parameters.service" @selectService="selectService"
        :user-id="userId" :selected-user="parameters.user" @selectUser="selectUser"
        :status-list="statusList" :url="url" :group="group" :lang="lang"
-       @highlight="highlight" @selectProcess="selectProcess"></gdm-process-row>
+       @highlight="highlight" @selectProcess="selectProcess" @removeProcess="removeProcess"></gdm-process-row>
       </div>
      </div>
      </div>
@@ -330,6 +330,11 @@ export default {
 //       this.$http.get(url, {credentials: true})
 //       .then( this.search())
 //     },
+    removeProcess (id) {
+      var url = this.api + 'removeProcess/' + id
+      this.$http.get(url, {credentials: true})
+      .then(resp => {this.search()})
+    },
     removeSelected(type) {
       this.parameters[type] = null
       this.search()

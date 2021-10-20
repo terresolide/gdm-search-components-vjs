@@ -233,6 +233,16 @@ export default {
   computed: {
     seeResult () {
       return this.process.status === 'TERMINATED' && this.process.result
+    },
+    log () {
+      if (!this.process.log) {
+        return null
+      }
+      if ((this.back || this.process.serviceName.indexOf('SAR') >= 0) && 
+          (this.process.status === 'RUNNING' || status === 'FAILED')) {
+        return this.process.log
+      }
+      return null
     }
   },
   created () {
@@ -267,7 +277,6 @@ export default {
       imageLayers: null,
       series: null,
       serieIndex: 0,
-      log: null,
       token: null,
       type: 'PEPS',
       describe: null,
@@ -462,7 +471,7 @@ export default {
       this.feature = response.feature
       this.feature.properties.id = this.id
       this.process = response
-      this.log = this.process.log
+      
       this.addResult(this.process.result)
       if (this.$el && this.$el.querySelector) {
         this.headerHeight = this.$el.querySelector('.gdm-process-header').clientHeight
