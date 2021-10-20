@@ -380,23 +380,21 @@ export default {
       var event = new CustomEvent('gdm:processSelect', {detail: {id: featureId}})
       document.dispatchEvent(event)
     },
-    selectService (service, event) {
+    selectService (service) {
       if (this.parameters.service && this.parameters.service.id === service.id) {
         this.parameters.service = null
       } else {
         this.parameters.service = service
       }
       this.search()
-      event.stopPropagation()
     },
-    selectUser (user, event) {
+    selectUser (user) {
       if (this.parameters.user && this.parameters.user.id === user.id) {
         this.parameters.user = null
       } else {
         this.parameters.user = user
       }
       this.search()
-      // event.stopPropagation()
     },
     groupChange(e) {
       this.parameters.group = e
