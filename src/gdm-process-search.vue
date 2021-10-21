@@ -206,7 +206,7 @@ export default {
        }
 	     var url = this.api + this.what + '?maxRecords=' + this.pagination.maxRecords + '&index=' + this.pagination.startIndex
 	     if (this.userId && this.back) {
-	        url += '&userId=' + this.userId
+	       url += '&userId=' + this.userId
 	     } else if (this.parameters.user) {
 	       url += '&userId=' + this.parameters.user.id
 	     }

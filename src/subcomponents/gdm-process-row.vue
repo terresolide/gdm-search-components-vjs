@@ -126,7 +126,7 @@
            </div>
    </div>
    <div class="gdm-process-column-7">
-      <div v-if="['DEBUG', 'PRE-RUN', 'RUNNING', 'ACCEPTED'].indexOf(process.properties.status) < 0">
+      <div v-if="canRemove">
        <span class="fa fa-close" :title="$t('remove_process')" @click="remove($event)"></span></div>  
      </div>
 </div>
@@ -179,6 +179,17 @@ export default {
     userId: {
       type: Number,
       default:null
+    }
+  },
+  computed: {
+    canRemove () {
+      if (!this.back && this.userId !== parseInt(this.process.properties.userId)) {
+        return false
+      } 
+      if (['DEBUG', 'PRE-RUN', 'RUNNING', 'ACCEPTED'].indexOf(this.process.properties.status) < 0) {
+        return true
+      }
+      return false
     }
   },
   data () {
