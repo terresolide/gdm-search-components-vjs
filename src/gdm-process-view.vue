@@ -392,7 +392,7 @@ export default {
 			             imageLayers.push(image)
 		             }
 		           }
-		         }  else {
+		         }  else if (prop.match(/[0-9]{8}\-[0-9]{8}/g)){
                // serie extract date and geo product identifier
                var date = prop
                // array of dates
@@ -423,23 +423,24 @@ export default {
              }
            }
          }
-         var text = this.$i18n.t('series')
-         for (var name in series) {
-           image = {
-             checked: false,
-             title: name,
-             bbox: bbox,
-             type: 'serie',
-             png: series[name].images[this.serieIndex].png,
-             legend: result.dir + key + '/legend_' + name + '_runw.png' 
-           }
-           if (text) {
-             image.first = text
-             text = null
-           }
-           imageLayers.push(image)
+         
         }
-        }
+        var text = this.$i18n.t('series')
+        for (var name in series) {
+          image = {
+            checked: false,
+            title: name,
+            bbox: bbox,
+            type: 'serie',
+            png: series[name].images[this.serieIndex].png,
+            legend: result.dir + key + '/legend_' + name + '_runw.png' 
+          }
+          if (text) {
+            image.first = text
+            text = null
+          }
+          imageLayers.push(image)
+         }
         this.imageLayers = imageLayers
         this.series = series
       }
