@@ -7,6 +7,7 @@
      "no_filter": "No filter",
      "reset": "Reset",
      "search": "Search",
+     "see_archived": "See archived jobs",
      "service_group": "Service group"
    },
    "fr":{
@@ -17,6 +18,7 @@
      "no_filter": "Aucun filtre",
      "reset": "Intialiser",
      "search": "Rechercher",
+     "see_archived": "Voir les jobs archivés",
      "service_group": "Groupe de services"
     }
 }
@@ -42,6 +44,8 @@
       <formater-select  :options="groups" :defaut="null" @input="groupChange" width="228px"></formater-select>
     </formater-search-box>
      <formater-search-box header-icon-class="fa fa-cog" open-icon-class="fa fa-caret-right" title="Status" :deployed="false" type="empty" >
+      
+      <div v-if="back"><span :style="{color: color}">{{$t('see_archived')}}</span>: <input v-model="archived" type="checkbox" @change="archivedChange"/></div>
       <formater-select  :options="statusList" :defaut="parameters.status" @input="statusChange" width="228px"></formater-select>
     </formater-search-box>
      <formater-search-box header-icon-class="fa fa-hourglass-end" open-icon-class="fa fa-caret-right" :title="$t('process_extent')" :deployed="false" type="empty" >
@@ -108,6 +112,10 @@ export default {
       type: Object,
       default: null
     },
+    back: {
+      type: Boolean,
+      default: false
+    },
     bbox: {
       type: String,
       default: null
@@ -151,6 +159,7 @@ export default {
         daymin: '2020-01-01',
         daymax: 'now'
       },
+      archived: false,
       format: 'DD/MM/YYYY',
       textSearch: null,
       dateFormat: 'DD/MM/YYYY',
@@ -195,6 +204,9 @@ export default {
         e = null
       }
       this.$emit('statusChange', e)
+    },
+    archivedChange () {
+      this.$emit('archivedChange', this.archived)
     },
     textChange(event) {
       if (event.which == 13 || event.keyCode == 13) {

@@ -28,9 +28,9 @@
   <div class="gdm-wrapper">
    <div class="column-left" >
     <gdm-form-process :lang="lang" :status="statusList" :groups="groups" :feature-collection="featureCollection" 
-    :color="color" :user="parameters.user" :service="parameters.service" :height="height"
+    :color="color" :user="parameters.user" :service="parameters.service" :height="height" :back="back"
      @remove="removeSelected" @dateChange="dateChange" @statusChange="statusChange" @groupChange="groupChange"
-     @textChange="textChange" @reset="reset"></gdm-form-process> 
+     @textChange="textChange" @archivedChange="archivedChange" @reset="reset"></gdm-form-process> 
    </div>
    <div class="column-right" >
    <div id="fmtLargeMap" style="width:calc(100%);"></div>
@@ -225,6 +225,9 @@ export default {
 	     if (this.parameters.group) {
 	       url +='&group=' + this.parameters.group
 	     }
+	     if (this.parameters.archived) {
+	       url += '&archived=1'
+	     }
 	     if (this.parameters.order) {
 	       url += '&order=' + encodeURIComponent(this.parameters.order)
 	     }
@@ -259,6 +262,14 @@ export default {
           this.parameters.order = 'tempStart ' + (this.order.temporal > 0 ? 'ASC' : 'DESC')
           this.parameters.order += ', start ' + (this.order.date > 0 ? 'ASC' : 'DESC')
           break
+      }
+      this.search()
+    },
+    archivedChange (value) {
+      if (value) {
+        this.parameters.archived = value
+      } else {
+        delete this.parameters.archived
       }
       this.search()
     },
