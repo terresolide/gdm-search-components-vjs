@@ -576,7 +576,8 @@ export default {
           this.$set(this.process, 'quota', detail.quota)
         }
         // if (this.back) {
-          this.log = detail.log
+        //  this.log = detail.log
+        this.$set(this.process, 'log', detail.log)
         // }
         this.$set(this.process, 'progress', detail.progress)
         this.$set(this.process, 'stepId', detail.stepId)
