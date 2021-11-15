@@ -511,7 +511,7 @@ export default {
                 var value = value0
                 var options = {}
                 while (value <= 32) {
-                  options[value + ''] = value + '-LOOKS'
+                  options[value + ''] = value + '-LOOK' + (value > 1 ? 'S': '')
                   value = value * 2
                 }
                 _this.parameters[index].options = options
