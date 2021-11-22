@@ -12,7 +12,8 @@
      "process_time": "Process time",
      "parameters": "Parameters",
      "seconds": "seconds",
-     "series": "Interferogram list"
+     "series": "Interferogram list",
+     "time_serie": "Time series"
    },
    "fr":{
      "common": "Produits communs",
@@ -27,7 +28,8 @@
      "parameters": "Paramètres",
      "process_time": "Calcul",
      "seconds": "secondes",
-     "series": "Liste d'interférogrammes"
+     "series": "Liste d'interférogrammes",
+     "time_serie": "Séries temporelles"
    }
 }
 </i18n>
@@ -392,7 +394,34 @@ export default {
 			             imageLayers.push(image)
 		             }
 		           }
-		         }  else if (prop.match(/[0-9]{8}\-[0-9]{8}/g)){
+		         }  else if (prop === 'Time_Serie') {
+		           var text = this.$i18n.t('time_serie')
+		           for (var name in result[key][prop]) {
+                 if (name.indexOf('geo') >= 0) {
+                   var image = {}
+                   image.title = name
+                   image.bbox = bbox
+                   image.type = 'image'
+                  // image.legend = result.dir + key + '/legend_' + name + '_runw.png' 
+                   if (text) {
+                     image.first = text
+                     text = null
+                   }
+                   image.footprint = footprint
+                   image.checked = false
+                   for(var file in result[key][prop][name]) {
+                     if (result[key][prop][name][file].substr(-3) === 'png') {
+                       image.png = result.dir + key + '/' + result[key][prop][name][file]
+                     }
+                     if (result[key][prop][name][file].substr(-4) === 'tiff') {
+                       image.tif = result.dir + key + '/' + result[key][prop][name][file]
+                     }
+                   }
+                   imageLayers.push(image)
+                 }
+               }
+		           
+		         }else if (prop.match(/[0-9]{8}\-[0-9]{8}/g)){
                // serie extract date and geo product identifier
                var date = prop
                // array of dates

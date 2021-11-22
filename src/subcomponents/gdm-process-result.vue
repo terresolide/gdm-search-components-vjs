@@ -66,11 +66,11 @@
        <h3 :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h3>
     </div>
     <div v-if="images && images.length > 0" :style="{width: series ? '35%' : '100%'}" style="margin-bottom:5px;">
-      <h4 v-if="series" :style="{color:color}" style="margin:0;vertical-align:top;">{{$t('common')}}</h4>
-      <h4 v-else :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h4>
+      <h4 v-if="!series" :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h4>
       
-      <div style="font-size:0.9rem;">
+      <div style="font-size:0.9rem;" >
 		    <div class="gdm-image-layer" v-if="image.type !== 'serie'" v-for="(image, index) in images" >
+		    <h4 v-if="image.first" :style="{color:color}" style="margin-bottom:0;vertical-align:top;font-size:1rem;">{{$t(image.first)}}</h4>
 		      <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'" @click="toggleImage(index)"></i> 
 		      <a v-if="image.tif && serviceName.indexOf('SAR') >= 0" :href="image.tif" class="fa fa-download" :title="$t('download')" style="padding:0 5px;color:black;"></a>
 		      <div style="display:inline-block;margin:0;max-width:calc(100% - 20px);">{{image.title}}</div>
@@ -220,6 +220,12 @@ export default {
 }
 </script>
 <style scoped>
+.gdm-image-layer h4 {
+  margin-top:10px;
+}
+.gdm-image-layer h4:first-child {
+  margin-top:0;
+}
 div.partial-result {
   max-width:150px;
   display:inline-block;
