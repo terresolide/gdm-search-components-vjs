@@ -40,6 +40,10 @@ export default {
       type: Number,
       default: 0
     },
+    serieName: {
+      type: String,
+      default: null
+    },
     color: {
       type: String,
       default: null
@@ -65,6 +69,9 @@ export default {
     serieIndex (newvalue) {
       this.computeSerieDate(newvalue)
       
+    },
+    serieName (newvalue) {
+      console.log(newvalue)
     }
   },
   created () {
@@ -86,15 +93,17 @@ export default {
   },
   methods: {
     computeSerieDate (index) {
-      if (!this.series) {
-        return ''
+      if (!this.series || !this.series[this.serieName]) {
+        this.serieDate = '---'
+        return
       }
       var name = Object.keys(this.series)[0]
-      var date = this.series[name].images[index].date.substring(0, 8)
-      var date2 = this.series[name].images[index].date.substring(9)
+      var date = this.series[this.serieName].images[index].date.substring(0, 8)
+      var date2 = this.series[this.serieName].images[index].date.substring(9)
       this.serieDate = moment(date, 'YYYYMMDD').format('ll') 
-      //if (this.fullscreen) {
+      if (date2) {
         this.serieDate += ' &rarr; ' + moment(date2, 'YYYYMMDD').format('ll')
+      }
 //       } else {
 //         this.serieDate += '<br />' + moment(date2, 'YYYYMMDD').format('ll')
 //       }

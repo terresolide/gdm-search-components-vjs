@@ -12,7 +12,7 @@
      "process_time": "Process time",
      "parameters": "Parameters",
      "seconds": "seconds",
-     "series": "Interferogram list",
+     "lists": "Interferogram list",
      "time_serie": "Time series"
    },
    "fr":{
@@ -28,7 +28,7 @@
      "parameters": "Paramètres",
      "process_time": "Calcul",
      "seconds": "secondes",
-     "series": "Liste d'interférogrammes",
+     "lists": "Liste d'interférogrammes",
      "time_serie": "Séries temporelles"
    }
 }
@@ -36,7 +36,7 @@
 <template>
  <span class="gdm-process-view" v-if="process">
  <div id="fmtLargeMap">
-   <gdm-serie-navigation v-if="series" :series="series" :serie-index="serieIndex" :color="color" :lang="lang"
+   <gdm-serie-navigation v-if="series" :series="series" :serie-index="serieIndex" :serie-name="serieName" :color="color" :lang="lang"
      :fullscreen="true" :loading="loadingLayer"  @dateChange="dateSerieChange"></gdm-serie-navigation>
  </div>
  <div style="position:relative;">
@@ -279,6 +279,7 @@ export default {
       imageLayers: null,
       series: null,
       serieIndex: 0,
+      serieName: null,
       token: null,
       type: 'PEPS',
       describe: null,
@@ -305,7 +306,9 @@ export default {
       )
     },
     toggleImage (e) {
+      console.log(e)
       var image = this.imageLayers[e]
+      this.serieName = image.title
       image.checked = !image.checked
       this.$set(this.imageLayers, e, image)
       this.$refs.map.toggleImageLayer(e, image.checked)
@@ -355,6 +358,7 @@ export default {
         // treatment result SAR
         var imageLayers = []
         var series = null
+        var lists = null
         var bbox = result.bbox
         // @todo footrpint à effacer, uniquement pour les tests
         var footprint = {
@@ -396,27 +400,40 @@ export default {
 		           }
 		         }  else if (prop === 'Time_Serie') {
 		           var text = this.$i18n.t('time_serie')
-		           for (var name in result[key][prop]) {
-                 if (name.indexOf('geo') >= 0) {
-                   var image = {}
-                   image.title = name
-                   image.bbox = bbox
-                   image.type = 'image'
-                  // image.legend = result.dir + key + '/legend_' + name + '_runw.png' 
-                   if (text) {
-                     image.first = text
-                     text = null
+               // array series
+               
+               for (var name in result[key]['Time_Serie']) {
+                 if (name.indexOf('geo') >= 0 && result[key]['Time_Serie'][name].serie)
+                 {
+                   if (!series) {
+                     series = {}
                    }
-                   image.footprint = footprint
-                   image.checked = false
-                   for(var file in result[key][prop][name]) {
-                     if (result[key][prop][name][file].substr(-3) === 'png') {
-                       image.png = result.dir + key + '/' + result[key][prop][name][file]
-                     }
-                     if (result[key][prop][name][file].substr(-4) === 'tiff') {
-                       image.tif = result.dir + key + '/' + result[key][prop][name][file]
-                     }
+                   series[name] = {
+                       images: []
                    }
+                   for(var date in result[key]['Time_Serie'][name].serie) 
+                   {
+                     series[name].images.push(
+                       {
+                         date: date,
+                         png: result.dir + key + '/' + result[key]['Time_Serie'][name].serie[date]
+                       }
+                     )
+                   }
+                   
+                   // create image layer
+                   image = {
+				             checked: false,
+				             title: name,
+				             bbox: bbox,
+				             type: 'serie',
+				             png: series[name].images[this.serieIndex].png,
+				             legend: result.dir + key + '/legend_' + name + '_runw.png' 
+				           }
+				           if (text) {
+				             image.first = text
+				             text = null
+				           }
                    imageLayers.push(image)
                  }
                }
@@ -426,12 +443,12 @@ export default {
                var date = prop
                // array of dates
                for (var name in result[key][prop]) {
-                 if (!series) {
-                   series = {}
+                 if (!lists) {
+                   lists = {}
                  }
                  if (name.indexOf('geo') >= 0) {
-                   if (!series[name]) {
-                     series[name] = {
+                   if (!lists[name]) {
+                     lists[name] = {
                          images: []
                      }
                    }
@@ -446,7 +463,7 @@ export default {
 //                        imageInside.tif = result.dir + key + '/' + result[key][prop][name][file]
 //                      }
                    }
-                   series[name].images.push(imageInside)
+                   lists[name].images.push(imageInside)
                  }
                }
              }
@@ -454,14 +471,14 @@ export default {
          }
          
         }
-        var text = this.$i18n.t('series')
-        for (var name in series) {
+        var text = this.$i18n.t('lists')
+        for (var name in lists) {
           image = {
             checked: false,
             title: name,
             bbox: bbox,
-            type: 'serie',
-            png: series[name].images[this.serieIndex].png,
+            type: 'list',
+            png: lists[name].images[this.serieIndex].png,
             legend: result.dir + key + '/legend_' + name + '_runw.png' 
           }
           if (text) {
@@ -470,8 +487,17 @@ export default {
           }
           imageLayers.push(image)
          }
-        this.imageLayers = imageLayers
+      }
+      this.imageLayers = imageLayers
+      if (series) {
         this.series = series
+      }
+      if (lists) {
+       if (this.series) {
+         this.series = Object.assign(this.series, lists)
+       } else {
+         this.series = lists
+       }
       }
     },
     display (response) {
