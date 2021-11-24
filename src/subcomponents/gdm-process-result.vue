@@ -35,17 +35,17 @@
      <div>
       <h3 :style="{color:color}" >{{$t('results')}}</h3>
       <div v-if="result['partial results']">
-      <div v-for="link, name in result['partial results']"  class="partial-result">
-        <a class="button" :href="link">
-           <i class="fa fa-download"></i> 
-           <span>{{name}}</span>
-        </a>
-         <div  @click="copyPartialCmd(name)" class="cmd-curl" :title="$t('copy_in_clipboard')">
-           (<i class="fa fa-clipboard"></i> <span>{{$t('copy_curl')}})</span> 
-          <div class="result-tooltip" v-show="showTooltip[name]"  @click="close($event, name)">{{$t('copied_to_clipboard')}}</div>
-       
-        </div>
-       </div>
+	      <div v-for="link, name in result['partial results']"  class="partial-result">
+	        <a class="button" :href="link">
+	           <i class="fa fa-download"></i> 
+	           <span>{{name}}</span>
+	        </a>
+	         <div  @click="copyPartialCmd(name)" class="cmd-curl" :title="$t('copy_in_clipboard')">
+	           (<i class="fa fa-clipboard"></i> <span>{{$t('copy_curl')}})</span> 
+	          <div class="result-tooltip" v-show="showTooltip[name]"  @click="close($event, name)">{{$t('copied_to_clipboard')}}</div>
+	       
+	        </div>
+	       </div>
       </div>
       <div v-else-if="result.results" style="margin-top:10px;">
 	      <a  :href="result.results" class="button" >
@@ -57,33 +57,51 @@
 	        <textarea ref="areaCmd" v-model="cmdCurl" v-show="false">{{cmdCurl}}</textarea>
 	      </a>
       </div>
-      <a v-if="result.dir" :href="result.dir" class="button" target="_blank" style="margin:10px 0 20px 0;">
-         <i class="fa fa-folder"></i> {{$t('folder')}}
-      </a>
+      
     </div>
     <div v-if="serviceName === 'DSM-OPT'" class="gdm-comment" v-html="$t('product_license')"></div>
-    <div v-if="series" style="display:block;">
-       <h3 :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h3>
-    </div>
-    <div v-if="images && images.length > 0" :style="{width: series ? '35%' : '100%'}" style="margin-bottom:5px;">
-      <h4 v-if="!series" :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h4>
+    <div v-if="result.dir" style="display:block;">
+      <a :href="result.dir" class="button" target="_blank" style="margin:10px 0 20px 0;">
+         <i class="fa fa-folder"></i> {{$t('folder')}}
+      </a>
+     </div>
+    <div v-if="!result.dir && images && images.length > 0" :style="{width: series ? '35%' : '100%'}" style="margin-bottom:5px;">
+      <h4  :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h4>
       
       <div style="font-size:0.9rem;" >
 		    <div class="gdm-image-layer" v-if="image.type !== 'serie' && image.type !== 'list'" v-for="(image, index) in images" >
-		    <h4 v-if="image.first" :style="{color:color}" style="margin-bottom:0;vertical-align:top;font-size:1rem;">{{$t(image.first)}}</h4>
+		    <h4 v-if="image.first" :style="{color:color}" style="margin-bottom:0;">{{$t(image.first)}}</h4>
 		      <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'" @click="toggleImage(index)"></i> 
 		      <a v-if="image.tif && serviceName.indexOf('SAR') >= 0" :href="image.tif" class="fa fa-download" :title="$t('download')" style="padding:0 5px;color:black;"></a>
 		      <div style="display:inline-block;margin:0;max-width:calc(100% - 20px);">{{image.title}}</div>
 		    </div>
 	    </div>
     </div>
-    <div v-if="series" style="width:calc(65% -5px);">
+    <div v-if="result.dir">
+     
+
+       <h3 :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h3>
+ 
+      <div v-if="images && images.length > 0"  style="margin-bottom:5px;">
+	      <h4 v-if="!series" :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h4>
+	      
+	      <div style="font-size:0.9rem;" >
+	        <div class="gdm-image-layer" v-if="image.type !== 'serie' && image.type !== 'list'" v-for="(image, index) in images" >
+	        <h4 v-if="image.first" :style="{color:color}" style="margin-bottom:0;">{{$t(image.first)}}</h4>
+	          <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'" @click="toggleImage(index)"></i> 
+	          <a v-if="image.tif && serviceName.indexOf('SAR') >= 0" :href="image.tif" class="fa fa-download" :title="$t('download')" style="padding:0 5px;color:black;"></a>
+	          <div style="display:inline-block;margin:0;max-width:calc(100% - 20px);">{{image.title}}</div>
+	        </div>
+	      </div>
+	    </div>
+    </div>
+    <div v-if="series" style="width:48%;min-width:300px;">
       <div>
       <gdm-serie-navigation :series="series" :serie-name="serieName" :serie-index="serieIndex" :color="color" :lang="lang" :main="true" 
       @dateChange="dateSerieChange"></gdm-serie-navigation>
       </div> 
       <div class="gdm-image-layer" v-if="image.type === 'serie' || image.type === 'list'" v-for="(image, index) in images" >
-         <h4 v-if="image.first" :style="{color:color}">{{image.first}}</h4>
+         <h4 v-if="image.first" :style="{color:color}" style="margin-bottom:0;">{{image.first}}</h4>
           <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'" @click="toggleImage(index)"></i> 
           <a v-if="image.tif" :href="image.tif" class="fa fa-download" :title="$t('download')" style="padding:0 5px;color:black;"></a>
           <div style="display:inline-block;margin:0;max-width:calc(100% - 20px);">{{image.title}}</div>
