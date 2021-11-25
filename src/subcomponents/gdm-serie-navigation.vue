@@ -50,7 +50,7 @@ export default {
   },
   computed: {
     lastIndex () {
-      if (!this.series || !this.serieName) {
+      if (!this.series || !this.serieName || !this.series[this.serieName]) {
         return 0
       }
       //var name = Object.keys(this.series)[this.serieName]
@@ -59,18 +59,18 @@ export default {
   },
   data () {
     return {
-      serieDate: 'Date navigation',
+      serieDate: 'Serie navigation',
       timer: null,
       playerChangeListener: null
     }
   },
   watch: {
     serieIndex (newvalue) {
-      this.computeSerieDate(newvalue)
+      this.computeSerieDate(this.serieName, newvalue)
       
     },
     serieName (newvalue) {
-      this.computeSerieDate(0)
+      this.computeSerieDate(newvalue, 0)
       this.goToFirst()
     }
   },
@@ -81,7 +81,7 @@ export default {
     document.addEventListener('SeriePlayerChange', this.playerChangeListener)
   },
   mounted (){
-    this.computeSerieDate(0)
+    // this.computeSerieDate(0)
   },
   destroyed () {
     if (this.main && this.timer) {
@@ -92,8 +92,8 @@ export default {
     this.playerChangeListener = null
   },
   methods: {
-    computeSerieDate (index) {
-      if (!this.series || !this.series[this.serieName]) {
+    computeSerieDate (serieName, index) {
+      if (!this.series || !this.series[serieName]) {
         this.serieDate = 'Serie navigation'
         return
       }

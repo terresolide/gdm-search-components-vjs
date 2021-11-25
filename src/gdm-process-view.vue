@@ -306,11 +306,9 @@ export default {
       )
     },
     toggleImage (e) {
-      console.log(e)
       var image = this.imageLayers[e]
       image.checked = !image.checked
       this.serieName = image.title
-      console.log(this.serieName)
       this.$set(this.imageLayers, e, image)
       this.$refs.map.toggleImageLayer(e, image.checked)
     },
