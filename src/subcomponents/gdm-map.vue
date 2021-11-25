@@ -143,14 +143,16 @@ export default {
      }
    },
    serieDateChange (index) {
-     for (var i in this.imageLayers) {
+     var _this = this
+     var i = this.imageLayers.findIndex(layer => _this.map.hasLayer(layer))
+     if (i < 0) {
+       return
+     }
       
-       if (this.imageLayers[i].type === 'serie') {
-         var image = this.series[this.imageLayers[i].name].images[index]
-         this.$emit('loadingLayer', true)
-         this.imageLayers[i].setUrl(image.png)
-       }
-      // this.serieLayers[name].setUrl(image.png)
+     if (this.imageLayers[i].type === 'serie' || this.imageLayers[i].type === 'list') {
+       var image = this.series[this.imageLayers[i].name].images[index]
+       this.$emit('loadingLayer', true)
+       this.imageLayers[i].setUrl(image.png)
      }
    },
 //    toggleSerieLayer (name, checked) {

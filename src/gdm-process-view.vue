@@ -161,7 +161,7 @@
 			  </div>
 		  </div>  
 		 <div class="gdm-list-images" >
-		  <h2 :style="{color:color}">Images</h2>
+		  <h2 :style="{color:color}">{{images.length}} images</h2>
 		  <div v-if="images.length > 0">
 			  <div  v-for="image in images" class="gdm-images-child" >
 	        <gdm-image :image="image" :type="type" :searching="false" :checked="false" :stereo-list="stereo" mode="view" :lang="lang"></gdm-image>
@@ -308,8 +308,9 @@ export default {
     toggleImage (e) {
       console.log(e)
       var image = this.imageLayers[e]
-      this.serieName = image.title
       image.checked = !image.checked
+      this.serieName = image.title
+      console.log(this.serieName)
       this.$set(this.imageLayers, e, image)
       this.$refs.map.toggleImageLayer(e, image.checked)
     },
@@ -323,6 +324,11 @@ export default {
     imageAdded (index) {
       var image = this.imageLayers[index]
       image.checked = true
+      if (image.type === 'serie' || image.type === 'list') {
+        this.serieName = image.title
+      } else {
+        this.serieName = null
+      }
       this.$set(this.imageLayers, index, image)
 //       var _this = this
 //       this.imageLayers.forEach(function (image, i) {
@@ -437,8 +443,12 @@ export default {
                    imageLayers.push(image)
                  }
                }
-		           
-		         }else if (prop.match(/[0-9]{8}\-[0-9]{8}/g)){
+		           if (!this.series) {
+		             this.series = series
+		           } else if (series){
+		             this.series = Object.assign(this.series, series)
+		           }
+		         } else if (prop.match(/[0-9]{8}\-[0-9]{8}/g)){
                // serie extract date and geo product identifier
                var date = prop
                // array of dates
@@ -488,17 +498,16 @@ export default {
           imageLayers.push(image)
          }
       }
-      this.imageLayers = imageLayers
-      if (series) {
-        this.series = series
-      }
       if (lists) {
-       if (this.series) {
-         this.series = Object.assign(this.series, lists)
-       } else {
-         this.series = lists
-       }
+        if (this.series) {
+          this.series = Object.assign(this.series, lists)
+        } else {
+          this.series = lists
+        }
       }
+      this.imageLayers = imageLayers
+      
+      console.log(this.series)
     },
     display (response) {
       this.describe = response.serviceParametersUrl

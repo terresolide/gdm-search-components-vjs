@@ -1,6 +1,5 @@
 <template>
 <div class="gdm-serie-navigation" :style="{background: fullscreen ? '#fff' : $shadeColor(color,0.85)}">
-     Dates:
      <span class="serie-navigation" :class="{disabled: serieIndex === 0 }">
        <span class="fa fa-angle-double-left" :style="{backgroundColor:color}" @click="goToFirst()"></span>
        <span class="fa fa-angle-left" :style="{backgroundColor:color}" @click="previous()"></span>
@@ -51,16 +50,16 @@ export default {
   },
   computed: {
     lastIndex () {
-      if (!this.series) {
-        return ''
+      if (!this.series || !this.serieName) {
+        return 0
       }
-      var name = Object.keys(this.series)[0]
-      return this.series[name].images.length - 1
+      //var name = Object.keys(this.series)[this.serieName]
+      return this.series[this.serieName].images.length - 1
     }
   },
   data () {
     return {
-      serieDate: '',
+      serieDate: 'Date navigation',
       timer: null,
       playerChangeListener: null
     }
@@ -71,7 +70,8 @@ export default {
       
     },
     serieName (newvalue) {
-      console.log(newvalue)
+      this.computeSerieDate(0)
+      this.goToFirst()
     }
   },
   created () {
@@ -94,7 +94,7 @@ export default {
   methods: {
     computeSerieDate (index) {
       if (!this.series || !this.series[this.serieName]) {
-        this.serieDate = '---'
+        this.serieDate = 'Serie navigation'
         return
       }
       var name = Object.keys(this.series)[0]
@@ -112,7 +112,6 @@ export default {
       this.$emit('dateChange', 0)
     },
     goToLast () {
-      console.log(this.lastIndex)
       this.$emit('dateChange', this.lastIndex)
     },
     next () {
@@ -152,8 +151,11 @@ export default {
 .gdm-serie-navigation {
   background: #fff;
   border-radius: 5px;
-  padding: 8px;
+  padding: 8px 3px;
+  font-size:0.8rem;
   border: 2px solid rgba(0,0,0,0.2);
+  max-width:330px;
+  text-align:center;
 }
 span.serie-navigation span{
   font-size: 1.3em;
