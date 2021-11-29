@@ -39,8 +39,10 @@
    <gdm-serie-navigation v-if="series" :series="series" :serie-index="serieIndex" :serie-name="serieName" :color="color" :lang="lang"
      :fullscreen="true" :loading="loadingLayer"  @dateChange="dateSerieChange"></gdm-serie-navigation>
  </div>
- <div style="position:relative;">
+ <div >
+   <div style="position:relative;">
 	 <gdm-service-status  :name="process.serviceName" :status="process.serviceStatus" :top="5" :right="10" :lang="lang" ></gdm-service-status>
+	 </div>
 	 <div class="gdm-process-header" :style="{background: $shadeColor(color,0.95)}">
 	   <div class="header-0">
 	    <h1 :style="{color:color}">{{(process.id + '').padStart(5, '0')}}<span v-if="process.token">-{{process.token}}</span><span v-if="process.name">  {{process.name }}</span></h1>
@@ -48,7 +50,7 @@
 	   <div class="header-1">
 	     <div class="gdm-map-container">
 	      <gdm-map ref="map" :bbox="process.feature" :images="imageLayers" :tile="feature.properties.bboxTile"
-	      :service-name="process.serviceName" :series="series" :serie-index="serieIndex" @dateChange="dateSerieChange"
+	      :service-name="process.serviceName" :series="series" :serie-index="serieIndex" :lang="lang" @dateChange="dateSerieChange"
 	      fullscreen="fmtLargeMap" :remove-height="8" @loadingLayer="loadingChange" @imageAdded="imageAdded" @imageRemoved="imageRemoved"></gdm-map>
 	     </div>
 	      <div style="text-align:center;margin-top:10px;">
@@ -96,7 +98,7 @@
           </div>
 	      </div>
 	   </div>
-	   <div class="header-2-2" >
+	   <div class="header-2-2" style="position:relative;z-index:0;">
 	     <gdm-process-progress :status="process.status" :progress="process.progress" 
 	     :step-id="process.stepId" :log="log" :back="back" :steps="process.serviceSteps" ></gdm-process-progress>
 	  </div>
@@ -184,6 +186,7 @@ import GdmProcessResult from './subcomponents/gdm-process-result.vue'
 import GdmImage from './subcomponents/gdm-image.vue'
 import GdmParameters from './subcomponents/gdm-parameters.vue'
 import GdmSerieNavigation from './subcomponents/gdm-serie-navigation.vue'
+
 import hs from './modules/howstereo.js'
 export default {
   name: 'GdmProcessView',
@@ -286,7 +289,15 @@ export default {
       stereo: null,
       fullscreen: false,
       defaultParameters: null,
-      loadingLayer: false
+      loadingLayer: false,
+      tio: {
+        ptValues: {
+          ns: [],
+          ew: []
+        },
+        searching: false,
+        showGraph: false
+      }
     }
   },
   methods: {
@@ -503,6 +514,16 @@ export default {
           this.series = lists
         }
       }
+      if (result.tio) {
+        imageLayers.push({
+          checked: false,
+          title: 'Tio name or sentence',
+          first: 'TIO',
+          bbox: bbox,
+          type: 'tio',
+          dir: result.tio
+        })
+      }
       this.imageLayers = imageLayers
       
       console.log(this.series)
@@ -664,6 +685,9 @@ export default {
   position:fixed;
   z-index:3000;
 }
+.gdm-process-view .graph-container {
+  z-index:3001;
+}
  .gdm-process-view div[id="fmtLargeMap"] .gdm-serie-navigation {
    position: absolute;
    bottom: 5px;
@@ -727,13 +751,16 @@ border: 4px solid lightgrey;
   padding: 0 0 5px 0;
   font-weight:700;
 }
+.gdm-process-header h1{
+  margin-top:-5px;
+}
 .gdm-map-container {
    width:300px;
    margin:auto;
 }
 .gdm-process-header {
-   position: relative;
-  margin-top:0px;
+  /* position: relative;*/
+  margin-top: 0px;
   display:grid;
   grid-template-columns: 310px 2fr 1.7fr;
   grid-template-rows: 50px 1fr 50px 1fr;

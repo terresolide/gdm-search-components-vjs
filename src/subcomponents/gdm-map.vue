@@ -1,8 +1,10 @@
 <template>
 <span class="gdm-map">
-<div id="fmtMap" class="mtdt-small">
-
+ <tio-graph v-if="tio.img" v-show="tio.showGraph" :dates="tio.img.dates" :ns-values="tio.ptValues.ns" :ew-values="tio.ptValues.ew" 
+   :keys="tio.img.keys" :maximum="tio.img.max" :lang="lang" @close="tio.showGraph=false"></tio-graph>
+ <div id="fmtMap" class="mtdt-small">
 </div>
+
 </span>
 </template>
 <script>
@@ -12,10 +14,14 @@ L.Control.Fullscreen = require('formater-metadata-vjs/src/modules/leaflet.contro
 L.Control.Legend = require('formater-metadata-vjs/src/modules/leaflet.control.legend.js')
 L.Control.Legend = require('../modules/leaflet.control.opacity.js')
 import GdmSerieNavigation from './gdm-serie-navigation.vue'
+import Tio from 'gdm-tio-vjs/src/modules/leaflet.imageOverlay.rotated.tio.js'
+L.ImageOverlay.Rotated.Tio = Tio
+const TioGraph = () => import('gdm-tio-vjs/src/tio-graph.vue')
 export default {
   name: 'GdmMap',
   components: {
-    GdmSerieNavigation
+    GdmSerieNavigation,
+    TioGraph
   },
   props: {
     featureCollection: {
@@ -53,6 +59,10 @@ export default {
     serviceName: {
       type: String,
       default: null
+    },
+    lang: {
+      type: String,
+      default: 'en'
     }
   },
   data () {
@@ -80,7 +90,14 @@ export default {
       fullscreenLayer: null,
       imageLayers: [],
       countImages: 0,
-      serieLayers: {}
+      tio: {
+        ptValues: {
+          ns: [],
+          ew: []
+        },
+        showGraph: false,
+        img: null
+      }
     }
   },
   watch: {
@@ -296,18 +313,29 @@ export default {
       }
 //       var ext = image.src.match(/\.[0-9a-z]+$/i)
 //       console.log(ext)
+      var _this = this
       if (image.mp4) {
         var layer = L.videoOverlay(image.mp4, bounds, {interactive: true, opacity:this.controlOpacity.getValue()})
         
       } else if (image.png) {
           var layer = L.imageOverlay(image.png, bounds, {opacity: this.controlOpacity.getValue()})
+      } else if (image.dir) {
+        var layer = new L.ImageOverlay.Rotated.Tio(image.dir)
+        layer.on('TIO:RESET', function (resp) {
+          _this.tio.ptValues = {ew: [], ns: []}
+          _this.tio.showGraph = false
+        })
+        layer.on('TIO:DATA', function (resp) {
+          _this.$set(_this.tio.ptValues, resp.dimension, resp.values)
+          _this.tio.showGraph = true
+        })
+        this.tio.img = layer
       }
       if (image.first) {
         layer.first = image.first
       }
       layer.type = image.type ? image.type : 'image'
       layer.name = image.title
-      var _this = this
       layer.on('load', function (e) {
         _this.$emit('loadingLayer', false)
       })
