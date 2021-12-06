@@ -283,6 +283,7 @@ export default {
               _this.show = false
             }
           }
+        
 //           if (listener.hasOwnProperty('or')) {
 //             console.log('or1')
 //             e.detail.value = e.detail.value || _this.values[_this.name]
@@ -325,11 +326,23 @@ export default {
               _this.disabled = false
             }
           }
-          // only for use roi
-          if (listener.hasOwnProperty('used') && listener.hasOwnProperty('mode')) {
-            if (e.detail.mode === listener.mode) {
-              _this.used = e.detail.value
-              _this.values[_this.name] = e.detail.value
+        
+          if (listener.hasOwnProperty('used')) {
+            if (listener.hasOwnProperty('mode')) {
+              // only for use roi
+	            if (e.detail.mode === listener.mode) {
+	              _this.used = e.detail.value
+	              _this.values[_this.name] = e.detail.value
+	            } 
+            } else if (listener.hasOwnProperty('value')) {
+              if (e.detail.value === listener.value) {
+                _this.used = true
+                _this.deployed = true
+              } else {
+                console.log('cas unw close')
+                _this.used = false
+                _this.deployed = false
+              }
             }
           }
         }
