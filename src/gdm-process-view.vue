@@ -13,7 +13,8 @@
      "parameters": "Parameters",
      "seconds": "seconds",
      "lists": "Interferogram list",
-     "time_serie": "Time series"
+     "time_serie": "Time series",
+     "units": "Units"
    },
    "fr":{
      "common": "Produits communs",
@@ -29,7 +30,8 @@
      "process_time": "Calcul",
      "seconds": "secondes",
      "lists": "Liste d'interférogrammes",
-     "time_serie": "Séries temporelles"
+     "time_serie": "Séries temporelles",
+     "units": "Unités"
    }
 }
 </i18n>
@@ -108,18 +110,24 @@
 	        <b>{{$t('cost')}}:</b>
 	        <span v-if="['WAITING', 'EVALUATED'].indexOf(process.status) >= 0">
 		        <span :style="{color: process.cost > process.quota ? 'red' : 'black' }">
-			        <b>{{process.cost.toLocaleString()}}&nbsp;CPU&nbsp;{{$t('seconds')}}</b> 
-			        <span >/ {{process.quota.toLocaleString()}}</span>
-		         </span>
+		           <span v-if="process.serviceName.indexOf('SAR') >= 0"> <b>{{process.cost.toLocaleString()}}&nbsp;{{$t('units')}}</b> </span>
+		           <span v-else> <b>{{process.cost.toLocaleString()}}&nbsp;CPU&nbsp;{{$t('seconds')}}</b></span>
+			         <span >/ {{process.quota.toLocaleString()}}</span>
+		        </span>
 		         <div v-if="back && process.cost > process.quota">
                  <a class="button"  :href="url + 'users/view/' + process.userId">{{$t('edit')}}</a>
              </div>
 	         </span>
-	         <span v-else><b>{{process.cost.toLocaleString()}}</b>&nbsp;CPU&nbsp;{{$t('seconds')}}</span>
+	         <span v-else>
+	            <span v-if="process.serviceName.indexOf('SAR') >= 0"><b>{{process.cost.toLocaleString()}}</b>&nbsp;{{$t('units')}}</span>
+	            <span v-else><b>{{process.cost.toLocaleString()}}</b>&nbsp;CPU&nbsp;{{$t('seconds')}}</span>
+	         </span>
 	         
 	      </div>
 	      <div v-if="process.cost <= 0 || ['WAITING', 'EVALUATED'].indexOf(process.status) < 0">
-	      <b>{{$t('owner_credit')}}:</b> {{process.quota.toLocaleString()}}&nbsp;CPU&nbsp;{{$t('seconds')}}
+	      <b>{{$t('owner_credit')}}:</b> 
+		      <span v-if="process.serviceName.indexOf('SAR') >= 0">{{process.quota.toLocaleString()}}&nbsp;{{$t('units')}}</span>
+		      <span v-else>{{process.quota.toLocaleString()}}&nbsp;CPU&nbsp;{{$t('seconds')}}</span>
 	      </div>
 	   </div>
 	   <div class="header-3">
