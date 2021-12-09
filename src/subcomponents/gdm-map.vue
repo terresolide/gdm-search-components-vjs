@@ -1,5 +1,7 @@
 <template>
 <span class="gdm-map">
+  <div v-if="tio && tio.searching" style="position:fixed;top:50%;left:50%;z-index:3002;color:#333;" class="fa fa-spinner fa-spin fa-2x fa-fw"></div>
+   
  <tio-graph v-if="tio.img" v-show="tio.showGraph" :dates="tio.img.dates" :ns-values="tio.ptValues.ns" :ew-values="tio.ptValues.ew" 
    :keys="tio.img.keys" :maximum="tio.img.max" :lang="lang" @close="tio.showGraph=false"></tio-graph>
  <div id="fmtMap" class="mtdt-small">
@@ -13,14 +15,14 @@ L.Control.Gdmlayer = require('../modules/leaflet.control.gdmlayer.js')
 L.Control.Fullscreen = require('formater-metadata-vjs/src/modules/leaflet.control.fullscreen.js')
 L.Control.Legend = require('formater-metadata-vjs/src/modules/leaflet.control.legend.js')
 L.Control.Legend = require('../modules/leaflet.control.opacity.js')
-import GdmSerieNavigation from './gdm-serie-navigation.vue'
+// import GdmSerieNavigation from './gdm-serie-navigation.vue'
 import Tio from 'gdm-tio-vjs/src/modules/leaflet.imageOverlay.rotated.tio.js'
 L.ImageOverlay.Rotated.Tio = Tio
 const TioGraph = () => import('gdm-tio-vjs/src/tio-graph.vue')
 export default {
   name: 'GdmMap',
   components: {
-    GdmSerieNavigation,
+  //  GdmSerieNavigation,
     TioGraph
   },
   props: {
@@ -96,7 +98,8 @@ export default {
           ew: []
         },
         showGraph: false,
-        img: null
+        img: null,
+        searching: false
       }
     }
   },
@@ -328,6 +331,9 @@ export default {
         layer.on('TIO:DATA', function (resp) {
           _this.$set(_this.tio.ptValues, resp.dimension, resp.values)
           _this.tio.showGraph = true
+        })
+        layer.on('TIO:SEARCHING', function (event) {
+          _this.tio.searching = event.searching
         })
         this.tio.img = layer
       }

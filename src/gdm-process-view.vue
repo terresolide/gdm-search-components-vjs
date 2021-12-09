@@ -14,6 +14,7 @@
      "seconds": "seconds",
      "lists": "Interferogram list",
      "time_serie": "Time series",
+     "tio_instructions":"Click on the map image to view the time series at that point.",
      "units": "Units"
    },
    "fr":{
@@ -31,6 +32,7 @@
      "seconds": "secondes",
      "lists": "Liste d'interférogrammes",
      "time_serie": "Séries temporelles",
+     "tio_instructions": "Cliquez sur l'image de la carte pour visualiser les séries temporelles en ce point.",
      "units": "Unités"
    }
 }
@@ -41,6 +43,7 @@
    <gdm-serie-navigation v-if="series" :series="series" :serie-index="serieIndex" :serie-name="serieName" :color="color" :lang="lang"
      :fullscreen="true" :loading="loadingLayer"  @dateChange="dateSerieChange"></gdm-serie-navigation>
  </div>
+ <div class="tio-instructions" v-show="showTioInstructions" @click="showTioInstructions=false">{{$t('tio_instructions')}}</div>
  <div >
    <div style="position:relative;">
 	 <gdm-service-status  :name="process.serviceName" :status="process.serviceStatus" :top="5" :right="10" :lang="lang" ></gdm-service-status>
@@ -298,14 +301,7 @@ export default {
       fullscreen: false,
       defaultParameters: null,
       loadingLayer: false,
-      tio: {
-        ptValues: {
-          ns: [],
-          ew: []
-        },
-        searching: false,
-        showGraph: false
-      }
+      showTioInstructions: false
     }
   },
   methods: {
@@ -345,6 +341,14 @@ export default {
         this.serieName = image.title
       } else {
         this.serieName = null
+      }
+      if (image.type === 'tio' && !image.displayed) {
+        this.showTioInstructions = true
+        image.displayed = true
+        var _this = this
+        setTimeout(function () {
+          _this.showTioInstructions = false
+        }, 10000)
       }
       this.$set(this.imageLayers, index, image)
 //       var _this = this
@@ -525,7 +529,7 @@ export default {
       if (result.tio) {
         imageLayers.push({
           checked: false,
-          title: 'Tio name or sentence',
+          title: 'TIO Interactive layer',
           first: 'TIO',
           bbox: bbox,
           type: 'tio',
@@ -534,7 +538,6 @@ export default {
       }
       this.imageLayers = imageLayers
       
-      console.log(this.series)
     },
     display (response) {
       this.describe = response.serviceParametersUrl
@@ -854,5 +857,18 @@ span.gdm-information {
    overflow-x:hidden;
    padding:5px 5px 8px 8px;
    box-shadow:1px 1px 3px grey;
+ }
+ .tio-instructions {
+    position: fixed;
+    max-width:300px;
+    padding:10px;
+    left: 50%;
+    top: 50%;
+     border: 1px solid #a3a3a3;
+    cursor: pointer;
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
+    background: white;
+    transform: translate(-50%, -50%);
+    z-index:3001;
  }
 </style>
