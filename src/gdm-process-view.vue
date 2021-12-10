@@ -858,6 +858,7 @@ span.gdm-information {
    padding:5px 5px 8px 8px;
    box-shadow:1px 1px 3px grey;
  }
+
  .tio-instructions {
     position: fixed;
     max-width:300px;

@@ -97,7 +97,7 @@
          :disabled="mode === 'view' || parameter.disabled" @change="change(parameter)"/>
    
      <div v-if="parameter.type === 'text'">
-          <input type="text" :required="parameter.required" :name="prefix + parameter.name" v-model="values[prefix + parameter.name]" 
+          <input type="text" :required="parameter.required" :name="prefix + parameter.name" :pattern="parameter.pattern" v-model="values[prefix + parameter.name]" 
           :placeholder="parameter.placeholder" :disabled="mode === 'view' || parameter.disabled" @change="change(parameter)"/>
      </div>
      <input v-if="parameter.type === 'number'"
@@ -105,7 +105,7 @@
         v-model="values[prefix + parameter.name]"  @change="change(parameter)" 
         :disabled="mode === 'view' || parameter.disabled" :class="{disabled:(parameter.type === 'customTypeNumber') || parameter.disabled}"/>
      
-     <input v-if="parameter.type === 'customTypeNumber'" type="text" :name="prefix + parameter.name" style="max-width:80px;"
+     <input v-if="parameter.type === 'customTypeNumber'" type="text" :name="prefix + parameter.name" :pattern="parameter.pattern" style="max-width:80px;"
         v-model="values[prefix + parameter.name]" :disabled="mode === 'view' || parameter.disabled"
          @change="change(parameter)" class="disabled"/>
   
