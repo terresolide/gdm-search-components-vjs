@@ -524,11 +524,13 @@ export default {
                 var value = value0
                 var options = {}
                 while (value <= 32) {
-                  options[value + ''] = value + '-LOOK' + (value > 1 ? 'S': '')
+                  options[value] = value + '-LOOK' + (value > 1 ? 'S': '')
                   value = value * 2
                 }
                 _this.parameters[index].options = options
-                _this.$set(_this.values, name, value0 + '')
+                if (!options[_this.values[name]]) {
+                  _this.$set(_this.values, name, value0)
+                }
               }
               _this.$forceUpdate()
             }
