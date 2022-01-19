@@ -188,15 +188,25 @@ export default {
        console.log(e)
        e.stopPropagation()
      },
-     copyCmd (url) {
-       this.$refs.areaCmd.select()
-       // node.setSelectionRange(0, 99999);
-       document.execCommand("copy");
-       this.showTooltip = true
+     copyCmd () {
+//        this.$refs.areaCmd.select()
+//        // node.setSelectionRange(0, 99999);
+//        document.execCommand("copy");
+//        this.showTooltip = true
+//        var _this = this
+//        setTimeout(function () {
+//          _this.showTooltip = false
+//        }, 2000)
        var _this = this
-       setTimeout(function () {
-         _this.showTooltip = false
-       }, 2000)
+       navigator.clipboard.writeText(this.cmdCurl).then(function() {
+         /* clipboard successfully set */
+         _this.showTooltip = true
+         setTimeout(function () {
+           _this.showTooltip = false
+         }, 2000)
+       }, function() {
+         alert(_this.$i18n.t('unauthorized_clipboard'))
+       });
      },
      copyPartialCmd (key) {
        var _this = this
