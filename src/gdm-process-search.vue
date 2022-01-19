@@ -115,6 +115,10 @@ export default {
       type: String,
       default: '#808080'
     },
+    example: {
+      type: Boolean,
+      value: false
+    },
     back: {
       type: Boolean,
       default: false
@@ -209,6 +213,9 @@ export default {
 	       url += '&userId=' + this.userId
 	     } else if (this.parameters.user) {
 	       url += '&userId=' + this.parameters.user.id
+	     }
+	     if (this.example) {
+	       url += '&example=1'
 	     }
 	     if (this.parameters.service) {
 	       url += '&serviceId=' + this.parameters.service.id
