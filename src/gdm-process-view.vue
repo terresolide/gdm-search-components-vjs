@@ -141,7 +141,7 @@
 	   <div class="header-4">--> 
 	   <div class="process-actions">
 	     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" 
-	     :process="process" :user-id="userId" :can-edit="!pleiadeRemoved" :lang="lang" :ciest2="ciest2" @processChange="statusChange" 
+	     :process="process" :user-id="userId" :can-edit="hasAccessService && !pleiadeRemoved" :lang="lang" :ciest2="ciest2" @processChange="statusChange" 
 	     @statusChange="statusChange" @ownerChange="userChange" @duplicate="duplicate">
 	     </gdm-process-actions>
 	   </div>
@@ -241,6 +241,10 @@ export default {
       type: Number,
       default: null
     },
+    access: {
+      type: Object,
+      default: () => {}
+    },
     back: {
       type: Boolean,
       default: false
@@ -259,6 +263,24 @@ export default {
         return this.process.log
       }
       return null
+    },
+    hasAccessService () {
+      if (this.back) {
+        return true
+      }
+      if (!this.access) {
+        return false
+      }
+      var sId = this.process.serviceId
+//       var access = this.access.find(gp => gp[sId])
+//       console.log(access)
+      var access = false
+      for (var key in this.access) {
+        if (this.access[key].hasOwnProperty(sId)) {
+          return this.access[key][sId]
+        }
+      }
+      return false
     }
   },
   created () {
