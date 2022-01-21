@@ -8,6 +8,7 @@
      "created": "Created",
      "edit": "Edit",
      "last_update": "Updated",
+     "map_layers": "Map layers",
      "owner_credit": "Actual credit",
      "process_time": "Process time",
      "parameters": "Parameters",
@@ -26,6 +27,7 @@
      "created": "Création",
      "edit": "Modifier",
      "last_update": "Maj",
+     "map_layers": "Couches cartographiques",
      "owner_credit": "Crédit actuel",
      "parameters": "Paramètres",
      "process_time": "Calcul",
@@ -549,10 +551,13 @@ export default {
         }
       }
       if (result.tio) {
+        if (imageLayers.length > 0 && !imageLayers[0].first) {
+          imageLayers[0].first = this.$i18n.t('map_layers')
+        }
         imageLayers.push({
           checked: false,
           title: 'TIO Interactive layer',
-          first: 'TIO',
+          first: this.$i18n.t('time_serie'),
           bbox: bbox,
           type: 'tio',
           dir: result.tio
@@ -781,7 +786,7 @@ border: 4px solid lightgrey;
 .gdm-process-header h1,
 .gdm-process-header h2 {
   margin:0;
-  padding: 0 0 5px 0;
+  padding: 5px 0;
   font-weight:700;
 }
 .gdm-process-header h1{

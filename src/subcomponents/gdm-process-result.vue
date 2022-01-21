@@ -7,7 +7,7 @@
      "copy_in_clipboard": "Copy the curl command\nin clipboard",
      "download": "Download",
      "folder": "Folder",
-     "preview": "Preview",
+     "preview": "Visualization",
      "product_license": "The products resulting from the DSM-OPT service are made available under a <a class='gdm-link'  href='https://creativecommons.org/licenses/by-nc/4.0/legalcode.fr' target='_blank'>CC-BY-NC</a> license, excluding any commercial use.",
      "results": "Results",
      "series": "Interferogram list",
@@ -43,7 +43,6 @@
 	         <div  @click="copyPartialCmd(name)" class="cmd-curl" :title="$t('copy_in_clipboard')">
 	           (<i class="fa fa-clipboard"></i> <span>{{$t('copy_curl')}})</span> 
 	          <div class="result-tooltip" v-show="showTooltip[name]"  @click="close($event, name)">{{$t('copied_to_clipboard')}}</div>
-	       
 	        </div>
 	       </div>
       </div>
@@ -66,33 +65,30 @@
       </a>
      </div>
     <div v-if="!result.dir && images && images.length > 0" :style="{width: series ? '35%' : '100%'}" style="margin-bottom:5px;">
-      <h4  :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h4>
-      
-      <div style="font-size:0.9rem;" >
-		    <div class="gdm-image-layer" v-if="image.type !== 'serie' && image.type !== 'list'" v-for="(image, index) in images" >
+      <h3  :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h3>
+      <div class="gdm-image-layer" v-if="image.type !== 'serie' && image.type !== 'list'" v-for="(image, index) in images" >
 		    <h4 v-if="image.first" :style="{color:color}" style="margin-bottom:0;">{{$t(image.first)}}</h4>
-		      <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'" @click="toggleImage(index)"></i> 
-		      <div style="display:inline-block;margin:0;max-width:calc(100% - 20px);">{{image.title}}</div>
+		    <div>
+			    <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'" @click="toggleImage(index)"></i> 
+			    <div style="display:inline-block;margin:0;max-width:calc(100% - 30px);">{{image.title}}</div>
 		    </div>
-	    </div>
+		  </div>
     </div>
     <div v-if="result.dir">
-     
-
        <h3 :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h3>
  
       <div v-if="images && images.length > 0"  style="margin-bottom:5px;">
 	      <h4 v-if="!series" :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h4>
-	      
-	      <div style="font-size:0.9rem;" >
 	        <div class="gdm-image-layer" v-if="image.type !== 'serie' && image.type !== 'list'" v-for="(image, index) in images" >
 	        <h4 v-if="image.first" :style="{color:color}" style="margin-bottom:0;">{{$t(image.first)}}</h4>
-	          <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'" @click="toggleImage(index)"></i> 
-	          <a v-if="image.tif && serviceName.indexOf('SAR') >= 0" :href="image.tif" class="fa fa-download" :title="$t('download')" style="padding:0 5px;color:black;"></a>
-	          <div style="display:inline-block;margin:0;max-width:calc(100% - 20px);">{{image.title}}</div>
+          <div style="margin-left:5px;">
+             <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'" @click="toggleImage(index)"></i> 
+              <a v-if="image.tif && serviceName.indexOf('SAR') >= 0" :href="image.tif" class="fa fa-download" :title="$t('download')" style="padding:0 5px;color:black;"></a>
+             <div style="display:inline-block;margin:0;max-width:calc(100% - 20px);">{{image.title}}</div>
+           </div>
 	        </div>
 	      </div>
-	    </div>
+
     </div>
     <div v-if="series" style="width:48%;min-width:300px;">
       <div>
@@ -101,6 +97,7 @@
       </div> 
       <div class="gdm-image-layer" v-if="image.type === 'serie' || image.type === 'list'" v-for="(image, index) in images" >
          <h4 v-if="image.first" :style="{color:color}" style="margin-bottom:0;">{{image.first}}</h4>
+         <div>
           <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'" @click="toggleImage(index)"></i> 
           <a v-if="image.tif" :href="image.tif" class="fa fa-download" :title="$t('download')" style="padding:0 5px;color:black;"></a>
           <div style="display:inline-block;margin:0;max-width:calc(100% - 20px);">{{image.title}}</div>
@@ -112,7 +109,7 @@
         </div>
       </div> -->
     </div>  
-    
+   </div> 
 
 </div>
 </template>
@@ -174,6 +171,9 @@ export default {
       } else {
         return null
       }
+    },
+    hasFirst () {
+      return this.images.some(img => img.first)
     }
   },
   destroyed: function() {
@@ -258,10 +258,14 @@ export default {
 </script>
 <style scoped>
 .gdm-image-layer h4 {
-  margin-top:10px;
+  margin: 10px 5px 0 5px;
+  font-size: 0.9rem;
 }
 .gdm-image-layer h4:first-child {
   margin-top:0;
+}
+.gdm-image-layer > div {
+  margin-left:5px;
 }
 div.partial-result {
   max-width:150px;
