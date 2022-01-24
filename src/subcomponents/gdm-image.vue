@@ -7,6 +7,7 @@
     "cloud_cover": "Cloud cover",
     "columns_rows": "Columns/Rows",
     "display_satellite": "Show approximate \nsatellite position",
+    "duplicate": "Duplicate",
     "hide_image": "Hide image",
     "geo_processing_level": "Geometric processing level",
     "nb_bands": "Nb bands",
@@ -38,6 +39,7 @@
      "click_to_reduce": "Cliquer pour fermer",
      "cloud_cover": "Couverture nuageuse",
      "display_satellite": "Voir la position \napproximative du satellite",
+     "duplicate": "Doublon",
      "hide_image": "Cacher",
      "nb_bands": "Nb bandes",
      "columns_rows": "Col/lignes",
@@ -67,7 +69,7 @@
 }
 </i18n>
 <template>
-<div class="gdm-image" :class="{'gdm-no-image': !image.productIdentifier, 'gdm-image-view': mode === 'view', 'gdm-pleiade': type === 'PLEIADES', 'gdm-removed': image.removed}" @mouseover="mouseover">
+<div class="gdm-image" :class="{'gdm-no-image': !image.productIdentifier, 'gdm-image-view': mode === 'view', 'gdm-pleiade': type === 'PLEIADES', 'gdm-removed': image.removed, 'gdm-duplicate': image.duplicate}" @mouseover="mouseover">
 	<div v-if="displayedImageId === image.productIdentifier" class="gdm-full"  @click="displayImage($event)" :title="$t('click_to_reduce')">
 	  <img :src="image.quicklook" >
 	</div>
@@ -80,7 +82,10 @@
   
 	</div>
 	<div class="gdm-image-title">
-	  <label v-if="image.productIdentifier">{{image.productIdentifier}}</label>
+	  <label v-if="image.productIdentifier">
+	     {{image.productIdentifier}}
+	     <span v-if="image.duplicate" style="color:darkred;">({{$t('duplicate')}})</span>
+	  </label>
 	  <label v-else >{{$t('no_image')}}</label>
 	</div>
 	<div class="gdm-image-2 gdm-fields">
@@ -407,6 +412,9 @@ margin: 0;
 padding: 0 5px;
 line-height:1;
 list-style-type: none;
+}
+.gdm-image.gdm-duplicate {
+  background: #fef5f5;
 }
 .gdm-image.gdm-pleiade {
   min-width:750px;
