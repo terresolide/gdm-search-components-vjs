@@ -75,7 +75,48 @@
         div.innerHTML = obj.layer.first
         this._overlaysList.appendChild(div)
       }
-      L.Control.Layers.prototype._addItem.call(this, obj)
+      if (obj.layer.images) {
+          var div = document.createElement('div')
+          var has = this._map.hasLayer(obj.layer)
+          var _this = this
+          obj.layer.images.forEach(function (img, index) {
+            console.log(img)
+            var label = document.createElement('label'),
+            checked = has && obj.layer.getIndex() === index,
+            input;
+
+            input = document.createElement('input');
+            input.type = 'checkbox';
+            input.className = 'leaflet-control-layers-selector';
+            input.defaultChecked = checked;
+         
+            _this._layerControlInputs.push(input);
+            input.layerId = L.Util.stamp(obj.layer);
+            input.index = index
+    
+            L.DomEvent.on(input, 'click', _this._onInputClick, _this);
+    
+            var name = document.createElement('span');
+            name.innerHTML = ' ' + img.title;
+    
+            // Helps from preventing layer control flicker when checkboxes are disabled
+            // https://github.com/Leaflet/Leaflet/issues/2771
+            var holder = document.createElement('div');
+    
+            label.appendChild(holder);
+            holder.appendChild(input);
+            holder.appendChild(name);
+            div.appendChild(label)
+            var container =  _this._overlaysList ;
+            container.appendChild(div);
+  
+            _this._checkDisabledLayers();
+          })
+         
+          return div;
+      } else {
+        L.Control.Layers.prototype._addItem.call(this, obj)
+      }
    },
    /**
     * Overwrite _onInputClick to remove the other layers (serie or image)
@@ -83,6 +124,7 @@
     */
    _onInputClick: function (e) {
      // get 'layerId' clicked and  if it is an exclusive layer (with type property)
+    
      var layerId = e.target.layerId
      var layer = this._getLayer(layerId).layer
      var isExclusive = layer.hasOwnProperty('type')
@@ -95,13 +137,28 @@
      for (var i = inputs.length - 1; i >= 0; i--) {
        input = inputs[i];
        layer = this._getLayer(input.layerId).layer;
- 
-       if (input.checked && (input.layerId === layerId || !isExclusive)) {
+       // case TIO change image url of layer, has property index of the image
+       var isIndex = e.target.hasOwnProperty('index') ? e.target.index === input.index : true
+       if (input.checked && isIndex && (input.layerId === layerId || !isExclusive)) {
          addedLayers.push(layer);
+         if (e.target.hasOwnProperty('index')) {
+           layer.setUrl(layer.images[e.target.index].png)
+           layer.legend = layer.images[e.target.index].legend
+           layer.indexImage = e.target.index
+//           layer.images.forEach(function (image, index) {
+//             if (index === e.target.index) {
+//                image.checked = true
+//             } else {
+//                image.checked = false
+//             }
+//           })
+           layer.checked = true
+         }
 //       } else if (!input.checked) {
 //         removedLayers.push(layer);
        } else if (!input.checked || (layer.type && isExclusive)) {
          input.checked = false
+         layer.checked = false
          removedLayers.push(layer);
        }
      }

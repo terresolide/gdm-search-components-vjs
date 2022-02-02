@@ -11,7 +11,7 @@
 }
 </i18n>
 <template>
-<span class="gdm-parameters" v-show="show" style="direction:ltr;" @contextmenu="$event.preventDefault()" >
+<span class="gdm-parameters" v-show="show" style="direction:ltr;"> <!--   @contextmenu="$event.preventDefault()" > -->
  <div v-if="!root" style="margin-left: -18px;":title="tr(describe.short)" >
 <!--   <div  v-if="used" class="gdm-deployed" @click="deployed = !deployed" style="width:6px;pointer:cursor;">{{deployed ? '-' : '+'}}</div>
  <div v-else="used" class="gdm-deployed" style="color:grey;">{{deployed ? '-' : '+'}}</div>
@@ -51,7 +51,7 @@
    </gdm-parameters>
    <div v-if="['complexe', 'complexeReturn', 'hidden'].indexOf(parameter.type) < 0" v-show="parameter.show" :class="parameter.classname">
    <div   style="opacity:0.5;margin-left:-18px;display:inline-block;width:14px;text-align: center;">-</div>
-   <div   style="display:inline-block;vertical-align:top;" :style="{maxWidth: (width - 30) + 'px'}">
+   <div   style="display:inline-block;vertical-align:top;" :style="{maxWidth: (parameter.blockWidth || (width - 30)) + 'px'}">
      <div v-if="parameter.type!== 'complexe' && parameter.type !== 'complexeReturn'" class="gdm-title"
      :style="titleStyle(parameter)"  :title="getTitle(parameter)" @contextmenu="showTooltip($event)">{{tr(parameter.title)}}</div>
      
@@ -62,15 +62,15 @@
      
      <div v-if="parameter.type === 'select' || parameter.type === 'customTypeSelect'" 
      style="display:inline-block;">
-        <select v-if="parameter.associative" :name="prefix + parameter.name" @change="change(parameter)" 
+        <select v-if="parameter.associative" :required="parameter.required" :name="prefix + parameter.name" @change="change(parameter)" 
         v-model="values[prefix + parameter.name]" :class="{disabled: (parameter.type === 'customTypeSelect' || parameter.disabled)}"
         :disabled="mode === 'view' || parameter.disabled">
-          <option v-for="(option, key) in parameter.options" :value="key">{{option}}</option>
+          <option v-for="(option, key) in parameter.options" :value="key">{{tr(option)}}</option>
         </select>
-        <select v-else :name="prefix + parameter.name" v-model="values[prefix + parameter.name]"
+        <select v-else :name="prefix + parameter.name"  v-model="values[prefix + parameter.name]"
         :class="{disabled : (parameter.type === 'customTypeSelect' || parameter.disabled)}" :disabled="mode === 'view' || parameter.disabled"
         @change="change(parameter)">
-          <option v-for="option in parameter.options" :value="option">{{option}}</option>
+           <option v-for="option in parameter.options" :value="option">{{option}}</option>
         </select>
      </div>
       <div v-if="parameter.type === 'multipleCheckbox'"  style="display:inline-block;">
@@ -748,6 +748,11 @@ div[id="app"] .gdm-tooltip a:hover {
     background-color: -internal-light-dark-color(white, black);
     border-image-outset: 0px;
     box-sizing: border-box;*/
+}
+.gdm-parameters div.large-input input,
+.gdm-parameters div.large-input select{
+   max-width:180px;
+   width: 180px;
 }
 .gdm-parameters input.invalid {
   box-shadow: 1px 1px 5px red;

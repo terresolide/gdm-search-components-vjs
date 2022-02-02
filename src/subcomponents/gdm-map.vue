@@ -145,13 +145,21 @@ export default {
     }
   },
   methods: {
-   toggleImageLayer (index, checked) {
+   toggleImageLayer (e, checked) {
+     console.log(checked)
+     var index = e.index
      if (checked) {
       // this.imageLayers[index].addTo(this.map)
        var _this = this
        this.imageLayers.forEach(function (image, i) {
-         if (i === index) {
-           image.addTo(_this.map)
+         if (i === index ) {
+             if (e.hasOwnProperty('indexImage')) {
+               image.index = e.indexImage
+               image.legend = image.images[e.indexImage].legend
+               image.setUrl(image.images[e.indexImage].png)
+               console.log(image)
+             }
+             image.addTo(_this.map)
          } else {
            if (_this.map.hasLayer(image)) {
              image.remove()
@@ -215,6 +223,8 @@ export default {
       }
       this.controlLegend = new L.Control.Legend(this.$i18n.locale, function (uuid) { return 'i' + uuid;})
       this.controlLegend.addTo(this.map)
+      // deploy legend by default
+      this.controlLegend._container.classList.add('expand')
       this.controlOpacity = new L.Control.Opacity(this.$i18n.locale)
       this.controlOpacity.addTo(this.map)
       this.map.getPane('overlayPane').style.pointerEvents = 'auto'
@@ -322,8 +332,8 @@ export default {
         
       } else if (image.png) {
           var layer = L.imageOverlay(image.png, bounds, {opacity: this.controlOpacity.getValue()})
-      } else if (image.dir) {
-        var layer = new L.ImageOverlay.Rotated.Tio(image.dir)
+      } else if (image.root) {
+        var layer = new L.ImageOverlay.Rotated.Tio(image.root)
         layer.on('TIO:RESET', function (resp) {
           _this.tio.ptValues = {ew: [], ns: []}
           _this.tio.showGraph = false
@@ -335,7 +345,13 @@ export default {
         layer.on('TIO:SEARCHING', function (event) {
           _this.tio.searching = event.searching
         })
+        layer.on('TIO:READY', function (data) {
+          //_this.images = this.images
+          _this.controlLayer.addOverlay(this, 'Inversion')
+          _this.$emit('tioReady', {layer: layer, index: index})
+        })
         this.tio.img = layer
+        
       }
       if (image.first) {
         layer.first = image.first
@@ -353,6 +369,9 @@ export default {
         if (_this.images[index].legend) {
           _this.controlLegend.addLegend(0, index, _this.images[index].legend)
         }
+        if (this.legend) {
+          _this.controlLegend.addLegend(0, index, this.legend)
+        }
         // remove the others
 //         _this.imageLayers.forEach(function (image, i) {
 //           if (i !== index && _this.map.hasLayer(image)) {
@@ -365,12 +384,13 @@ export default {
         } else {
           _this.controlOpacity.setVisible(false)
         }
-        _this.$emit('imageAdded', index)
+        _this.$emit('imageAdded', {index: index, indexImage: layer.indexImage})
       })
       layer.on('remove', function () {
-        if (_this.images[index].legend) {
+        if (_this.images[index].legend || this.legend) {
           _this.controlLegend.removeLegend(index)
         }
+      
         _this.countImages = _this.countImages -1
         if (_this.countImages > 0) {
           _this.controlOpacity.setVisible(true)
@@ -381,7 +401,9 @@ export default {
       })
       this.imageLayers.push(layer)
       // layer.addTo(_this.map)
-      this.controlLayer.addOverlay(layer, image.title, 'common')
+      if (!image.root) {
+         this.controlLayer.addOverlay(layer, image.title, 'common')
+      }
     },
     highlightLayer (id)
     {

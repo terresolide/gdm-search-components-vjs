@@ -57,7 +57,7 @@
 	   <div class="header-1">
 	     <div class="gdm-map-container">
 	      <gdm-map ref="map" :bbox="process.feature" :images="imageLayers" :tile="feature.properties.bboxTile"
-	      :service-name="process.serviceName" :series="series" :serie-index="serieIndex" :lang="lang" @dateChange="dateSerieChange"
+	      :service-name="process.serviceName" :series="series" :serie-index="serieIndex" :lang="lang" @dateChange="dateSerieChange" @tioReady="tioImagesReady"
 	      fullscreen="fmtLargeMap" :remove-height="8" @loadingLayer="loadingChange" @imageAdded="imageAdded" @imageRemoved="imageRemoved"></gdm-map>
 	     </div>
 	      <div style="text-align:center;margin-top:10px;">
@@ -151,7 +151,7 @@
 	    <div v-if="process && process.result && process.status === 'TERMINATED'" :class="{highlight:seeResult}" style="margin-top:15px;"
 	    :style="{background: seeResult ? $shadeColor(color,0.92): 'none'}">
        <gdm-process-result  :result="process.result" :series="series" :service-name="process.serviceName"
-        :lang="lang" :color="color" :images="imageLayers" :serie-index="serieIndex"
+        :lang="lang" :color="color" :images="imageLayers" :serie-index="serieIndex" 
         @toggleImage="toggleImage"  @dateSerieChange="dateSerieChange" >
        </gdm-process-result>
        </div>
@@ -345,10 +345,23 @@ export default {
       )
     },
     toggleImage (e) {
-      var image = this.imageLayers[e]
-      image.checked = !image.checked
-      this.serieName = image.title
-      this.$set(this.imageLayers, e, image)
+      console.log(e)
+      var image = this.imageLayers[e.index]
+      if (e.hasOwnProperty('indexImage')) {
+        if (image.checked && image.index === e.indexImage) {
+          image.checked = false
+        } else {
+          image.checked = true
+          image.index = e.indexImage
+          // this.$refs.map.toggleImageLayer(e, image.checked)
+        }
+      } else {
+	      image.checked = !image.checked
+	      this.serieName = image.title
+// 	      this.$set(this.imageLayers, e, image)
+// 	      this.$refs.map.toggleImageLayer(e, image.checked)
+      }
+      this.$set(this.imageLayers, e.index, image)
       this.$refs.map.toggleImageLayer(e, image.checked)
     },
     // @toRemove
@@ -358,7 +371,14 @@ export default {
 //       this.$set(this.series, name, serie)
 //       this.$refs.map.toggleSerieLayer(name, serie.checked)
 //     },
-    imageAdded (index) {
+    tioImagesReady (e) {
+       var image = this.imageLayers[e.index]
+       image.images = e.layer.images
+       this.$set(this.imageLayers, e.index , image)
+    },
+    imageAdded (e) {
+      console.log(e)
+      var index = e.index
       var image = this.imageLayers[index]
       image.checked = true
       if (image.type === 'serie' || image.type === 'list') {
@@ -366,13 +386,16 @@ export default {
       } else {
         this.serieName = null
       }
-      if (image.type === 'tio' && !image.displayed) {
-        this.showTioInstructions = true
-        image.displayed = true
-        var _this = this
-        setTimeout(function () {
-          _this.showTioInstructions = false
-        }, 10000)
+      if (image.type === 'tio') {
+        image.index = e.indexImage
+        if (!image.displayed) {
+	        this.showTioInstructions = true
+	        image.displayed = true
+	        var _this = this
+	        setTimeout(function () {
+	          _this.showTioInstructions = false
+	        }, 10000)
+        }
       }
       this.$set(this.imageLayers, index, image)
 //       var _this = this
@@ -550,7 +573,7 @@ export default {
           this.series = lists
         }
       }
-      if (result.tio) {
+      if (result.inversion) {
         if (imageLayers.length > 0 && !imageLayers[0].first) {
           imageLayers[0].first = this.$i18n.t('map_layers')
         }
@@ -560,7 +583,7 @@ export default {
           first: this.$i18n.t('time_serie'),
           bbox: bbox,
           type: 'tio',
-          dir: result.tio
+          root: result.inversion
         })
       }
       this.imageLayers = imageLayers

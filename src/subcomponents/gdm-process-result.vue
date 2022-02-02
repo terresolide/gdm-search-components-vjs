@@ -68,7 +68,14 @@
       <h3  :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h3>
       <div class="gdm-image-layer" v-if="image.type !== 'serie' && image.type !== 'list'" v-for="(image, index) in images" >
 		    <h4 v-if="image.first" :style="{color:color}" style="margin-bottom:0;">{{$t(image.first)}}</h4>
-		    <div>
+		    <!-- TIO CASE -->
+		    <div v-if="image.images">
+		      <div v-for="imageTio, indexTio in image.images">
+             <i class="fa" style="vertical-align:top;":class="image.checked && image.index === indexTio ?'fa-eye':'fa-eye-slash'" @click="toggleImageTio(index, indexTio)"></i> 
+             <div style="display:inline-block;margin:0;max-width:calc(100% - 30px);">{{imageTio.title}}</div>
+           </div>
+		    </div>
+		    <div v-else>
 			    <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'" @click="toggleImage(index)"></i> 
 			    <div style="display:inline-block;margin:0;max-width:calc(100% - 30px);">{{image.title}}</div>
 		    </div>
@@ -248,8 +255,11 @@ export default {
        }
      },
      toggleImage (index) {
-       this.$emit('toggleImage', index)
-     } // ,
+       this.$emit('toggleImage', {index: index})
+     },
+     toggleImageTio (index, indexImage) {
+         this.$emit('toggleImage', {index: index, indexImage: indexImage})
+     }// ,
 //      toggleSerie (name) {
 //        this.$emit('toggleSerie', name)
 //      }
