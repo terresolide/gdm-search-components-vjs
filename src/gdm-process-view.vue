@@ -345,10 +345,9 @@ export default {
       )
     },
     toggleImage (e) {
-      console.log(e)
       var image = this.imageLayers[e.index]
       if (e.hasOwnProperty('indexImage')) {
-        if (image.checked && image.index === e.indexImage) {
+        if (image.checked && image.indexImage === e.indexImage) {
           image.checked = false
         } else {
           image.checked = true

@@ -35,7 +35,7 @@
 }
 </i18n>
 <template>
-<span class="gdm-process-actions" v-if="process && userId" >
+<span class="gdm-process-actions" v-if="process && (userId || back)" >
       <div  v-if="submitting" class="gdm-searching"><i class="fa fa-circle-o-notch animated"></i></div>
 
       <div v-if="process.status === 'EVALUATED'">

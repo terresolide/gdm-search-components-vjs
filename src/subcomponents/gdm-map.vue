@@ -146,8 +146,6 @@ export default {
   },
   methods: {
    toggleImageLayer (e, checked) {
-     console.log(checked)
-     console.log(e)
      var index = e.index
      if (checked) {
       // this.imageLayers[index].addTo(this.map)
@@ -157,8 +155,8 @@ export default {
              if (e.hasOwnProperty('indexImage')) {
                image.indexImage = e.indexImage
                image.legend = image.images[e.indexImage].legend
-               _this.controlLegend.removeLegend(index)
-               _this.controlLegend.addLegend(0, index, image.legend)
+              _this.controlLegend.removeLegend(index)
+             _this.controlLegend.addLegend(0, index, image.images[e.indexImage].legend)
                image.setUrl(image.images[e.indexImage].png)
                // _this.$set(_this.imageLayers, i, image)
                // _this.controlLayer._update()
@@ -357,6 +355,9 @@ export default {
         this.tio.img = layer
         
       }
+      if (image.legend) {
+        layer.legend = image.legend
+      }
       if (image.first) {
         layer.first = image.first
       }
@@ -372,9 +373,8 @@ export default {
         }
 //         if (_this.images[index].legend) {
 //           _this.controlLegend.addLegend(0, index, _this.images[index].legend)
-//         }
-        console.log(this.legend)
-        if (this.legend) {
+//         }else 
+          if (this.legend) {
           _this.controlLegend.addLegend(0, index, this.legend)
         }
         // remove the others

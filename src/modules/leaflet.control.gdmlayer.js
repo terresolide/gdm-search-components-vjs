@@ -182,7 +182,6 @@
     * to use the local _addItem when update
     */
    _update: function () {
-     console.log('update')
      if (!this._container) { return this; }
 
      L.DomUtil.empty(this._baseLayersList);
