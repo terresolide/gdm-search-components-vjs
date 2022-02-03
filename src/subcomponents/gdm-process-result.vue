@@ -258,6 +258,7 @@ export default {
        this.$emit('toggleImage', {index: index})
      },
      toggleImageTio (index, indexImage) {
+         console.log(indexImage)
          this.$emit('toggleImage', {index: index, indexImage: indexImage})
      }// ,
 //      toggleSerie (name) {

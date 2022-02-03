@@ -80,11 +80,9 @@
           var has = this._map.hasLayer(obj.layer)
           var _this = this
           obj.layer.images.forEach(function (img, index) {
-            console.log(img)
             var label = document.createElement('label'),
-            checked = has && obj.layer.getIndex() === index,
+            checked = has && obj.layer.indexImage === index,
             input;
-
             input = document.createElement('input');
             input.type = 'checkbox';
             input.className = 'leaflet-control-layers-selector';
@@ -178,6 +176,38 @@
      this._handlingClick = false;
 
      this._refocusOnMap();
+   },
+   /**
+    * Overwrite method _update from leaflet/src/core/Control.layers
+    * to use the local _addItem when update
+    */
+   _update: function () {
+     console.log('update')
+     if (!this._container) { return this; }
+
+     L.DomUtil.empty(this._baseLayersList);
+     L.DomUtil.empty(this._overlaysList);
+
+     this._layerControlInputs = [];
+     var baseLayersPresent, overlaysPresent, i, obj, baseLayersCount = 0;
+
+     for (i = 0; i < this._layers.length; i++) {
+       obj = this._layers[i];
+       this._addItem(obj);
+       overlaysPresent = overlaysPresent || obj.overlay;
+       baseLayersPresent = baseLayersPresent || !obj.overlay;
+       baseLayersCount += !obj.overlay ? 1 : 0;
+     }
+
+     // Hide base layers section if there's only one layer.
+     if (this.options.hideSingleBase) {
+       baseLayersPresent = baseLayersPresent && baseLayersCount > 1;
+       this._baseLayersList.style.display = baseLayersPresent ? '' : 'none';
+     }
+
+     this._separator.style.display = overlaysPresent && baseLayersPresent ? '' : 'none';
+
+     return this;
    }
  })
  module.exports = L.Control.Gdmlayer
