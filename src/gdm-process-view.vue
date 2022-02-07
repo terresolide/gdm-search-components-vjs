@@ -351,7 +351,7 @@ export default {
           image.checked = false
         } else {
           image.checked = true
-          image.index = e.indexImage
+          image.indexImage = e.indexImage
           // this.$refs.map.toggleImageLayer(e, image.checked)
         }
       } else {
@@ -376,7 +376,6 @@ export default {
        this.$set(this.imageLayers, e.index , image)
     },
     imageAdded (e) {
-      console.log(e)
       var index = e.index
       var image = this.imageLayers[index]
       image.checked = true
@@ -386,7 +385,7 @@ export default {
         this.serieName = null
       }
       if (image.type === 'tio') {
-        image.index = e.indexImage
+        image.indexImage = e.indexImage
         if (!image.displayed) {
 	        this.showTioInstructions = true
 	        image.displayed = true

@@ -159,7 +159,7 @@ export default {
              _this.controlLegend.addLegend(0, index, image.images[e.indexImage].legend)
                image.setUrl(image.images[e.indexImage].png)
                // _this.$set(_this.imageLayers, i, image)
-               // _this.controlLayer._update()
+                _this.controlLayer._update()
              }
              image.addTo(_this.map)
          } else {

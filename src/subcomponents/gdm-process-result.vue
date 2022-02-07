@@ -71,7 +71,7 @@
 		    <!-- TIO CASE -->
 		    <div v-if="image.images">
 		      <div v-for="imageTio, indexTio in image.images">
-             <i class="fa" style="vertical-align:top;":class="image.checked && image.index === indexTio ?'fa-eye':'fa-eye-slash'" @click="toggleImageTio(index, indexTio)"></i> 
+             <i class="fa" style="vertical-align:top;":class="image.checked && image.indexImage === indexTio ?'fa-eye':'fa-eye-slash'" @click="toggleImageTio(index, indexTio)"></i> 
              <div style="display:inline-block;margin:0;max-width:calc(100% - 30px);">{{imageTio.title}}</div>
            </div>
 		    </div>
