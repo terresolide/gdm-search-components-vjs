@@ -13,6 +13,7 @@
      "evaluate": "Evaluate",
      "duplicate": "Duplicate",
      "debug": "Switch to debug",
+     "get_result": "Get result",
      "run": "end of debug",
      "share_ciest2": "Share with CIEST2"
    },
@@ -29,6 +30,7 @@
      "evaluate": "Evaluer",
      "duplicate": "Dupliquer",
      "debug": "Passer en mode debug",
+     "get_result": "Obtenir les résultats",
      "run": "Fin du debug" ,
      "share_ciest2": "Partager CIEST2"
    }
@@ -57,6 +59,8 @@
       <div v-else-if="process.status === 'PURGED' || process.status === 'ABORTED' || process.status === 'TERMINATED'">
          <a class="button" @click="duplicate"  :class="{disabled: !canEdit}">{{$t('duplicate')}}</a>
           <a class="button" v-if="!back && userId===process.userId && ciest2 && !isCiest2 && process.status==='TERMINATED'" @click="share"  :class="{disabled: !canEdit}">{{$t('share_ciest2')}}</a>
+          <!--  GET RESULT IF NOT EXISTS -->
+          <a class="button" v-if="process.status === 'TERMINATED' && !process.result" @click="getResult" :class="{disabled: searchResult}">{{$t('get_result')}}</a>
       </div>
        
       <div v-else-if="process.status === 'RUNNING' || process.status === 'PRE-RUN' || process.status === 'ACCEPTED'">
@@ -136,7 +140,8 @@ export default {
       status: null,
       timer: null,
       isCiest2: false,
-      getCount: 0
+      getCount: 0,
+      searchResult: false
     }
   },
   computed: {
@@ -207,6 +212,22 @@ export default {
     clickGetStatus() {
       this.submitting = true
       this.getStatusInDepth()
+    },
+    getResult () {
+      this.searchResult = true
+      this.submitting = true
+      this.$http.get(this.api + '/getResult/' + this.process.id, {credentials: true})
+      .then(function (resp) {
+        console.log('get result')
+        var _this = this
+        setTimeout(function () {
+          _this.submitting = false
+          _this.getStatus()
+        }, 10000)
+      }, function (e) {
+        this.submitting = false
+        
+      })
     },
     getStatus () {
       this.$http.get(this.api + '/getStatus/' + this.process.id, {credentials: true})

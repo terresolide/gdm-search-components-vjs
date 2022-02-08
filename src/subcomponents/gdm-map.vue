@@ -15,6 +15,7 @@ L.Control.Gdmlayer = require('../modules/leaflet.control.gdmlayer.js')
 L.Control.Fullscreen = require('formater-metadata-vjs/src/modules/leaflet.control.fullscreen.js')
 L.Control.Legend = require('formater-metadata-vjs/src/modules/leaflet.control.legend.js')
 L.Control.Legend = require('../modules/leaflet.control.opacity.js')
+require('leaflet-imageoverlay-rotated')
 // import GdmSerieNavigation from './gdm-serie-navigation.vue'
 import Tio from 'gdm-tio-vjs/src/modules/leaflet.imageOverlay.rotated.tio.js'
 L.ImageOverlay.Rotated.Tio = Tio
@@ -321,8 +322,11 @@ export default {
     initImageLayer (image, index) {
       if (image.bbox) {
         var bounds = [[image.bbox[1], image.bbox[0]], [image.bbox[3], image.bbox[2]]]
-      }else if (this.bboxTile && image.title.charAt(0) === 'T') {
+      } else if (this.bboxTile && image.title.charAt(0) === 'T') {
         var bounds = this.bboxTile
+//       } else if (image.bounds){
+//          var bounds = [[image.bounds.pointTL[1], image.bounds.pointTL[0]],
+//                        [image.bounds.pointBR[1], image.bounds.pointBR[0]]]
       } else {
         var bounds = this.bboxLayer.getBounds()
       }
@@ -332,8 +336,13 @@ export default {
       if (image.mp4) {
         var layer = L.videoOverlay(image.mp4, bounds, {interactive: true, opacity:this.controlOpacity.getValue()})
         
-      } else if (image.png) {
+      } else if (image.png && !image.bounds) {
           var layer = L.imageOverlay(image.png, bounds, {opacity: this.controlOpacity.getValue()})
+      } else if (image.png && image.bounds) {
+        var layer = new L.ImageOverlay.Rotated(image.png, [image.bounds.pointTL[1], image.bounds.pointTL[0]], 
+        [image.bounds.pointTR[1], image.bounds.pointTR[0]],
+        [image.bounds.pointBL[1], image.bounds.pointBL[0]],
+        {opacity: 0.5})
       } else if (image.root) {
         var layer = new L.ImageOverlay.Rotated.Tio(image.root)
         layer.on('TIO:RESET', function (resp) {

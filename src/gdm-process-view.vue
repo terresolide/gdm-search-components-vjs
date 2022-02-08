@@ -420,10 +420,14 @@ export default {
         result.thumbnails.sort(function (a, b) {
           return a.title > b.title ? 1 : -1
         })
+        console.log(result.bounds)
         var imageLayers = result.thumbnails
         imageLayers.forEach(function (image) {
           image.checked = false,
           image.type = 'image'
+          if (result.bounds) {
+            image.bounds = result.bounds
+          }
         })
         this.imageLayers = imageLayers
       } else if (result){
@@ -571,7 +575,7 @@ export default {
           this.series = lists
         }
       }
-      if (result.inversion) {
+      if (result && result.inversion) {
         if (imageLayers.length > 0 && !imageLayers[0].first) {
           imageLayers[0].first = this.$i18n.t('map_layers')
         }
