@@ -9,6 +9,8 @@
      "edit": "Edit",
      "last_update": "Updated",
      "map_layers": "Map layers",
+     "no_accessible_process_user": "You don't have permission to view this job.<br/>Please login.",
+     "no_accessible_process": "You don't have permission to view this job.",
      "owner_credit": "Actual credit",
      "process_time": "Process time",
      "parameters": "Parameters",
@@ -28,6 +30,8 @@
      "edit": "Modifier",
      "last_update": "Maj",
      "map_layers": "Couches cartographiques",
+     "no_accessible_process_user": "Vous n'avez pas la permission de visualiser ce job.<br/>Connectez-vous s'il vous plait.",
+     "no_accessible_process": "Vous n'avez pas la permission de visualiser ce job.",
      "owner_credit": "Crédit actuel",
      "parameters": "Paramètres",
      "process_time": "Calcul",
@@ -40,151 +44,163 @@
 }
 </i18n>
 <template>
- <span class="gdm-process-view" v-if="process">
- <div id="fmtLargeMap">
-   <gdm-serie-navigation v-if="series" :series="series" :serie-index="serieIndex" :serie-name="serieName" :color="color" :lang="lang"
-     :fullscreen="true" :loading="loadingLayer"  @dateChange="dateSerieChange"></gdm-serie-navigation>
- </div>
- <div class="tio-instructions" v-show="showTioInstructions" @click="showTioInstructions=false">{{$t('tio_instructions')}}</div>
- <div >
-   <div style="position:relative;">
-	 <gdm-service-status  :name="process.serviceName" :status="process.serviceStatus" :top="5" :right="10" :lang="lang" ></gdm-service-status>
+ <span class="gdm-process-view" >
+ <div v-if="process">
+	 <div id="fmtLargeMap">
+	   <gdm-serie-navigation v-if="series" :series="series" :serie-index="serieIndex" :serie-name="serieName" :color="color" :lang="lang"
+	     :fullscreen="true" :loading="loadingLayer"  @dateChange="dateSerieChange"></gdm-serie-navigation>
 	 </div>
-	 <div class="gdm-process-header" :style="{background: $shadeColor(color,0.95)}">
-	   <div class="header-0">
-	    <h1 :style="{color:color}">{{(process.id + '').padStart(5, '0')}}<span v-if="process.token">-{{process.token}}</span><span v-if="process.name">  {{process.name }}</span></h1>
-	   </div>
-	   <div class="header-1">
-	     <div class="gdm-map-container">
-	      <gdm-map ref="map" :bbox="process.feature" :images="imageLayers" :tile="feature.properties.bboxTile"
-	      :service-name="process.serviceName" :series="series" :serie-index="serieIndex" :lang="lang" @dateChange="dateSerieChange" @tioReady="tioImagesReady"
-	      fullscreen="fmtLargeMap" :remove-height="8" @loadingLayer="loadingChange" @imageAdded="imageAdded" @imageRemoved="imageRemoved"></gdm-map>
-	     </div>
-	      <div style="text-align:center;margin-top:10px;">
-	         {{date2str(process.tempStart, true)}}
-	         <span v-if="type !== 'PLEIADES'" class="fa fa-long-arrow-right"></span>
-	         <span v-if="type !== 'PLEIADES'">{{date2str(process.tempEnd, true)}}</span> 
-	     </div>
-	   </div>
-	   <div class="header-2-1" style="padding: 0 10px;">
-	      <h2 :style="{color:color, margin: 0}">{{$t('status_informations')}}</h2>
-	      <div>
-	        <div>
-             <b>{{$t('created')}}: </b>
-             <span style="white-space:nowrap;">
-               {{date2str(process.start)}}
-             </span>
-           </div>
-           <div v-if="process.processStart">
-           <b>{{$t('process_time')}}:</b>
-		        <span style="white-space:nowrap;">
-		          {{date2str(process.processStart)}}
-		        </span>
-	          <span class="fa fa-long-arrow-right"></span>
-	          <span v-if="process.processEnd" style="white-space:nowrap;">
-             {{date2str(process.processEnd)}}
-             </span>
-             <span v-else style="color:grey;white-space:nowrap;">
-             {{date2str(process.end)}}
-             </span>
-          </div>
-          <div v-else>
-             <b>{{$t('last_update')}}: </b>
-             <span style="white-space:nowrap;">
-               {{date2str(process.end)}}
-             </span>
-          </div>
-          <div v-if="process.status === 'TERMINATED' && process.datePurge"
-          style="font-size:0.9em;color:darkred;cursor:pointer;" :title="$t('clear_data')">
-           <i class="fa fa-exclamation-triangle"> 
-           </i>
-           <b>Purge: </b>
-             <span style="white-space:nowrap;">
-               {{date2str(process.datePurge)}}
-             </span>
-          </div>
-	      </div>
-	   </div>
-	   <div class="header-2-2" style="position:relative;z-index:0;">
-	     <gdm-process-progress :status="process.status" :progress="process.progress" 
-	     :step-id="process.stepId" :log="log" :back="back" :steps="process.serviceSteps" ></gdm-process-progress>
-	  </div>
-	  <div class="header-2-3">
-	      <div><b>{{$t('owner')}}:</b> {{process.email}}</div>
-	      <div v-if="process.cost > 0" >
-	        <b>{{$t('cost')}}:</b>
-	        <span v-if="['WAITING', 'EVALUATED'].indexOf(process.status) >= 0">
-		        <span :style="{color: process.cost > process.quota ? 'red' : 'black' }">
-		           <span v-if="process.serviceName.indexOf('SAR') >= 0"> <b>{{process.cost.toLocaleString()}}&nbsp;{{$t('units')}}</b> </span>
-		           <span v-else> <b>{{process.cost.toLocaleString()}}&nbsp;CPU&nbsp;{{$t('seconds')}}</b></span>
-			         <span >/ {{process.quota.toLocaleString()}}</span>
-		        </span>
-		         <div v-if="back && process.cost > process.quota">
-                 <a class="button"  :href="url + 'users/view/' + process.userId">{{$t('edit')}}</a>
-             </div>
-	         </span>
-	         <span v-else>
-	            <span v-if="process.serviceName.indexOf('SAR') >= 0"><b>{{process.cost.toLocaleString()}}</b>&nbsp;{{$t('units')}}</span>
-	            <span v-else><b>{{process.cost.toLocaleString()}}</b>&nbsp;CPU&nbsp;{{$t('seconds')}}</span>
-	         </span>
-	         
-	      </div>
-	      <div v-if="process.cost <= 0 || ['WAITING', 'EVALUATED'].indexOf(process.status) < 0">
-	      <b>{{$t('owner_credit')}}:</b> 
-		      <span v-if="process.serviceName.indexOf('SAR') >= 0">{{process.quota.toLocaleString()}}&nbsp;{{$t('units')}}</span>
-		      <span v-else>{{process.quota.toLocaleString()}}&nbsp;CPU&nbsp;{{$t('seconds')}}</span>
-	      </div>
-	   </div>
-	   <div class="header-3">
-	  <div style="max-width:130px;display:inline-block;">
-        <gdm-process-status v-if="statusList" :status="process.status" :progress="process.progress" :status-list="statusList" :lang="lang"></gdm-process-status>
-     </div>
-	  <!--  </div>
-	   <div class="header-4">--> 
-	   <div class="process-actions">
-	     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" 
-	     :process="process" :user-id="userId" :can-edit="hasAccessService && !pleiadeRemoved" :lang="lang" :ciest2="ciest2" @processChange="statusChange" 
-	     @statusChange="statusChange" @ownerChange="userChange" @duplicate="duplicate">
-	     </gdm-process-actions>
-	   </div>
-	    
-	    <div v-if="process && process.result && process.status === 'TERMINATED'" :class="{highlight:seeResult}" style="margin-top:15px;"
-	    :style="{background: seeResult ? $shadeColor(color,0.92): 'none'}">
-       <gdm-process-result  :result="process.result" :series="series" :service-name="process.serviceName"
-        :lang="lang" :color="color" :images="imageLayers" :serie-index="serieIndex" 
-        @toggleImage="toggleImage"  @dateSerieChange="dateSerieChange" >
-       </gdm-process-result>
-       </div>
+	 <div class="tio-instructions" v-show="showTioInstructions" @click="showTioInstructions=false">{{$t('tio_instructions')}}</div>
+	 <div >
+	   <div style="position:relative;">
+		 <gdm-service-status  :name="process.serviceName" :status="process.serviceStatus" :top="5" :right="10" :lang="lang" ></gdm-service-status>
 		 </div>
-		 </div>
-		 <div class="gdm-list-parameters" v-if="describe"> 
-		  <h2 :style="{color:color}">{{$t('parameters')}}</h2>
-       <div>
-		 <gdm-parameters  mode="view" :describe="describe" :default-parameters="defaultParameters" :width="360" :color="color" :lang="lang"></gdm-parameters>
-        <div style="height:120px;"></div>
-      </div>
-      </div>
-		 <div class="gdm-list-parameters" v-else >
-			 <h2 :style="{color:color}">{{$t('parameters')}}</h2>
-			 <div>
-			  <div v-for="(value, prop) in parameters" style="font-size:0.9rem;max-width:400px;">
-			    <b >{{prop}}:</b> <div style="vertical-align:top;max-width:350px;display:inline-block;overflow-wrap:anywhere">{{value}}</div>
-			  </div>
-			  <div v-for="(value, prop) in position" v-if="prop !== 'bbox'" style="font-size:0.9rem;max-width:400px;">
-          <b >{{prop}}:</b> <div style="vertical-align:top;max-width:350px;display:inline-block;overflow-wrap:anywhere">{{value}}</div>
-        </div>
-			  </div>
-		  </div>  
-		 <div class="gdm-list-images" >
-		  <h2 :style="{color:color}">{{images.length}} images</h2>
-		  <div v-if="images.length > 0">
-			  <div  v-for="image in images" class="gdm-images-child" >
-	        <gdm-image :image="image" :type="type" :searching="false" :checked="false" :stereo-list="stereo" mode="view" :lang="lang"></gdm-image>
+		 <div class="gdm-process-header" :style="{background: $shadeColor(color,0.95)}">
+		   <div class="header-0">
+		    <h1 :style="{color:color}">{{(process.id + '').padStart(5, '0')}}<span v-if="process.token">-{{process.token}}</span><span v-if="process.name">  {{process.name }}</span></h1>
+		   </div>
+		   <div class="header-1">
+		     <div class="gdm-map-container">
+		      <gdm-map ref="map" :bbox="process.feature" :images="imageLayers" :tile="feature.properties.bboxTile"
+		      :service-name="process.serviceName" :series="series" :serie-index="serieIndex" :lang="lang" @dateChange="dateSerieChange" @tioReady="tioImagesReady"
+		      fullscreen="fmtLargeMap" :remove-height="8" @loadingLayer="loadingChange" @imageAdded="imageAdded" @imageRemoved="imageRemoved"></gdm-map>
+		     </div>
+		      <div style="text-align:center;margin-top:10px;">
+		         {{date2str(process.tempStart, true)}}
+		         <span v-if="type !== 'PLEIADES'" class="fa fa-long-arrow-right"></span>
+		         <span v-if="type !== 'PLEIADES'">{{date2str(process.tempEnd, true)}}</span> 
+		     </div>
+		   </div>
+		   <div class="header-2-1" style="padding: 0 10px;">
+		      <h2 :style="{color:color, margin: 0}">{{$t('status_informations')}}</h2>
+		      <div>
+		        <div>
+	             <b>{{$t('created')}}: </b>
+	             <span style="white-space:nowrap;">
+	               {{date2str(process.start)}}
+	             </span>
+	           </div>
+	           <div v-if="process.processStart">
+	           <b>{{$t('process_time')}}:</b>
+			        <span style="white-space:nowrap;">
+			          {{date2str(process.processStart)}}
+			        </span>
+		          <span class="fa fa-long-arrow-right"></span>
+		          <span v-if="process.processEnd" style="white-space:nowrap;">
+	             {{date2str(process.processEnd)}}
+	             </span>
+	             <span v-else style="color:grey;white-space:nowrap;">
+	             {{date2str(process.end)}}
+	             </span>
+	          </div>
+	          <div v-else>
+	             <b>{{$t('last_update')}}: </b>
+	             <span style="white-space:nowrap;">
+	               {{date2str(process.end)}}
+	             </span>
+	          </div>
+	          <div v-if="process.status === 'TERMINATED' && process.datePurge"
+	          style="font-size:0.9em;color:darkred;cursor:pointer;" :title="$t('clear_data')">
+	           <i class="fa fa-exclamation-triangle"> 
+	           </i>
+	           <b>Purge: </b>
+	             <span style="white-space:nowrap;">
+	               {{date2str(process.datePurge)}}
+	             </span>
+	          </div>
+		      </div>
+		   </div>
+		   <div class="header-2-2" style="position:relative;z-index:0;">
+		     <gdm-process-progress :status="process.status" :progress="process.progress" 
+		     :step-id="process.stepId" :log="log" :back="back" :steps="process.serviceSteps" ></gdm-process-progress>
+		  </div>
+		  <div class="header-2-3">
+		      <div><b>{{$t('owner')}}:</b> {{process.email}}</div>
+		      <div v-if="process.cost > 0" >
+		        <b>{{$t('cost')}}:</b>
+		        <span v-if="['WAITING', 'EVALUATED'].indexOf(process.status) >= 0">
+			        <span :style="{color: process.cost > process.quota ? 'red' : 'black' }">
+			           <span v-if="process.serviceName.indexOf('SAR') >= 0"> <b>{{process.cost.toLocaleString()}}&nbsp;{{$t('units')}}</b> </span>
+			           <span v-else> <b>{{process.cost.toLocaleString()}}&nbsp;CPU&nbsp;{{$t('seconds')}}</b></span>
+				         <span >/ {{process.quota.toLocaleString()}}</span>
+			        </span>
+			         <div v-if="back && process.cost > process.quota">
+	                 <a class="button"  :href="url + 'users/view/' + process.userId">{{$t('edit')}}</a>
+	             </div>
+		         </span>
+		         <span v-else>
+		            <span v-if="process.serviceName.indexOf('SAR') >= 0"><b>{{process.cost.toLocaleString()}}</b>&nbsp;{{$t('units')}}</span>
+		            <span v-else><b>{{process.cost.toLocaleString()}}</b>&nbsp;CPU&nbsp;{{$t('seconds')}}</span>
+		         </span>
+		         
+		      </div>
+		      <div v-if="process.cost <= 0 || ['WAITING', 'EVALUATED'].indexOf(process.status) < 0">
+		      <b>{{$t('owner_credit')}}:</b> 
+			      <span v-if="process.serviceName.indexOf('SAR') >= 0">{{process.quota.toLocaleString()}}&nbsp;{{$t('units')}}</span>
+			      <span v-else>{{process.quota.toLocaleString()}}&nbsp;CPU&nbsp;{{$t('seconds')}}</span>
+		      </div>
+		   </div>
+		   <div class="header-3">
+		  <div style="max-width:130px;display:inline-block;">
+	        <gdm-process-status v-if="statusList" :status="process.status" :progress="process.progress" :status-list="statusList" :lang="lang"></gdm-process-status>
+	     </div>
+		  <!--  </div>
+		   <div class="header-4">--> 
+		   <div class="process-actions">
+		     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" 
+		     :process="process" :user-id="userId" :can-edit="hasAccessService && !pleiadeRemoved" :lang="lang" :ciest2="ciest2" @processChange="statusChange" 
+		     @statusChange="statusChange" @ownerChange="userChange" @duplicate="duplicate">
+		     </gdm-process-actions>
+		   </div>
+		    
+		    <div v-if="process && process.result && process.status === 'TERMINATED'" :class="{highlight:seeResult}" style="margin-top:15px;"
+		    :style="{background: seeResult ? $shadeColor(color,0.92): 'none'}">
+	       <gdm-process-result  :result="process.result" :series="series" :service-name="process.serviceName"
+	        :lang="lang" :color="color" :images="imageLayers" :serie-index="serieIndex" 
+	        @toggleImage="toggleImage"  @dateSerieChange="dateSerieChange" >
+	       </gdm-process-result>
+	       </div>
+			 </div>
+			 </div>
+			 <div class="gdm-list-parameters" v-if="describe"> 
+			  <h2 :style="{color:color}">{{$t('parameters')}}</h2>
+	       <div>
+			 <gdm-parameters  mode="view" :describe="describe" :default-parameters="defaultParameters" :width="360" :color="color" :lang="lang"></gdm-parameters>
+	        <div style="height:120px;"></div>
 	      </div>
+	      </div>
+			 <div class="gdm-list-parameters" v-else >
+				 <h2 :style="{color:color}">{{$t('parameters')}}</h2>
+				 <div>
+				  <div v-for="(value, prop) in parameters" style="font-size:0.9rem;max-width:400px;">
+				    <b >{{prop}}:</b> <div style="vertical-align:top;max-width:350px;display:inline-block;overflow-wrap:anywhere">{{value}}</div>
+				  </div>
+				  <div v-for="(value, prop) in position" v-if="prop !== 'bbox'" style="font-size:0.9rem;max-width:400px;">
+	          <b >{{prop}}:</b> <div style="vertical-align:top;max-width:350px;display:inline-block;overflow-wrap:anywhere">{{value}}</div>
+	        </div>
+				  </div>
+			  </div>  
+			 <div class="gdm-list-images" >
+			  <h2 :style="{color:color}">{{images.length}} images</h2>
+			  <div v-if="images.length > 0">
+				  <div  v-for="image in images" class="gdm-images-child" >
+		        <gdm-image :image="image" :type="type" :searching="false" :checked="false" :stereo-list="stereo" mode="view" :lang="lang"></gdm-image>
+		      </div>
+			  </div>
+			  <div v-else style="text-align:center;padding: 30px;">NO IMAGES SELECTED - TYPE REQUEST</div>
+			  </div>
+			  
+		</div>
+	</div>
+	<div v-else class="gdm-warning">
+	   <div v-if="errorCode">
+		    <div v-if="!userId && !back" v-html="$t('no_accessible_process_user')">
+					
+				</div>
+				<div v-else>
+				   {{$t('no_accessible_process')}}
+				</div>
 		  </div>
-		  <div v-else style="text-align:center;padding: 30px;">NO IMAGES SELECTED - TYPE REQUEST</div>
-		  </div>
-		  
 	</div>
  </span>
 </template>
@@ -252,6 +268,12 @@ export default {
       default: false
     }
   },
+  watch: {
+    userId (newvalue) {
+      this.getToken()
+      this.load()
+    }
+  },
   computed: {
     seeResult () {
       return this.process.status === 'TERMINATED' && this.process.result
@@ -292,7 +314,7 @@ export default {
     this.load()
   },
   mounted () {
-    if (this.$el && this.$el.querySelector) {
+    if (this.$el && this.$el.querySelector && this.$el.querySelector('.gdm-process-header')) {
       this.headerHeight = this.$el.querySelector('.gdm-process-header').clientHeight
     }
   },
@@ -308,6 +330,7 @@ export default {
       position: {},
       feature: null,
       process: null,
+      errorCode: null,
       // INPUT IMAGES
       images: [],
       pleiadeRemoved: false,
@@ -420,7 +443,6 @@ export default {
         result.thumbnails.sort(function (a, b) {
           return a.title > b.title ? 1 : -1
         })
-        console.log(result.bounds)
         var imageLayers = result.thumbnails
         imageLayers.forEach(function (image) {
           image.checked = false,
@@ -620,7 +642,7 @@ export default {
       this.process = response
       
       this.addResult(this.process.result)
-      if (this.$el && this.$el.querySelector) {
+      if (this.$el && this.$el.querySelector && this.$el.querySelector('.gdm-process-header')) {
         this.headerHeight = this.$el.querySelector('.gdm-process-header').clientHeight
       }
     },
@@ -679,7 +701,8 @@ export default {
       }
     },
     error (response) {
-      alert('error server code = ' + response.status)
+      // alert('error server code = ' + response.status)
+      this.errorCode = response.status
     },
     load () {
       var url = this.api + '/getProcess/' + this.id
@@ -699,7 +722,7 @@ export default {
       if (!status.error) {
         this.statusList = status
       }
-      if (this.$el && this.$el.querySelector) {
+      if (this.$el && this.$el.querySelector && this.$el.querySelector('.gdm-process-header')) {
         this.headerHeight = this.$el.querySelector('.gdm-process-header').clientHeight
       }
     },
@@ -740,6 +763,19 @@ export default {
 }
 </script>
 <style>
+.gdm-process-view .gdm-warning {
+   margin-top: 60px;
+}
+.gdm-process-view .gdm-warning > div {
+  border: 1px solid darkred;
+  color: darkred;
+  width: 450px;
+  margin:auto;
+  padding: 20px;
+  border-radius: 5px;
+  -webkit-box-shadow: 0 0px 3px rgba(0,0,0,0.5);
+  box-shadow: 0 0px 3px rgba(0,0,0,0.5);
+}
 .gdm-process-view div[id="fmtLargeMap"] {
   width:calc(100% - 6px);
   top:0;
