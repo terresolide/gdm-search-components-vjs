@@ -192,15 +192,9 @@
 			  
 		</div>
 	</div>
-	<div v-else class="gdm-warning">
-	   <div v-if="errorCode">
-		    <div v-if="!userId && !back" v-html="$t('no_accessible_process_user')">
-					
-				</div>
-				<div v-else>
-				   {{$t('no_accessible_process')}}
-				</div>
-		  </div>
+	<div v-else-if="errorCode" >
+	    <login-to-access v-if="!userId && !back"" :message="$t('no_accessible_process_user')"></login-to-access>
+	    <login-to-access v-else :message="$t('no_accessible_process')"></login-to-access>
 	</div>
  </span>
 </template>
@@ -215,6 +209,7 @@ import GdmProcessResult from './subcomponents/gdm-process-result.vue'
 import GdmImage from './subcomponents/gdm-image.vue'
 import GdmParameters from './subcomponents/gdm-parameters.vue'
 import GdmSerieNavigation from './subcomponents/gdm-serie-navigation.vue'
+const LoginToAccess = () => import('./subcomponents/login-to-access.vue')
 
 import hs from './modules/howstereo.js'
 export default {
@@ -228,7 +223,8 @@ export default {
     GdmProcessResult,
     GdmImage,
     GdmParameters,
-    GdmSerieNavigation
+    GdmSerieNavigation,
+    LoginToAccess
   },
   props: {
     id: {
