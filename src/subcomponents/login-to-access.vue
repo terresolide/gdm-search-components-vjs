@@ -38,7 +38,7 @@ export default {
 </script>
 <style scoped>
 .full-error {
-   background: url('~@/assets/images/connect-you-background.png') no-repeat center center fixed;
+   background: url('./../assets/images/connect-you-background.png') no-repeat center center fixed;
    width:100%;
    min-height:500px;
    height:100vh;
