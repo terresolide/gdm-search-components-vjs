@@ -2,11 +2,15 @@
 {
   "en": {
     "product_type": "Product Type",
-    "right_click": "Right click for infos"
+    "right_click": "Right click for infos",
+    "draw_bbox": "Draw a ROI",
+    "search_bbox": "Search a ROI"
   },
   "fr": {
      "product_type": "Type de Produit",
-     "right_click": "Clic droit pour + infos"
+     "right_click": "Clic droit pour + infos",
+     "draw_bbox": "Dessiner une zone d'intérêt",
+     "search_bbox": "Rechercher une zone d'intérêt"
     }
 }
 </i18n>
@@ -16,7 +20,7 @@
 <!--   <div  v-if="used" class="gdm-deployed" @click="deployed = !deployed" style="width:6px;pointer:cursor;">{{deployed ? '-' : '+'}}</div>
  <div v-else="used" class="gdm-deployed" style="color:grey;">{{deployed ? '-' : '+'}}</div>
  -->
-  <div  v-show="required" class="gdm-used fa fa-check-square-o" style="color:grey;"></div>
+  <div  v-show="required" class="gdm-used fa" :class="{'fa-chevron-circle-right': !deployed, 'fa-chevron-circle-down': deployed}" @click="deployed = !deployed" ></div>
   
   <div  v-if="type === 'complexeReturn'"  class="gdm-used fa"  @click="changeUsed"  
   :class="{ 'fa-square-o': !used, 'fa-check-square-o': used, disabled: disabled || mode === 'view'}"></div>
@@ -37,11 +41,11 @@
 <div v-show="deployed && (used || mode === 'view')"  style="margin-left:20px;">
 <div v-if="mode !== 'view' && (name === 'dsmopt_use_roi' || name === 'correl_use_roi')"
  style="margin-top:5px;font-size:0.9em;text-align:center;">
-   <span class="button" @click="triggerDrawBbox"><i class=" fa fa-edit"></i> &nbsp;Draw a bbox</span>
+   <span class="button" @click="triggerDrawBbox"><i class=" fa fa-edit"></i> &nbsp;{{$t('draw_bbox')}}</span>
 </div>
 <div v-if="mode !== 'view' && name === 'dsmopt_use_roi'"
  style="margin-top:5px;font-size:0.9em;text-align:center;">
-   <span class="button" @click="triggerSearchBbox"><i class="fa fa-search"></i> &nbsp;Search a bbox</span>
+   <span class="button" @click="triggerSearchBbox"><i class="fa fa-search"></i> &nbsp;{{$t('search_bbox')}}</span>
 </div>
  <div v-for="(parameter, key) in parameters" style="overflow: visible;position:relative;" :style="{marginTop:'5px'}" :key="key" 
   v-if="!(mode === 'view' && parameter.type === 'customInputImages')">
