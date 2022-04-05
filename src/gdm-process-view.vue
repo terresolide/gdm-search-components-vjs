@@ -672,7 +672,10 @@ export default {
           var urlImg = this.api.replace('/api', '/upload/pleiades/') + list[index].feature.properties.icon
           list[index].feature.properties.quicklook = urlImg
         }
-        this.images.push(list[index].feature.properties)
+        var find = this.images.find(img => img.id === list[index].id )
+        if (!find) {
+          this.images.push(list[index].feature.properties)
+        }
         this.getImage(list, index + 1)
       } else if (list[index] && list[index].url) {
         this.$http.get(list[index].url).then(function (response) {
