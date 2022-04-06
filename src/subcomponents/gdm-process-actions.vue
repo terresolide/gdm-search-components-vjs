@@ -41,7 +41,7 @@
       <div  v-if="submitting" class="gdm-searching"><i class="fa fa-circle-o-notch animated"></i></div>
 
       <div v-if="process.status === 'EVALUATED'">
-         <a class="button" v-if="!back && url" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
+         <a class="button" v-if="!back && url && canEdit" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
          <a class="button" @click="launch" :class="{disabled: disabled || !hasCredit || !canEdit}"
          :disabled="disabled || !hasCredit">{{$t('launch')}}</a>
       </div>
@@ -49,7 +49,7 @@
         <a class="button" @click="duplicate" :class="{disabled: !canEdit}">{{$t('duplicate')}}</a>
       </div>
       <div v-else-if="process.status === 'INVALID'">
-        <a class="button" v-if="!back && url"  :href="url + 'process/' + process.id + '/edit'" :class="{disabled: !canEdit}">{{$t('edit')}}</a>
+        <a class="button" v-if="!back && url  && canEdit"  :href="url + 'process/' + process.id + '/edit'" :class="{disabled: !canEdit}">{{$t('edit')}}</a>
       </div>
       <div v-else-if="process.status === 'CANCELED'">
          <a  style="display:none;" class="button" v-if="isOptic" @click="todo" :class="{disabled: disabled}"
@@ -80,12 +80,12 @@
         </a>
       </div>
       <div v-else-if="process.status === 'SAVED'">
-         <a class="button" v-if="!back && url" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
+         <a class="button" v-if="!back && url && canEdit" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
          <a class="button" @click="evaluate" :class="{disabled: disabled}" 
          :disabled="disabled || !canEdit">{{$t('evaluate')}}</a>
       </div>
       <div v-else-if="process.status === 'WAITING'">
-	       <a class="button" v-if="!back && url" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
+	       <a class="button" v-if="!back && url  && canEdit" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
 	       <a class="button" v-if="process.format.indexOf('sar') >= 0 " :class="{disabled: disabled || !hasCredit}"
 	       :disabled="disabled || !hasCredit || !canEdit" @click="launch">
 	         {{$t('launch')}}
@@ -197,6 +197,7 @@ export default {
   },
   mounted () {
     this.launchTimer()
+    console.log(this.canEdit)
   },
   methods:{
     launchTimer () {
