@@ -8,7 +8,9 @@
      "reset": "Reset",
      "search": "Search",
      "see_archived": "See archived jobs",
-     "service_group": "Service group"
+     "service_group": "Service group",
+     "creation": "Creation",
+     "start": "Start"
    },
    "fr":{
      "process_extent": "Dates du calcul",
@@ -19,7 +21,9 @@
      "reset": "Intialiser",
      "search": "Rechercher",
      "see_archived": "Voir les jobs archivés",
-     "service_group": "Groupe de services"
+     "service_group": "Groupe de services",
+     "creation": "Création",
+     "start": "Lancement"
     }
 }
 </i18n>
@@ -49,10 +53,12 @@
       <formater-select  :options="statusList" :defaut="parameters.status" @input="statusChange" width="228px"></formater-select>
     </formater-search-box>
      <formater-search-box header-icon-class="fa fa-hourglass-end" open-icon-class="fa fa-caret-right" :title="$t('process_extent')" :deployed="false" type="empty" >
-
+       <b :style="{color: color}">{{$t('creation')}}</b>
        <formater-temporal-search name="" lang="fr" :format="format" daymin="2020-03-01" @change="dateChange"></formater-temporal-search>
+       <b :style="{color: color}">{{$t('start')}}</b>
+       <formater-temporal-search name="process" lang="fr" :format="format" daymin="2020-03-01" @change="dateChange"></formater-temporal-search>
     </formater-search-box>
-
+    
     <formater-search-box  header-icon-class="fa fa-filter" open-icon-class="fa fa-caret-right" :title="$t('filters')" :deployed="false" type="empty" >
      <div style="margin-left:10px;min-height:70px;">
      <div v-if="!user && !service" style="font-style:italic;color:grey;">{{$t('no_filter')}}</div>

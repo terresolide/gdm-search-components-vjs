@@ -8,7 +8,9 @@
     "parameters": "Parameters",
     "no_process": "No process",
     "unauthorized": "Access Unauthorized",
-    "forbidden": "Access Forbidden: deconnected?"
+    "forbidden": "Access Forbidden: deconnected?",
+    "creation": "creation",
+    "start": "start"
   },
   "fr": {
     "process_dates": "Job information",
@@ -18,7 +20,9 @@
     "parameters": "Paramètres",
     "no_process": "Aucun calcul",
     "unauthorized": "Accès non autorisé à cette ressource",
-    "forbidden": "Access interdit: deconnecté?"
+    "forbidden": "Access interdit: deconnecté?",
+    "creation": "création",
+    "start": "lancement"
   }
 }
 </i18n>
@@ -46,13 +50,18 @@
          <div class="gdm-process-header-column-2">Status</div>
          <div class="gdm-process-header-column-3">
             {{$t('process_dates')}}<br/> 
-            ( Date <span class="fa-button fa" :class="order.date === 1 ? 'fa-long-arrow-down' : 'fa-long-arrow-up'" 
-            @click="orderChange('date')"></span> )
+            (<span class="fa-button"  @click="orderChange('date')">
+                {{$t('creation')}} 
+                <i class="fa" :class="{'fa-long-arrow-down': order.date === 1, 'fa-long-arrow-up': order.date != 1, unactive: orderBy != 'date'}" ></i>
+             </span>,
+            <span class="fa-button"  @click="orderChange('processStart')">
+                {{$t('start')}}
+                <i class="fa" :class="{'fa-long-arrow-down': order.processStart === 1, 'fa-long-arrow-up': order.processStart != 1, unactive: orderBy != 'processStart'}" ></i></span>  )
          </div>
          <div class="gdm-process-header-column-4">
            <span v-if="group === 'DEM'">{{$t('image_dates')}}</span>
            <span v-else>{{$t('temporal_extent')}}</span>
-           <span class="fa-button fa" :class="order.temporal === 1 ? 'fa-long-arrow-down' : 'fa-long-arrow-up'"
+           <span class="fa-button fa" :class="{'fa-long-arrow-down': order.temporal === 1, 'fa-long-arrow-up': order.temporal != 1, unactive: orderBy != 'temporal'}"
            @click="orderChange('temporal')"></span>
          </div>
          <div class="gdm-process-header-column-5" >{{$t('parameters')}}</div>
@@ -144,8 +153,10 @@ export default {
       selectedProcessId: null,
       order: {
         temporal: 1,
-        date: -1
+        date: -1,
+        processStart: 1
       },
+      orderBy: 'date',
       parameters: {
         user: null,
         service: null,
@@ -240,7 +251,7 @@ export default {
 	     }
 	     url += '&lang=' + this.lang
 	     var self = this
-	     var dateType = ['Start', 'End', 'tempStart', 'tempEnd']
+	     var dateType = ['Start', 'End', 'tempStart', 'tempEnd', 'processStart', 'processEnd']
 	     dateType.forEach(function (name) {
 	       if (self.parameters[name] && self.parameters[name] != 'Invalid date') {
 	         url += '&' + name.charAt(0).toLowerCase() + name.slice(1) + '=' + self.parameters[name]
@@ -261,14 +272,25 @@ export default {
       switch (order) {
         case 'date':
           this.order.date = (-1) * this.order.date
+          this.orderBy = 'date'
           this.parameters.order = ' start ' + (this.order.date > 0 ? 'ASC' : 'DESC')
-          this.parameters.order += ', tempStart ' + (this.order.temporal > 0 ? 'ASC' : 'DESC')
+//           this.parameters.order += ', tempStart ' + (this.order.temporal > 0 ? 'ASC' : 'DESC')
+//            this.parameters.order += ', processStart ' + (this.order.processStart > 0 ? 'ASC' : 'DESC')
           break
         case 'temporal':
           this.order.temporal = (-1) * this.order.temporal
+          this.orderBy = 'temporal'
           this.parameters.order = 'tempStart ' + (this.order.temporal > 0 ? 'ASC' : 'DESC')
-          this.parameters.order += ', start ' + (this.order.date > 0 ? 'ASC' : 'DESC')
+//           this.parameters.order += ', start ' + (this.order.date > 0 ? 'ASC' : 'DESC')
+//           this.parameters.order += ', processStart ' + (this.order.processStart > 0 ? 'ASC' : 'DESC')
           break
+        case 'processStart':
+          this.order.processStart = (-1) * this.order.processStart
+          this.orderBy = 'processStart'
+          this.parameters.order = 'processStart ' + (this.order.processStart > 0 ? 'ASC' : 'DESC')
+//           this.parameters.order += ', tempStart ' + (this.order.temporal > 0 ? 'ASC' : 'DESC')
+//           this.parameters.order += ', start ' + (this.order.date > 0 ? 'ASC' : 'DESC')
+          
       }
       this.search()
     },
@@ -281,6 +303,7 @@ export default {
       this.search()
     },
     dateChange (e) {
+      console.log(e)
       var change = {'from': 'Start', 'to': 'End'}
       var name = e.name.replace('from','Start').replace('to', 'End')
       this.parameters[name] = e.value
@@ -488,6 +511,10 @@ export default {
 .fa-button:hover {
   border:1px dotted grey;
 }
+i.unactive,
+span.unactive {
+  color: #5f5f5f;
+}
 .gdm-process-search{
 font-size: 0.9rem;
 }
@@ -499,7 +526,7 @@ display: grid;
    font-weight:700;
    border: 1px solid lightgrey;
    min-height:20px;
-   max-height:45px;
+   max-height:55px;
 }
 .gdm-process-header-column-1 {
   grid-column: 1;
