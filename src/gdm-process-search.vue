@@ -9,8 +9,8 @@
     "no_process": "No process",
     "unauthorized": "Access Unauthorized",
     "forbidden": "Access Forbidden: deconnected?",
-    "creation": "creation",
-    "start": "start"
+    "creation": "Created",
+    "start": "Start"
   },
   "fr": {
     "process_dates": "Job information",
@@ -21,8 +21,8 @@
     "no_process": "Aucun calcul",
     "unauthorized": "Accès non autorisé à cette ressource",
     "forbidden": "Access interdit: deconnecté?",
-    "creation": "création",
-    "start": "lancement"
+    "creation": "Création",
+    "start": "Début"
   }
 }
 </i18n>
@@ -50,13 +50,14 @@
          <div class="gdm-process-header-column-2">Status</div>
          <div class="gdm-process-header-column-3">
             {{$t('process_dates')}}<br/> 
-            (<span class="fa-button"  @click="orderChange('date')">
+            <span class="fa-button"  @click="orderChange('date')">
                 {{$t('creation')}} 
-                <i class="fa" :class="{'fa-long-arrow-down': order.date === 1, 'fa-long-arrow-up': order.date != 1, unactive: orderBy != 'date'}" ></i>
-             </span>,
-            <span class="fa-button"  @click="orderChange('processStart')">
+                <i class="fa" style="display:inline-block" :class="{'fa-long-arrow-down': order.date === 1, 'fa-long-arrow-up': order.date != 1, unactive: orderBy != 'date'}" ></i>
+             </span>
+            <span class="fa-button" style="display:inline-block"  @click="orderChange('processStart')">
                 {{$t('start')}}
-                <i class="fa" :class="{'fa-long-arrow-down': order.processStart === 1, 'fa-long-arrow-up': order.processStart != 1, unactive: orderBy != 'processStart'}" ></i></span>  )
+                <i class="fa" :class="{'fa-long-arrow-down': order.processStart === 1, 'fa-long-arrow-up': order.processStart != 1, unactive: orderBy != 'processStart'}" ></i>
+                </span>
          </div>
          <div class="gdm-process-header-column-4">
            <span v-if="group === 'DEM'">{{$t('image_dates')}}</span>
