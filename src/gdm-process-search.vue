@@ -3,8 +3,8 @@
   "en": {
     "process_dates": "Job information",
     "identifiers": "Identifiers",
-    "image_dates": "Date of images",
-    "temporal_extent": "Temporal extent",
+    "image_dates": "Date of  <span>images&nbsp;<i class='fa {class} {active}'></i></span>",
+    "temporal_extent": "Temporal <span>extent&nbsp;<i class='fa {class} {active}'></i></span>",
     "parameters": "Parameters",
     "no_process": "No process",
     "unauthorized": "Access Unauthorized",
@@ -15,8 +15,8 @@
   "fr": {
     "process_dates": "Job information",
     "identifiers": "Identifiants",
-    "image_dates": "Date des images",
-    "temporal_extent": "Etendue temporelle",
+    "image_dates": "Date des  <span>images&nbsp;<i class='fa {class} {active}'></i></span>",
+    "temporal_extent": "Etendue  <span>temporelle&nbsp;<i class='fa {class} {active}'></i></span>",
     "parameters": "Paramètres",
     "no_process": "Aucun calcul",
     "unauthorized": "Accès non autorisé à cette ressource",
@@ -57,13 +57,14 @@
             <span class="fa-button" style="display:inline-block"  @click="orderChange('processStart')">
                 {{$t('start')}}
                 <i class="fa" :class="{'fa-long-arrow-down': order.processStart === 1, 'fa-long-arrow-up': order.processStart != 1, unactive: orderBy != 'processStart'}" ></i>
-                </span>
+            </span>
          </div>
          <div class="gdm-process-header-column-4">
-           <span v-if="group === 'DEM'">{{$t('image_dates')}}</span>
-           <span v-else>{{$t('temporal_extent')}}</span>
-           <span class="fa-button fa" :class="{'fa-long-arrow-down': order.temporal === 1, 'fa-long-arrow-up': order.temporal != 1, unactive: orderBy != 'temporal'}"
-           @click="orderChange('temporal')"></span>
+           <span class="fa-button" style="display:inline-block;" @click="orderChange('temporal')">
+	           <span v-if="group === 'MNS'" v-html="$t('image_dates',{class: order.temporal === 1 ? 'fa-long-arrow-down':'fa-long-arrow-up', active:  orderBy != 'temporal' ? 'unactive': ''})"></span>
+	           <span v-else v-html="$t('temporal_extent',{class: order.temporal === 1 ? 'fa-long-arrow-down':'fa-long-arrow-up', active:  orderBy != 'temporal' ? 'unactive': ''})"></span>
+	          
+	         </span>
          </div>
          <div class="gdm-process-header-column-5" >{{$t('parameters')}}</div>
       </div>
@@ -389,9 +390,11 @@ export default {
       this.search()
     },
     resize () {
-      var maph = this.$el.querySelector('#fmtLargeMap').offsetHeight
-      this.height = window.innerHeight - 65
-      this.listHeight = this.height - maph - 32
+      if (this.$el && this.$el.querySelector) {
+	      var maph = this.$el.querySelector('#fmtLargeMap').offsetHeight
+	      this.height = window.innerHeight - 65
+	      this.listHeight = this.height - maph - 32
+      }
     },
     restart (id, event) {
       event.stopPropagation()
@@ -503,6 +506,9 @@ export default {
     color: #999;
     pointer-events: none;
   }
+  .fa-button span {
+   display:inline-block;
+}
 </style>
 <style scoped>
 .fa-button {
@@ -512,6 +518,7 @@ export default {
 .fa-button:hover {
   border:1px dotted grey;
 }
+
 i.unactive,
 span.unactive {
   color: #5f5f5f;
