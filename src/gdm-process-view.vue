@@ -450,6 +450,7 @@ export default {
         this.imageLayers = imageLayers
       } else if (result){
         // treatment result SAR
+        var subswath = null
         var imageLayers = []
         var series = null
         var lists = null
@@ -464,6 +465,7 @@ export default {
         }
         for(var key in result) {
          if (key.indexOf('iw') >= 0) {
+           subswath = key
            for (var prop in result[key]) {
 		         if (prop === 'Common_Product') {
 		           // search for each geo product the png image
@@ -514,7 +516,6 @@ export default {
                        }
                      )
                    }
-                   
                    // create image layer
                    image = {
 				             checked: false,
@@ -577,7 +578,7 @@ export default {
             bbox: bbox,
             type: 'list',
             png: lists[name].images[this.serieIndex].png,
-            legend: result.dir + key + '/legend_' + name + '_runw.png' 
+            legend: result.dir + subswath + '/legend_' + name + '_runw.png' 
           }
           if (text) {
             image.first = text
