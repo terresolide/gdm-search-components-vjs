@@ -503,6 +503,9 @@ export default {
               if (listener.hasOwnProperty('or')) {
                 e.detail.value = e.detail.value || _this.values[_this.name]
               }
+              if (listener.hasOwnProperty('map') && listener.map[e.detail.value]) {
+                _this.$set(_this.values, name, listener.map[e.detail.value])
+              }
               if (listener.hasOwnProperty('value')) {
                 for (var prop in listener.value) {
                   if (prop === 'value') {

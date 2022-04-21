@@ -90,7 +90,7 @@
      <div class="job-header" >
       <div>
         <h2>Total nouvels utilisateurs</h2>
-         <div v-for="(type, index) in userTypes" >
+         <div v-if="userTypes" v-for="(type, index) in userTypes" >
                <span class="fa fa-circle" :style="{color: colors[index]}"></span>
                <b>{{type.t_name_fr}}</b>:
                <span v-if="newUsers.count && newUsers.count[type.t_id]">{{newUsers.count[type.t_id].toLocaleString()}}</span>
