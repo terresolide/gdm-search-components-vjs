@@ -20,6 +20,13 @@
       <option value="month">Mois</option>
       <option value="year">Year</option>
     </select>
+    <span v-if="mode === 'connection'">
+       <label>Par</label>
+       <select v-model="group" @change="draw()">
+           <option value="type">type d'utilisateur</option>
+           <option value="pole">pôle de données</option>
+       </select>
+    </span>
     <span v-if="mode === 'job' || mode === 'ciest2'">
       <label>Statut</label>
       <select v-model="status" @change="search()">
@@ -63,12 +70,12 @@
 	       <div v-for="(type, index) in userTypes" >
 	             <span class="fa fa-circle" :style="{color: colors[index]}"></span>
 	             <b>{{type.t_name_fr}}</b>:
-	             <span v-if="sessions.count && sessions.count[type.t_id]">{{sessions.count[type.t_id].toLocaleString()}}</span>
+	             <span v-if="sessions.type.count && sessions.type.count[type.t_id]">{{sessions.type.count[type.t_id].toLocaleString()}}</span>
 	             <span v-else>0</span>
 	       </div>
 	        <hr  style="width:60%;margin-left:5px;color:gray;">
            <div >
-              <b>Total</b>: {{sessions.avg.count}}
+              <b>Total</b>: {{sessions.type.avg.count}}
            </div>
 	    </div>
 	    <div>
@@ -76,15 +83,16 @@
          <div v-for="(type, index) in userTypes" >
                <span class="fa fa-circle" :style="{color: colors[index]}"></span>
                <b>{{type.t_name_fr}}</b>:
-               <span v-if="sessions.count && sessions.count[type.t_id]">{{(sessions.count[type.t_id] / days.length).toLocaleString()}}</span>
+               <span v-if="sessions.type.count && sessions.type.count[type.t_id]">{{(sessions.type.count[type.t_id] / days.length).toLocaleString()}}</span>
                <span v-else>0</span>
          </div>
           <hr  style="width:60%;margin-left:5px;color:gray;">
            <div >
-              <b>Total</b>: {{(sessions.avg.count / days.length).toLocaleString()}}
+              <b>Total</b>: {{(sessions.type.avg.count / days.length).toLocaleString()}}
            </div>
       </div>
 	  </div>
+
     <div id="sessions" style="margin-top:30px;"></div>
     <h1>Suivi des créations de comptes</h1>
      <div class="job-header" >
@@ -119,6 +127,11 @@
   </div>
    <div v-show="mode === 'service'">
      <div id="services" style="margin-top:30px;"></div>
+     <h2>Répartition par service</h2>
+     <div v-for="service in services" style="width:49%;display:inline-block;">
+     <h3 style="color:black;">Service {{service.name}}</h3>
+      <div :id="'service' + service.id"></div>
+     </div>
    </div>
     <div v-show="mode === 'job'" class="job-content" >
     <h1>{{selectedName}}</h1>
@@ -351,11 +364,13 @@ export default {
       endDate: null,
       by: 'day',
       mode: 'connection',
+      group: 'type',
 //       newUsers: { days:{}, months: {}, years: {}},
 //       process: { days: {}, months: {}, years: {}},
      // products: { days: {}, months: {}, years: {}},
       serviceUsers: [],
       userTypes: [],
+      poles: [],
       days:[],
       months:[],
       years: [],
@@ -388,8 +403,11 @@ export default {
     }
   },
   created () {
-    this.getUserTypes()
-    this.sessions = this.defaultData()
+    this.getClassification()
+    this.sessions = {
+      type: this.defaultData(),
+      pole: this.defaultData()
+    }
     this.newUsers = this.defaultData()
     this.jobs = this.defaultData()
     this.products = this.defaultData()
@@ -526,7 +544,7 @@ export default {
     },
     drawConnection() {
       var categories = this[this.by + 's']
-      var data = this.sessions.data[this.by + 's']
+      var data = this.sessions.type.data[this.by + 's']
       var series = []
       for(var type in data) {
         series.push({
@@ -642,9 +660,13 @@ export default {
         })
       })
     },
-    getUserTypes () {
-      var url = this.appUrl + '/auth/getOrganismTypes'
-      this.$http.get(url)
+    getClassification () {
+      var url = this.appUrl + '/auth/getClassification'
+      this.$http.get(url, {
+//         headers: {
+//           'Accept-Language': 'fr'
+//         }
+      })
       .then(function (response) {
         this.initialize(response.body)
       })
@@ -655,6 +677,7 @@ export default {
       this.endDate = moment().endOf('month').format('YYYY-MM-DD')
       if (data.types) {
         this.userTypes = data.types
+        this.poles = data.poles
       }
       this.getServices()
       this.search()
@@ -1036,17 +1059,28 @@ export default {
       var _this = this 
       var first = true
       this.userTypes.forEach(function (tp) {
-        var tab = data.sessions.filter(u => u.type === tp.t_id)
-        var results = _this.extractSeriesFrom(tab, tp.t_id, _this.sessions, first)
+        var tab = data.sessionByType.filter(u => u.type === tp.t_id)
+        var results = _this.extractSeriesFrom(tab, tp.t_id, _this.sessions.type, first)
         first = false
-        _this.sessions.data.days[tp.t_id] = results.days
-        _this.sessions.data.months[tp.t_id] = results.months
-        _this.sessions.data.years[tp.t_id] = results.years
+        _this.sessions.type.data.days[tp.t_id] = results.days
+        _this.sessions.type.data.months[tp.t_id] = results.months
+        _this.sessions.type.data.years[tp.t_id] = results.years
         
       })
-      this.average(this.sessions, true)
+      this.average(this.sessions.type, true)
+      this.poles.forEach(function (po) {
+        var tab = data.sessionByPole.filter(u => u.pole === po.po_id)
+        var results = _this.extractSeriesFrom(tab, po.po_id, _this.sessions.pole, first)
+        first = false
+        _this.sessions.pole.data.days[po.po_id] = results.days
+        _this.sessions.pole.data.months[po.po_id] = results.months
+        _this.sessions.pole.data.years[po.po_id] = results.years
+        
+      })
+
+      this.average(this.sessions.pole, true)
       // this.sessions.avg.average = this.sessions.avg.count / this.days.length
-      console.log(this.sessions.avg)
+      console.log(this.sessions.type.avg)
       this.drawConnection()
      
       this.userTypes.forEach(function (tp) {
