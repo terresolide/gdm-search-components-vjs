@@ -23,8 +23,8 @@
     <span v-if="mode === 'connection'">
        <label>Par</label>
        <select v-model="group" @change="draw()">
-           <option value="type">type d'utilisateur</option>
-           <option value="pole">pôle de données</option>
+           <option value="type">Type d'utilisateur</option>
+           <option value="pole">Pôle de données</option>
        </select>
     </span>
     <span v-if="mode === 'job' || mode === 'ciest2'">
@@ -62,11 +62,13 @@
   <div v-else>
   Il ne s'agit pas d'un historique. L'accès aux services d'un utilisateur peut changer au cours du temps et l'information historique n'est pas enregistrée.
   </div>
+  <!-- RESULTS -->
+  <!-- MODE CONNECTION -->
   <div v-show="mode === 'connection'">
     <h1>Suivi des authentifications</h1>
-    <div class="job-header" >
+    <div v-if="group === 'type'" class="job-header" >
 	    <div>
-	      <h2>Total connexions aux services de calcul</h2>
+	      <h2>Total connexions aux services de calcul par type d'organisme</h2>
 	       <div v-for="(type, index) in userTypes" >
 	             <span class="fa fa-circle" :style="{color: colors[index]}"></span>
 	             <b>{{type.t_name_fr}}</b>:
@@ -92,21 +94,49 @@
            </div>
       </div>
 	  </div>
-
+     <div v-else class="job-header" >
+      <div>
+        <h2>Total connexions aux services de calcul par pôle</h2>
+         <div v-for="(pole, index) in poles" >
+               <span class="fa fa-circle" :style="{color: pole.po_color}"></span>
+               <b>{{poleName(pole.po_id)}}</b>:
+               <span v-if="sessions.pole.count && sessions.pole.count[pole.po_id]">{{sessions.pole.count[pole.po_id].toLocaleString()}}</span>
+               <span v-else>0</span>
+         </div>
+          <hr  style="width:60%;margin-left:5px;color:gray;">
+           <div >
+              <b>Total</b>: {{sessions.pole.avg.count}}
+           </div>
+      </div>
+      <div>
+        <h2>Visiteurs par jour</h2>
+         <div v-for="(pole, index) in poles" >
+               <span class="fa fa-circle" :style="{color: pole.po_color}"></span>
+               <b>{{poleName(pole.po_id)}}</b>:
+               <span v-if="sessions.pole.count && sessions.pole.count[pole.po_id]">{{(sessions.pole.count[pole.po_id] / days.length).toLocaleString()}}</span>
+               <span v-else>0</span>
+         </div>
+          <hr  style="width:60%;margin-left:5px;color:gray;">
+           <div >
+              <b>Total</b>: {{(sessions.pole.avg.count / days.length).toLocaleString()}}
+           </div>
+      </div>
+    </div>
     <div id="sessions" style="margin-top:30px;"></div>
+    
     <h1>Suivi des créations de comptes</h1>
-     <div class="job-header" >
+     <div v-if="group === 'type'" class="job-header" >
       <div>
         <h2>Total nouvels utilisateurs</h2>
          <div v-if="userTypes" v-for="(type, index) in userTypes" >
                <span class="fa fa-circle" :style="{color: colors[index]}"></span>
                <b>{{type.t_name_fr}}</b>:
-               <span v-if="newUsers.count && newUsers.count[type.t_id]">{{newUsers.count[type.t_id].toLocaleString()}}</span>
+               <span v-if="newUsers.type.count && newUsers.type.count[type.t_id]">{{newUsers.type.count[type.t_id].toLocaleString()}}</span>
                <span v-else>0</span>
          </div>
           <hr  style="width:60%;margin-left:5px;color:gray;">
            <div >
-              <b>Total</b>: {{newUsers.avg.count}}
+              <b>Total</b>: {{newUsers.type.avg.count}}
            </div>
       </div>
       <div>
@@ -114,12 +144,40 @@
          <div v-for="(type, index) in userTypes" >
                <span class="fa fa-circle" :style="{color: colors[index]}"></span>
                <b>{{type.t_name_fr}}</b>:
-               <span v-if="newUsers.count && newUsers.count[type.t_id]">{{(newUsers.count[type.t_id] / days.length).toLocaleString()}}</span>
+               <span v-if="newUsers.type.count && newUsers.type.count[type.t_id]">{{(newUsers.type.count[type.t_id] / days.length).toLocaleString()}}</span>
                <span v-else>0</span>
          </div>
           <hr  style="width:60%;margin-left:5px;color:gray;">
            <div >
-              <b>Total</b>: {{(newUsers.avg.count / days.length).toLocaleString()}}
+              <b>Total</b>: {{(newUsers.type.avg.count / days.length).toLocaleString()}}
+           </div>
+      </div>
+    </div>
+    <div v-else class="job-header" >
+      <div>
+        <h2>Total nouvels utilisateurs</h2>
+         <div  v-for="(pole, index) in poles" >
+               <span class="fa fa-circle" :style="{color: pole.po_color}"></span>
+               <b>{{poleName(pole.po_id)}}</b>:
+               <span v-if="newUsers.pole.count && newUsers.pole.count[pole.po_id]">{{newUsers.pole.count[pole.po_id].toLocaleString()}}</span>
+               <span v-else>0</span>
+         </div>
+          <hr  style="width:60%;margin-left:5px;color:gray;">
+           <div >
+              <b>Total</b>: {{newUsers.pole.avg.count}}
+           </div>
+      </div>
+      <div>
+        <h2>Nouveaux comptes par jour</h2>
+         <div v-for="(pole, index) in poles" >
+               <span class="fa fa-circle" :style="{color: pole.po_color}"></span>
+               <b>{{poleName(pole.po_id)}}</b>:
+               <span v-if="newUsers.pole.count && newUsers.pole.count[pole.po_id]">{{(newUsers.pole.count[pole.po_id] / days.length).toLocaleString()}}</span>
+               <span v-else>0</span>
+         </div>
+          <hr  style="width:60%;margin-left:5px;color:gray;">
+           <div >
+              <b>Total</b>: {{(newUsers.pole.avg.count / days.length).toLocaleString()}}
            </div>
       </div>
     </div>
@@ -408,7 +466,10 @@ export default {
       type: this.defaultData(),
       pole: this.defaultData()
     }
-    this.newUsers = this.defaultData()
+    this.newUsers = {
+      type: this.defaultData(),
+      pole: this.defaultData()
+    }
     this.jobs = this.defaultData()
     this.products = this.defaultData()
     this.ciest2 = this.defaultData()
@@ -433,6 +494,25 @@ export default {
         this.selectedService = ''
       }
       this.search()
+    },
+    nameByKey (key) {
+      if (this.group === 'pole') {
+        return this.poleName(key)
+      } else {
+        return this.userTypeName(key)
+      }
+    },
+    poleName (key) {
+      var find = this.poles.find(pl => pl.po_id === key)
+      if (find) {
+        if (find.po_name) {
+          return find.po_name
+        } else {
+          return find.po_description.fr
+        }
+      } else {
+        return 'inconnu'
+      }
     },
     userTypeName (type) {
       var find = this.userTypes.find(tp => tp.t_id === type)
@@ -532,27 +612,43 @@ export default {
     },
     drawNewUsers () {
       var categories = this[this.by + 's']
-      var data = this.newUsers.data[this.by + 's']
+      var data = this.newUsers[this.group].data[this.by + 's']
       var series = []
-      for(var type in data) {
+      var options = {}
+      for(var key in data) {
         series.push({
-          name: this.userTypeName(type),
-          data: data[type]
+          name: this.nameByKey(key),
+          data: data[key]
         })
+        if (this.group === 'pole') {
+          if (!options.colors) {
+            options.colors = []
+          }
+          var pl = this.poles.find(pl => pl.po_id === key)
+          options.colors.push(pl.po_color)
+        }
       }
-      this.drawHistogram('newUsers', 'Histogramme des Nouveaux comptes', categories, series)
+      this.drawHistogram('newUsers', 'Histogramme des Nouveaux comptes', categories, series, options)
     },
     drawConnection() {
       var categories = this[this.by + 's']
-      var data = this.sessions.type.data[this.by + 's']
+      var data = this.sessions[this.group].data[this.by + 's']
       var series = []
-      for(var type in data) {
+      var options = {}
+      for(var key in data) {
         series.push({
-          name: this.userTypeName(type),
-          data: data[type]
+          name: this.nameByKey(key), // this.userTypeName(type),
+          data: data[key]
         })
+        if (this.group === 'pole') {
+          if (!options.colors) {
+            options.colors = []
+          }
+          var pl = this.poles.find(pl => pl.po_id === key)
+          options.colors.push(pl.po_color)
+        }
       }
-      this.drawHistogram('sessions', 'Histogramme de connexions', categories, series)
+      this.drawHistogram('sessions', 'Histogramme de connexions', categories, series, options)
     },
     drawJobs () {
       var categories = this[this.by + 's']
@@ -682,20 +778,30 @@ export default {
       this.getServices()
       this.search()
     },
-    average (content, userType) {
+    average (content, group) {
       var count = 0
       var duration = 0
       var countDuration = 0
       var cost = 0
       var countCost = 0
-      if (userType) {
-        this.userTypes.forEach(function (type) {
-          count += content.count[type.t_id]
-          countDuration += content.countDuration[type.t_id]
-          duration += content.duration[type.t_id]
-          cost += content.cost[type.t_id]
-          countCost += content.countCost[type.t_id]
-        })
+      if (group) {
+        if (group === 'type') {
+	        this.userTypes.forEach(function (type) {
+	          count += content.count[type.t_id]
+	          countDuration += content.countDuration[type.t_id]
+	          duration += content.duration[type.t_id]
+	          cost += content.cost[type.t_id]
+	          countCost += content.countCost[type.t_id]
+	        })
+        } else {
+          this.poles.forEach(function (pole) {
+            count += content.count[pole.po_id]
+            countDuration += content.countDuration[pole.po_id]
+            duration += content.duration[pole.po_id]
+            cost += content.cost[pole.po_id]
+            countCost += content.countCost[pole.po_id]
+          })
+        }
       } else {
         this.selectedServices.forEach(function (sv) {
           count += content.count[sv.name]
@@ -1067,7 +1173,7 @@ export default {
         _this.sessions.type.data.years[tp.t_id] = results.years
         
       })
-      this.average(this.sessions.type, true)
+      this.average(this.sessions.type, 'type')
       this.poles.forEach(function (po) {
         var tab = data.sessionByPole.filter(u => u.pole === po.po_id)
         var results = _this.extractSeriesFrom(tab, po.po_id, _this.sessions.pole, first)
@@ -1078,20 +1184,30 @@ export default {
         
       })
 
-      this.average(this.sessions.pole, true)
+      this.average(this.sessions.pole, 'pole')
       // this.sessions.avg.average = this.sessions.avg.count / this.days.length
       console.log(this.sessions.type.avg)
       this.drawConnection()
      
       this.userTypes.forEach(function (tp) {
-        var tab = data.newUsers.filter(u => u.type === tp.t_id)
-        var results = _this.extractSeriesFrom(tab, tp.t_id, _this.newUsers, false)
-        _this.newUsers.data.days[tp.t_id] = results.days
-        _this.newUsers.data.months[tp.t_id] = results.months
-        _this.newUsers.data.years[tp.t_id] = results.years
+        var tab = data.newUserByType.filter(u => u.type === tp.t_id)
+        var results = _this.extractSeriesFrom(tab, tp.t_id, _this.newUsers.type, false)
+        _this.newUsers.type.data.days[tp.t_id] = results.days
+        _this.newUsers.type.data.months[tp.t_id] = results.months
+        _this.newUsers.type.data.years[tp.t_id] = results.years
         
       })
-      this.average(this.newUsers, true)
+      this.average(this.newUsers.type, 'type')
+      this.poles.forEach(function (po) {
+        var tab = data.newUserByPole.filter(u => u.pole === po.po_id)
+        var results = _this.extractSeriesFrom(tab, po.po_id, _this.newUsers.pole, first)
+        first = false
+        _this.newUsers.pole.data.days[po.po_id] = results.days
+        _this.newUsers.pole.data.months[po.po_id] = results.months
+        _this.newUsers.pole.data.years[po.po_id] = results.years
+        
+      })
+      this.average(this.newUsers.pole, 'pole')
       this.drawNewUsers()
 
     },
