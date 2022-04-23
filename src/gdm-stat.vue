@@ -10,7 +10,9 @@
     </li>
   </ul>
 </div>
-<div style="margin-left:20px;">
+<gdm-stat-form ref="form" :mode="mode" :services="services" :groups="groups" @search="search" @draw="draw"></gdm-stat-form>
+
+<!-- <div style="margin-left:20px;">
   <div class="user-search" :class="{'user-search-large': mode === 'job' || mode === 'product' || mode === 'ciest2'}" v-if="mode !== 'service'">
     <label>Du</label> <input v-model="startDate" type="date" @change="search()">
     <label>au</label> <input v-model="endDate" type="date" @change="search()">
@@ -61,7 +63,7 @@
   </div>
   <div v-else>
   Il ne s'agit pas d'un historique. L'accès aux services d'un utilisateur peut changer au cours du temps et l'information historique n'est pas enregistrée.
-  </div>
+  </div> -->
   <!-- RESULTS -->
   <!-- MODE CONNECTION -->
   <div v-show="mode === 'connection'">
@@ -378,6 +380,7 @@ import ExportData from 'highcharts/modules/export-data'
 // import FullScreen from 'highcharts/modules/full-screen'
 
 import Accessibility from 'highcharts/modules/accessibility'
+import GdmStatForm from './subcomponents/gdm-stat-form.vue'
 
 if (typeof Highcharts === 'object') {
   HighchartsExporting(Highcharts)
@@ -388,6 +391,9 @@ if (typeof Highcharts === 'object') {
 import moment from 'moment'
 export default {
   name: 'GdmStat',
+  components: {
+    GdmStatForm
+  },
   props: {
     appUrl: {
       type: String,
@@ -395,27 +401,52 @@ export default {
     }
   },
   computed: {
-    selectedServices () {
-      if (this.selectedGroup !== '') {
-        return this.groups[this.selectedGroup]
+    selectedName () {
+      if (this.$refs && this.$refs.form) {
+        return this.$refs.form.selectedName
       } else {
-        return this.services
+        return ''
       }
     },
-    selectedName () {
-      if (this.selectedService !== '') {
-        var find = this.services.find(s => s.id === this.selectedService)
-        if (find) {
-          return 'Jobs pour le service ' + find.name
-        }
+    selectedService () {
+      if (this.$refs && this.$refs.form) {
+        return this.$refs.form.selectedService
+      } else {
+        console.log(this.services)
+        return ''
       }
-      if (this.selectedGroup !== '') {
-        return 'Jobs pour les services ' + this.selectedGroup
+    },
+    selectedServices () {
+      if (this.$refs && this.$refs.form) {
+        return this.$refs.form.selectedServices
+      } else {
+        console.log(this.services)
+        return this.services
       }
-      
-      return 'Jobs pour tous les services'
     }
   },
+//   computed: {
+//     selectedServices () {
+//       if (this.selectedGroup !== '') {
+//         return this.groups[this.selectedGroup]
+//       } else {
+//         return this.services
+//       }
+//     },
+//     selectedName () {
+//       if (this.selectedService !== '') {
+//         var find = this.services.find(s => s.id === this.selectedService)
+//         if (find) {
+//           return 'Jobs pour le service ' + find.name
+//         }
+//       }
+//       if (this.selectedGroup !== '') {
+//         return 'Jobs pour les services ' + this.selectedGroup
+//       }
+      
+//       return 'Jobs pour tous les services'
+//     }
+//   },
   data () {
     return {
       startDate: null,
@@ -453,9 +484,9 @@ export default {
       status: '',
      // avg: {},
    //   avgProduct: {},
-      selectedService: '',
-      selectedGroup: '',
-      userType: false,
+//       selectedService: '',
+//       selectedGroup: '',
+//       userType: false,
       colors: ['#2f7ed8', '#910000', '#8bbc21',   '#1aadce',
         '#492970', '#f28f43', '#77a1e5', '#c42525', '#a6c96a', '#0d233a']
     }
@@ -489,14 +520,14 @@ export default {
         avg: {}
       }
     },
-    changeGroup () {
-      if (this.selectedGroup !== '') {
-        this.selectedService = ''
-      }
-      this.search()
-    },
-    nameByKey (key) {
-      if (this.group === 'pole') {
+//     changeGroup () {
+//       if (this.selectedGroup !== '') {
+//         this.selectedService = ''
+//       }
+//       this.search()
+//     },
+    nameByKey (key, group) {
+      if (group === 'pole') {
         return this.poleName(key)
       } else {
         return this.userTypeName(key)
@@ -522,24 +553,25 @@ export default {
         'Inconnu'
       }
     },
-    draw () {
+    draw (e) {
+      this.group = e.group
       switch (this.mode) {
         case 'connection':
-          this.drawConnection()
-          this.drawNewUsers()
+          this.drawConnection(e)
+          this.drawNewUsers(e)
           break
         case 'services':
-          this.drawServices()
+          this.drawServices(e)
           break
         case 'job':
-          this.drawJobs()
+          this.drawJobs(e)
           break
         case 'product':
-          this.drawProducts()
+          this.drawProducts(e)
           break;
         case 'ciest2':
-          this.drawCiest2()
-          this.drawDownload()
+          this.drawCiest2(e)
+          this.drawDownload(e)
       }
     },
     drawHistogram (id, title, categories, series, options ) {
@@ -610,17 +642,17 @@ export default {
         series: series
       });
     },
-    drawNewUsers () {
-      var categories = this[this.by + 's']
-      var data = this.newUsers[this.group].data[this.by + 's']
+    drawNewUsers (details) {
+      var categories = this[details.by + 's']
+      var data = this.newUsers[details.group].data[details.by + 's']
       var series = []
       var options = {}
       for(var key in data) {
         series.push({
-          name: this.nameByKey(key),
+          name: this.nameByKey(key, details.group),
           data: data[key]
         })
-        if (this.group === 'pole') {
+        if (details.group === 'pole') {
           if (!options.colors) {
             options.colors = []
           }
@@ -630,17 +662,18 @@ export default {
       }
       this.drawHistogram('newUsers', 'Histogramme des Nouveaux comptes', categories, series, options)
     },
-    drawConnection() {
-      var categories = this[this.by + 's']
-      var data = this.sessions[this.group].data[this.by + 's']
+    drawConnection(details) {
+      console.log(details)
+      var categories = this[details.by + 's']
+      var data = this.sessions[details.group].data[details.by + 's']
       var series = []
       var options = {}
       for(var key in data) {
         series.push({
-          name: this.nameByKey(key), // this.userTypeName(type),
+          name: this.nameByKey(key, details.group), // this.userTypeName(type),
           data: data[key]
         })
-        if (this.group === 'pole') {
+        if (details.group === 'pole') {
           if (!options.colors) {
             options.colors = []
           }
@@ -768,15 +801,15 @@ export default {
       })
     },
     initialize (data) {
-      this.by = 'day'
-      this.startDate = moment().startOf('month').format('YYYY-MM-DD')
-      this.endDate = moment().endOf('month').format('YYYY-MM-DD')
+//       this.by = 'day'
+//       this.startDate = moment().startOf('month').format('YYYY-MM-DD')
+//       this.endDate = moment().endOf('month').format('YYYY-MM-DD')
       if (data.types) {
         this.userTypes = data.types
         this.poles = data.poles
       }
       this.getServices()
-      this.search()
+      // this.search()
     },
     average (content, group) {
       var count = 0
@@ -820,34 +853,34 @@ export default {
     jobsAverage () {
       this.average(this.jobs, this.userType)
       return
-      var _this = this
-      var count = 0
-      var duration = 0
-      var countDuration = 0
-      var cost = 0
-      var countCost = 0
-      if (this.userType) {
-        this.userTypes.forEach(function (type) {
-          count += _this.jobs.count[type.t_id]
-          countDuration += _this.jobs.countDuration[type.t_id]
-          duration += _this.duration[type.t_id]
-          cost += _this.jobs.cost[type.t_id]
-          countCost += _this.jobs.countCost[type.t_id]
-        })
-      } else {
-	      this.selectedServices.forEach(function (sv) {
-	        count += _this.jobs.count[sv.name]
-	        countDuration += _this.jobs.countDuration[sv.name]
-	        duration += _this.jobs.duration[sv.name]
-	        cost += _this.jobs.cost[sv.name]
-	        countCost += _this.jobs.countCost[sv.name]
-	      })
-      }
-      this.avg = {
-        count: count,
-        cost: countCost > 0 ? Math.round(cost / countCost) : 0,
-        duration: countDuration > 0 ? Math.round(duration / countDuration) : 0
-      }
+//       var _this = this
+//       var count = 0
+//       var duration = 0
+//       var countDuration = 0
+//       var cost = 0
+//       var countCost = 0
+//       if (this.userType) {
+//         this.userTypes.forEach(function (type) {
+//           count += _this.jobs.count[type.t_id]
+//           countDuration += _this.jobs.countDuration[type.t_id]
+//           duration += _this.duration[type.t_id]
+//           cost += _this.jobs.cost[type.t_id]
+//           countCost += _this.jobs.countCost[type.t_id]
+//         })
+//       } else {
+// 	      this.selectedServices.forEach(function (sv) {
+// 	        count += _this.jobs.count[sv.name]
+// 	        countDuration += _this.jobs.countDuration[sv.name]
+// 	        duration += _this.jobs.duration[sv.name]
+// 	        cost += _this.jobs.cost[sv.name]
+// 	        countCost += _this.jobs.countCost[sv.name]
+// 	      })
+//       }
+//       this.avg = {
+//         count: count,
+//         cost: countCost > 0 ? Math.round(cost / countCost) : 0,
+//         duration: countDuration > 0 ? Math.round(duration / countDuration) : 0
+//       }
     },
     productsAverage () {
       var _this = this
@@ -876,63 +909,68 @@ export default {
     },
     setMode (value) {
       this.mode = value
-      this.search()
+      this.$refs.form.search()
     },
-    search () {
+    search (e) {
       if (!this.appUrl) {
         return
       }
       switch (this.mode) {
         case 'connection':
-          this.searchConnection()
+          this.searchConnection(e)
           break
         case 'service':
-          this.searchService()
+          this.searchService(e)
           break
         case 'job':
-          this.searchJob()
+          this.searchJob(e)
           break
         case 'product':
-          this.searchProduct()
+          this.searchProduct(e)
+          break;
         case 'ciest2':
-          this.searchCiest2()
+          this.searchCiest2(e)
           break
       }
     },
-    searchConnection () {
+    searchConnection (e) {
+      console.log(e)
       var url = this.appUrl + '/statistics/searchSession?'
       var params = [];
-          if (this.startDate) {
-        params.push('start=' + this.startDate)
+      if (e.startDate) {
+        params.push('start=' + e.startDate)
       }
-      if (this.endDate) {
-        params.push('end=' + this.endDate)
+      if (e.endDate) {
+        params.push('end=' + e.endDate)
       }
       url += params.join('&')
       this.$http.get(url)
       .then(function (response) {
-        this.treatmentConnection(response.body)
+        this.treatmentConnection(response.body, e)
       })
     },
-    searchJob () {
+    searchJob (e) {
       var url = this.appUrl + '/statistics/searchJobs?'
       var params = [];
-          if (this.startDate) {
-        params.push('start=' + this.startDate)
+      if (e.startDate) {
+        params.push('start=' + e.startDate)
       }
-      if (this.endDate) {
-        params.push('end=' + this.endDate)
+      if (e.endDate) {
+        params.push('end=' + e.endDate)
       }
-      if (this.status !== '') {
-        params.push('status=' + this.status)
+      if (e.status) {
+        params.push('status=' + e.status)
       }
-      if (this.selectedService !== '') {
-        params.push('service=' + this.selectedService)
-      } else if (this.selectedGroup !== '') {
-        var services = this.selectedServices.map(sv => sv.id)
-        params.push('service=' + services.join(','))
+//       if (this.selectedService !== '') {
+//         params.push('service=' + this.selectedService)
+//       } else if (this.selectedGroup !== '') {
+//         var services = this.selectedServices.map(sv => sv.id)
+//         params.push('service=' + services.join(','))
+//       }
+      if (e.service) {
+        params.push('service=' + e.service)
       }
-      if (this.userType) {
+      if (e.type) {
         params.push('type=1')
       }
       url += params.join('&')
@@ -1160,7 +1198,7 @@ export default {
       }
       return results
     },
-    treatmentConnection (data) {
+    treatmentConnection (data, e) {
      // this.sessions = this.extractSeriesFrom(data.sessions, true)
       var _this = this 
       var first = true
@@ -1187,7 +1225,7 @@ export default {
       this.average(this.sessions.pole, 'pole')
       // this.sessions.avg.average = this.sessions.avg.count / this.days.length
       console.log(this.sessions.type.avg)
-      this.drawConnection()
+      this.drawConnection(e)
      
       this.userTypes.forEach(function (tp) {
         var tab = data.newUserByType.filter(u => u.type === tp.t_id)
@@ -1208,7 +1246,7 @@ export default {
         
       })
       this.average(this.newUsers.pole, 'pole')
-      this.drawNewUsers()
+      this.drawNewUsers(e)
 
     },
     treatmentJobs (data) {
