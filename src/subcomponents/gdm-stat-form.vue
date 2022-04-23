@@ -45,12 +45,11 @@
      </span>
      <span v-if="mode === 'job'">
       <label>Regrouper par</label>
-      <select v-model="groupBy">
-         <option value="">Service</option>
+      <select v-model="groupBy" @change="search()">
+         <option value="service">Service</option>
          <option value="type">Type d'organisme</option>
          <option value="pole">Pôle de données</option>
       </select>
-      <input type="checkbox" v-model="groupBy" @change="search()"/>
     </span>
    
   </div>
@@ -109,9 +108,10 @@ export default {
       startDate: null,
       endDate: null,
       group: 'type',
-      groupBy: '',
+      groupBy: 'service',
       status: '',
       selectedService: '',
+      selectedServices: [],
       selectedGroup: '',
       userType: null
     }
@@ -120,6 +120,7 @@ export default {
     this.by = 'day'
     this.startDate = moment().startOf('month').format('YYYY-MM-DD')
     this.endDate = moment().endOf('month').format('YYYY-MM-DD')
+    this.selectedServices = this.services
     this.search()
   },
   methods: {
@@ -140,9 +141,9 @@ export default {
         var services = this.selectedServices.map(sv => sv.id)
         details.service = services.join(',')
       }
-      if (this.groupBy !== '') {
-        details[this.groupBy] = 1
-      }
+
+      details.groupBy = this.groupBy
+
       if (this.group) {
         details.group = this.group
       }
@@ -155,7 +156,11 @@ export default {
     changeGroup () {
       if (this.selectedGroup !== '') {
         this.selectedService = ''
+        this.selectedServices = this.groups[this.selectedGroup]
+      } else {
+        this.selectedServices = this.services
       }
+      this.$emit('servicesChange', this.selectedServices)
       this.search()
     },
     draw () {
