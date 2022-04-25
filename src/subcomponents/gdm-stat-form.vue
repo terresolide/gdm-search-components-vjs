@@ -81,13 +81,13 @@ export default {
     }
   },
   computed: {
-    selectedServices () {
-      if (this.selectedGroup !== '') {
-        return this.groups[this.selectedGroup]
-      } else {
-        return this.services
-      }
-    },
+//     selectedServices () {
+//       if (this.selectedGroup !== '') {
+//         return this.groups[this.selectedGroup]
+//       } else {
+//         return this.services
+//       }
+//     },
     selectedName () {
       if (this.selectedService !== '') {
         var find = this.services.find(s => s.id === this.selectedService)
