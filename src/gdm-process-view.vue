@@ -448,7 +448,7 @@ export default {
           }
         })
         this.imageLayers = imageLayers
-      } else if (result){
+      } else if (result && !this.imageLayers){
         // treatment result SAR
         var subswath = null
         var imageLayers = []
@@ -475,7 +475,6 @@ export default {
 		             if (name.indexOf('geo') >= 0) {
 			             var image = {}
 		               image.title = name
-		               console.log(result[key][prop][name].bbox)
 		               if(result[key][prop][name].bbox) {
 		                 image.bbox = result[key][prop][name].bbox
 		               } else {
@@ -670,6 +669,7 @@ export default {
     },
     getImage(list, index) {
       if (list[index] && list[index].feature) {
+        list[index].feature.properties.id = list[index].id
         if (this.type === 'PLEIADES') {
           // specific case pleiades
           if (list[index].removed || !list[index].owner) {
@@ -678,19 +678,22 @@ export default {
           } else {
             list[index].feature.properties.removed = false
           }
-          list[index].feature.properties.id = list[index].id
           var urlImg = this.api.replace('/api', '/upload/pleiades/') + list[index].feature.properties.icon
           list[index].feature.properties.quicklook = urlImg
         }
-        var find = this.images.find(img => img.id === list[index].id )
+        var find = this.images.find(img => img.id === list[index].id)
         if (!find) {
           this.images.push(list[index].feature.properties)
         }
         this.getImage(list, index + 1)
       } else if (list[index] && list[index].url) {
         this.$http.get(list[index].url).then(function (response) {
-          if (response.body) {
-            this.images.push(response.body.features[0].properties)
+          if (response.body && response.body.features && response.body.features[0]) {
+            var identifier = response.body.features[0].properties.productIdentifier
+            var find = this.images.find(img => img.productIdentifier === identifier )
+            if (!find) {
+              this.images.push(response.body.features[0].properties)
+            }
           }
           this.getImage(list, index + 1)
           

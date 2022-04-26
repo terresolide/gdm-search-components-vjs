@@ -200,7 +200,6 @@ export default {
   methods:{
      close (e, name) {
        this.showTooltip[name] = false
-       console.log(e)
        e.stopPropagation()
      },
      copyCmd () {
