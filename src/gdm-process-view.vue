@@ -467,6 +467,7 @@ export default {
          if (key.indexOf('iw') >= 0) {
            subswath = key
            for (var prop in result[key]) {
+             
 		         if (prop === 'Common_Product') {
 		           // search for each geo product the png image
 		           var text = this.$i18n.t('common')
@@ -474,7 +475,12 @@ export default {
 		             if (name.indexOf('geo') >= 0) {
 			             var image = {}
 		               image.title = name
-		               image.bbox = bbox
+		               console.log(result[key][prop][name].bbox)
+		               if(result[key][prop][name].bbox) {
+		                 image.bbox = result[key][prop][name].bbox
+		               } else {
+		                  image.bbox = bbox
+		               }
 		               image.type = 'image'
 		               image.legend = result.dir + key + '/legend_' + name + '_runw.png' 
 		               if (text) {
@@ -484,10 +490,12 @@ export default {
 		               image.footprint = footprint
 		               image.checked = false
 		               for(var file in result[key][prop][name]) {
-				             if (result[key][prop][name][file].substr(-3) === 'png') {
+				             if (typeof result[key][prop][name][file] === 'string' &&
+				                 result[key][prop][name][file].substr(-3) === 'png') {
 				               image.png = result.dir + key + '/' + result[key][prop][name][file]
 				             }
-				             if (result[key][prop][name][file].substr(-4) === 'tiff') {
+				             if (typeof result[key][prop][name][file] === 'string' &&
+				                 result[key][prop][name][file].substr(-4) === 'tiff') {
 		                   image.tif = result.dir + key + '/' + result[key][prop][name][file]
 		                 }
 		               }
@@ -555,7 +563,8 @@ export default {
                    imageInside.date = date
                   // image.footprint = footprint
                    for(var file in result[key][prop][name]) {
-                     if (result[key][prop][name][file].substr(-3) === 'png') {
+                     if (typeof result[key][prop][name][file] === 'string' &&
+                         result[key][prop][name][file].substr(-3) === 'png') {
                        imageInside.png = result.dir + key + '/' + result[key][prop][name][file]
                      }
 //                      if (result[key][prop][name][file].substr(-4) === 'tiff') {

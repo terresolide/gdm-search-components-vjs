@@ -46,6 +46,7 @@
 	        </div>
 	       </div>
       </div>
+    
       <div v-else-if="result.results" style="margin-top:10px;">
 	      <a  :href="result.results" class="button" >
 	       <i class="fa fa-download"></i> {{$t('download')}}
@@ -63,7 +64,10 @@
       <a :href="result.dir" class="button" target="_blank" style="margin:10px 0 20px 0;">
          <i class="fa fa-folder"></i> {{$t('folder')}}
       </a>
+      <a v-if="result.synthesis" :href="result.synthesis" class="button" target="_blank" style="margin:10px 0 20px 10px;">
+        <i class="fa fa-file-text"></i> Synthèse</a>
      </div>
+     
     <div v-if="!result.dir && images && images.length > 0" :style="{width: series ? '35%' : '100%'}" style="margin-bottom:5px;">
       <h3  :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h3>
       <div class="gdm-image-layer" v-if="image.type !== 'serie' && image.type !== 'list'" v-for="(image, index) in images" >
@@ -149,6 +153,10 @@ export default {
       default: 0
     },
     serviceName: {
+      type: String,
+      default: null
+    },
+    synthesis: {
       type: String,
       default: null
     },
