@@ -14,7 +14,7 @@ var L = require("leaflet");
 L.Control.Gdmlayer = require('../modules/leaflet.control.gdmlayer.js')
 L.Control.Fullscreen = require('formater-metadata-vjs/src/modules/leaflet.control.fullscreen.js')
 L.Control.Legend = require('formater-metadata-vjs/src/modules/leaflet.control.legend.js')
-L.Control.Legend = require('../modules/leaflet.control.opacity.js')
+require('../modules/leaflet.control.opacity.js')
 require('leaflet-imageoverlay-rotated')
 // import GdmSerieNavigation from './gdm-serie-navigation.vue'
 import Tio from 'gdm-tio-vjs/src/modules/leaflet.imageOverlay.rotated.tio.js'

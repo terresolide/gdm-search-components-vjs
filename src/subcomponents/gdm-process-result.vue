@@ -85,7 +85,7 @@
 		    </div>
 		  </div>
     </div>
-    <div v-if="result.dir">
+    <div v-if="result.dir && images && images.length > 0">
        <h3 :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h3>
  
       <div v-if="images && images.length > 0"  style="margin-bottom:5px;">

@@ -153,7 +153,7 @@
 		     </gdm-process-actions>
 		   </div>
 		    
-		    <div v-if="process && process.result && process.status === 'TERMINATED'" :class="{highlight:seeResult}" style="margin-top:15px;"
+		    <div v-if="process && process.result && (process.status === 'TERMINATED' || process.status === 'FAILED')" :class="{highlight:seeResult}" style="margin-top:15px;"
 		    :style="{background: seeResult ? $shadeColor(color,0.92): 'none'}">
 	       <gdm-process-result  :result="process.result" :series="series" :service-name="process.serviceName"
 	        :lang="lang" :color="color" :images="imageLayers" :serie-index="serieIndex" 
