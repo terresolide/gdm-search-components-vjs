@@ -89,7 +89,7 @@
        <h3 :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h3>
  
       <div v-if="images && images.length > 0"  style="margin-bottom:5px;">
-	      <h4 v-if="!series" :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h4>
+	      <h4 v-if="!series" :style="{color:color}" style="margin:10px 0 0 0;">{{$t('common')}}</h4>
 	        <div class="gdm-image-layer" v-if="image.type !== 'serie' && image.type !== 'list'" v-for="(image, index) in images" >
 	        <h4 v-if="image.first" :style="{color:color}" style="margin-bottom:0;">{{$t(image.first)}}</h4>
           <div style="margin-left:5px;">
