@@ -49,6 +49,7 @@
 	 <div id="fmtLargeMap">
 	   <gdm-serie-navigation v-if="series" :series="series" :serie-index="serieIndex" :serie-name="serieName" :color="color" :lang="lang"
 	     :fullscreen="true" :loading="loadingLayer"  @dateChange="dateSerieChange"></gdm-serie-navigation>
+	    <div v-if="mouseposition" class="gdm-mouseposition" >{{mouseposition}}</div>
 	 </div>
 	 <div class="tio-instructions" v-show="showTioInstructions" @click="showTioInstructions=false">{{$t('tio_instructions')}}</div>
 	 <div >
@@ -63,7 +64,8 @@
 		     <div class="gdm-map-container">
 		      <gdm-map ref="map" :bbox="process.feature" :images="imageLayers" :tile="feature.properties.bboxTile"
 		      :service-name="process.serviceName" :series="series" :serie-index="serieIndex" :lang="lang" @dateChange="dateSerieChange" @tioReady="tioImagesReady"
-		      fullscreen="fmtLargeMap" :remove-height="8" @loadingLayer="loadingChange" @imageAdded="imageAdded" @imageRemoved="imageRemoved"></gdm-map>
+		      fullscreen="fmtLargeMap" :remove-height="8" @loadingLayer="loadingChange" @imageAdded="imageAdded" @imageRemoved="imageRemoved"
+		      @mousemove="mousemove"></gdm-map>
 		     </div>
 		      <div style="text-align:center;margin-top:10px;">
 		         {{date2str(process.tempStart, true)}}
@@ -344,10 +346,14 @@ export default {
       fullscreen: false,
       defaultParameters: null,
       loadingLayer: false,
-      showTioInstructions: false
+      showTioInstructions: false,
+      mouseposition: null
     }
   },
   methods: {
+    mousemove (val) {
+      this.mouseposition = val
+    },
     dateSerieChange (index) {
       if (!this.loadingLayer) {
         this.serieIndex = index
@@ -868,6 +874,7 @@ border: 4px solid lightgrey;
 .gdm-map-container {
    width:300px;
    margin:auto;
+   position:relative;
 }
 .gdm-process-header {
   /* position: relative;*/

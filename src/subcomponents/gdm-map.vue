@@ -4,10 +4,11 @@
    
  <tio-graph v-if="tio.img" v-show="tio.showGraph" :dates="tio.img.dates" :ns-values="tio.ptValues.ns" :ew-values="tio.ptValues.ew" 
    :keys="tio.img.keys" :maximum="tio.img.max" :lang="lang" @close="tio.showGraph=false"></tio-graph>
- <div id="fmtMap" class="mtdt-small">
-</div>
 
-</span>
+	 <div id="fmtMap" class="mtdt-small"></div>
+	 <div class="gdm-mouseposition" >{{mouseposition}}</div>
+
+ </span>
 </template>
 <script>
 var L = require("leaflet");
@@ -88,6 +89,7 @@ export default {
       selectListener: null,
       highlightListener: null,
       highlightedLayer: null,
+      mouseposition: null,
       // selected layer
       selectedLayer: null,
       fullscreenLayer: null,
@@ -234,6 +236,16 @@ export default {
       this.initBbox()
       this.initFeatureCollection()
       this.initImageLayers(this.images)
+      var _this = this
+      this.map.on('mousemove', function (e) {
+        var lat = Math.round(e.latlng.lat * 10000) / 10000
+        var lng = Math.round(e.latlng.lng * 10000) / 10000
+        _this.mouseposition = 'Latlng(' + lat + ', ' + lng + ')'
+        _this.$emit('mousemove', _this.mouseposition)
+      })
+      this.map.on('mouseout', function (e) {
+        _this.mouseposition = null
+      })
     },
     initBbox () {
       if (this.bboxLayer) {
@@ -471,11 +483,22 @@ export default {
 
 <style src="formater-commons-components-vjs/src/assets/css/formater-icon.css"></style>
 <style>
+.gdm-mouseposition {
+     position:absolute;
+     bottom:5px;
+     left:3px;
+     font-size:11px;
+     padding: 0 5px;
+     color: #333;
+     z-index:1;
+     background: rgba(255, 255, 255, 0.7);
+   }
 .research-map{
   float:left;
   margin-right: 10px;
 }
-
+div.map-container {
+}
 div[id="fmtMap"]{
  position:relative;
  width: 100%;

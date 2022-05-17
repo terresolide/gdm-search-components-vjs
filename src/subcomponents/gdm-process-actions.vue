@@ -60,7 +60,7 @@
          <a class="button" @click="duplicate"  :class="{disabled: !canEdit}">{{$t('duplicate')}}</a>
           <a class="button" v-if="!back && userId===process.userId && ciest2 && !isCiest2 && process.status==='TERMINATED'" @click="share"  :class="{disabled: !canEdit}">{{$t('share_ciest2')}}</a>
           <!--  GET RESULT IF NOT EXISTS -->
-          <a class="button" v-if="process.status === 'TERMINATED' && !process.result" @click="getResult" :class="{disabled: searchResult}">{{$t('get_result')}}</a>
+          <a class="button" v-if="process.status === 'TERMINATED' && back && !process.result" @click="getResult" :class="{disabled: searchResult}">{{$t('get_result')}}</a>
       </div>
        
       <div v-else-if="process.status === 'RUNNING' || process.status === 'PRE-RUN' || process.status === 'ACCEPTED'">
