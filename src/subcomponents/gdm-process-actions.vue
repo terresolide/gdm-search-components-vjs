@@ -59,6 +59,8 @@
       <div v-else-if="process.status === 'PURGED' || process.status === 'ABORTED' || process.status === 'TERMINATED'">
          <a class="button" @click="duplicate"  :class="{disabled: !canEdit}">{{$t('duplicate')}}</a>
           <a class="button" v-if="!back && userId===process.userId && ciest2 && !isCiest2 && process.status==='TERMINATED'" @click="share"  :class="{disabled: !canEdit}">{{$t('share_ciest2')}}</a>
+           <a class="button" v-if="back && !isExample && process.status==='TERMINATED'" @click="publish"  :class="{disabled: !canEdit}">{{$t('publish')}}</a>
+         
           <!--  GET RESULT IF NOT EXISTS -->
           <a class="button" v-if="process.status === 'TERMINATED' && back && !process.result" @click="getResult" :class="{disabled: searchResult}">{{$t('get_result')}}</a>
       </div>
@@ -140,6 +142,7 @@ export default {
       status: null,
       timer: null,
       isCiest2: false,
+      isExample: false,
       getCount: 0,
       searchResult: false
     }
@@ -196,6 +199,7 @@ export default {
     this.$i18n.locale = this.lang
   },
   mounted () {
+    this.isExample = this.process.isExample 
     this.launchTimer()
     console.log(this.canEdit)
   },
@@ -332,6 +336,21 @@ export default {
         this.submitting = false
       })
       
+    },
+    publish () {
+      this.submitting = true
+      this.$http.post(
+          this.api + '/publish/' + this.process.id,
+          {url: 'https://test.machine.chose'},
+          {credentials: true, emulateJSON: true})
+      .then(function (resp) {
+        this.$emit('ownerChange', resp.body.owner)
+        this.$emit('resultChange', resp.body.result)
+        this.isExample = true
+        this.submitting = false
+      }, function (e) {
+        this.submitting = false
+      })
     },
     share () {
       this.submitting = true

@@ -247,8 +247,13 @@ export default {
         if (this.describe.emit) {
           this.emit = this.describe.emit
         }
+        if (this.describe.defaults) {
+          var event = new CustomEvent('gdm-parameters:init', {detail: {name: this.name, values: this.describe.defaults}})
+          document.dispatchEvent(event)
+        }
         this.prefix = this.parent + (this.describe.prefix ? this.describe.prefix : '')
         this.initListeners()
+        
         this.extractChildValues()
        // this.initValues()
       }
@@ -448,6 +453,11 @@ export default {
       var _this = this
       this.parameters.forEach(function (parameter , index) {
         var name = _this.prefix + parameter.name
+        if (parameter.defaults) {
+          // the defaults values for the parameters
+          var event = new CustomEvent('gdm-parameters:init', {detail: {name: name, values: parameter.defaults}})
+          document.dispatchEvent(event)
+        }
         // case json format
         if (parameter.name.substr(parameter.name.length - 1) === ':') {
           var params = _this.defaultParameters[name.substr(0, name.length - 1)]
