@@ -38,6 +38,13 @@
 </i18n>
 <template>
 <span class="gdm-process-actions" v-if="process && (userId || back)" >
+      <div v-if="showPublish" class="publish-box">
+        <div style="float:right;"><span class="gdm-close fa fa-close" @click="showPublish=false"></span></div>
+        <h3 :style="{color:color}">Entrez l'url du nouveau répertoire</h3>
+        <input v-model="resultUrl" type="url" required style="min-width:380px;" @keyup="validUrl"/>
+         <input type="button" class="button" @click="publish" :disabled="invalidUrl" value="Publier" />
+         
+      </div>
       <div  v-if="submitting" class="gdm-searching"><i class="fa fa-circle-o-notch animated"></i></div>
 
       <div v-if="process.status === 'EVALUATED'">
@@ -59,7 +66,7 @@
       <div v-else-if="process.status === 'PURGED' || process.status === 'ABORTED' || process.status === 'TERMINATED'">
          <a class="button" @click="duplicate"  :class="{disabled: !canEdit}">{{$t('duplicate')}}</a>
           <a class="button" v-if="!back && userId===process.userId && ciest2 && !isCiest2 && process.status==='TERMINATED'" @click="share"  :class="{disabled: !canEdit}">{{$t('share_ciest2')}}</a>
-           <a class="button" v-if="back && !isExample && process.status==='TERMINATED'" @click="publish"  :class="{disabled: !canEdit}">{{$t('publish')}}</a>
+           <a class="button" v-if="back  && process.status==='TERMINATED'" @click="showPublish=true"  :class="{disabled: !canEdit}">Publier</a>
          
           <!--  GET RESULT IF NOT EXISTS -->
           <a class="button" v-if="process.status === 'TERMINATED' && back && !process.result" @click="getResult" :class="{disabled: searchResult}">{{$t('get_result')}}</a>
@@ -143,6 +150,9 @@ export default {
       timer: null,
       isCiest2: false,
       isExample: false,
+      resultUrl: null,
+      showPublish: false,
+      invalidUrl: true,
       getCount: 0,
       searchResult: false
     }
@@ -341,15 +351,13 @@ export default {
       this.submitting = true
       this.$http.post(
           this.api + '/publish/' + this.process.id,
-          {url: 'https://test.machine.chose'},
+          {url: this.resultUrl},
           {credentials: true, emulateJSON: true})
       .then(function (resp) {
-        this.$emit('ownerChange', resp.body.owner)
-        this.$emit('resultChange', resp.body.result)
-        this.isExample = true
-        this.submitting = false
+        location.reload()
       }, function (e) {
         this.submitting = false
+        alert('Une erreur c\'est produite!')
       })
     },
     share () {
@@ -395,11 +403,27 @@ export default {
         console.log('error request ', resp.status)
         
       })
+    },
+    validUrl (e) {
+      console.log(e.target.validity.valid)
+     this.invalidUrl = !e.target.validity.valid
     }
   }
 }
 </script>
 <style scoped>
+.gdm-close {
+  padding: 2px 5px;
+  cursor: pointer;
+  pointer-events:auto;
+  border: 1px dotted white;
+}
+.gdm-close.fa-close:hover {
+  border-color: grey;
+}
+.gdm-process-actions {
+  position:relative;
+}
 .gdm-process-actions .gdm-searching {
   position:fixed;
   color: white;
@@ -407,6 +431,22 @@ export default {
   top:20%;
   left:50%;
   z-index:30;
+}
+.publish-box {
+     position:absolute;
+     padding: 0 10px 10px 10px;
+     border:2px solid #CCC;
+     border-radius: 5px;
+     background: white;
+     top:0;
+     right:0;
+     text-align:left;
+     min-width:450px;
+     box-shadow: 3px 3px 6px grey;
+     z-index:2000;
+}
+.publish-box h3 {
+  margin: 10px 0;
 }
 .gdm-searching i {
   font-size:3rem;
