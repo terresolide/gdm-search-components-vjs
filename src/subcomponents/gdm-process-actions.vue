@@ -62,12 +62,19 @@
          <a  style="display:none;" class="button" v-if="isOptic" @click="todo" :class="{disabled: disabled}"
           :disabled="disabled">{{$t('relaunch')}}</a>
       </div>
+  
       <!--  PURGED NOTHING TO DO => CREATE NEW PROCESS WITH THIS-->
       <div v-else-if="process.status === 'PURGED' || process.status === 'ABORTED' || process.status === 'TERMINATED'">
          <a class="button" @click="duplicate"  :class="{disabled: !canEdit}">{{$t('duplicate')}}</a>
-          <a class="button" v-if="!back && userId===process.userId && ciest2 && !isCiest2 && process.status==='TERMINATED'" @click="share"  :class="{disabled: !canEdit}">{{$t('share_ciest2')}}</a>
-           <a class="button" v-if="back  && process.status==='TERMINATED'" @click="showPublish=true"  :class="{disabled: !canEdit}">Publier</a>
-         
+         <a class="button" v-if="!back && userId===process.userId && ciest2 && !isCiest2 && process.status==='TERMINATED'" @click="share"  :class="{disabled: !canEdit}">{{$t('share_ciest2')}}</a>
+         <a class="button" v-if="back && process.status ==='TERMINATED'" @click="showPublish=true"  :class="{disabled: !canEdit}">Publier</a>
+         <span v-if="process.group === 'SAR' && process.status === 'TERMINATED'">
+	         <a class="button" v-if="!back && userId === process.userId" 
+	         @click="requestPublish" :class="{disabled: process.keep}">Rendre public</a>
+           <a class="button" v-if="back && !process.keep">Ne pas purger</a>
+           <a class="button" v-else-if="back && process.keep">A purger</a>
+         </span>
+        
           <!--  GET RESULT IF NOT EXISTS -->
           <a class="button" v-if="process.status === 'TERMINATED' && back && !process.result" @click="getResult" :class="{disabled: searchResult}">{{$t('get_result')}}</a>
       </div>
@@ -211,7 +218,8 @@ export default {
   mounted () {
     this.isExample = this.process.isExample 
     this.launchTimer()
-    console.log(this.canEdit)
+    console.log(this.userId)
+    console.log(this.process.userId)
   },
   methods:{
     launchTimer () {
@@ -359,6 +367,9 @@ export default {
         this.submitting = false
         alert('Une erreur c\'est produite!')
       })
+    },
+    requestPublish () {
+      console.log('here')
     },
     share () {
       this.submitting = true

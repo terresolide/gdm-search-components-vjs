@@ -74,7 +74,7 @@
            </div>
          </div>
          <div style="position:relative;">
-	         <span v-if="process.properties.datePurge && process.properties.status === 'TERMINATED'" class="date-purge"> 
+	         <span v-if="!process.properties.keep && process.properties.datePurge && process.properties.status === 'TERMINATED'" class="date-purge"> 
 	            <i class="fa fa-exclamation-triangle"></i>
 	            <b>Purge: </b>{{printDate(process.properties.datePurge)}}
 	         </span>
