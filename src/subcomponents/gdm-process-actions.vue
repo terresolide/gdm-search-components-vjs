@@ -11,9 +11,11 @@
      "cancel": "Stop",
      "purge": "To trash",
      "evaluate": "Evaluate",
+     "error_occured": "An error has occured",
      "duplicate": "Duplicate",
      "debug": "Switch to debug",
      "get_result": "Get result",
+     "recorded_request": "Your request has been saved.\nIt will be processed as quickly as possible by our service.",
      "run": "end of debug",
      "share_ciest2": "Share with CIEST2"
    },
@@ -28,9 +30,11 @@
      "cancel": "Stopper",
      "purge": "Vider",
      "evaluate": "Evaluer",
+     "error_occured": "Une erreur s'est produite",
      "duplicate": "Dupliquer",
      "debug": "Passer en mode debug",
      "get_result": "Obtenir les résultats",
+     "recorded_request": "Votre demande a été enregistrée.\nElle sera traitée le plus rapidement possible par nos services.",
      "run": "Fin du debug" ,
      "share_ciest2": "Partager CIEST2"
    }
@@ -365,11 +369,29 @@ export default {
         location.reload()
       }, function (e) {
         this.submitting = false
-        alert('Une erreur c\'est produite!')
+        alert(this.$i18n.t('error_occured' + ': ' + 'DISCONNECTED ?'))
       })
     },
     requestPublish () {
-      console.log('here')
+      this.submitting = true
+      this.$http.get(
+          this.api.replace('api', 'requests') + '/publish/' + this.process.id,
+          {headers: { 'accept-language': this.lang}, credentials: true, emulateJSON: true})
+      .then(function (resp) {
+         console.log(resp)
+         if(resp.body && resp.body.success) {
+           alert(this.$i18n.t('recorded_request'))
+           this.$emit('keptProcess')
+         } else {
+           if (resp.body.error) {
+             alert(this.$i18n.t('error_occured') + ': ' +  resp.body.error)
+           }
+         }
+         this.submitting = false
+      }, function (e) {
+        this.submitting = false
+        alert(this.$i18n.t('error_occured'))
+      })
     },
     share () {
       this.submitting = true

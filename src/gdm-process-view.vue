@@ -101,7 +101,7 @@
 	               {{date2str(process.end)}}
 	             </span>
 	          </div>
-	          <div v-if="process.status === 'TERMINATED' && process.datePurge"
+	          <div v-if="process.status === 'TERMINATED' && process.datePurge && !process.keep"
 	          style="font-size:0.9em;color:darkred;cursor:pointer;" :title="$t('clear_data')">
 	           <i class="fa fa-exclamation-triangle"> 
 	           </i>
@@ -151,7 +151,8 @@
 		   <div class="process-actions">
 		     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" :color="color"
 		     :process="process" :user-id="userId" :can-edit="hasAccessService && !pleiadeRemoved" :lang="lang" :ciest2="ciest2" @processChange="statusChange" 
-		     @statusChange="statusChange" @ownerChange="userChange" @duplicate="duplicate">
+		     @statusChange="statusChange" @ownerChange="userChange" @duplicate="duplicate"
+		     @keptProcess="keepProcess">
 		     </gdm-process-actions>
 		   </div>
 		    
@@ -721,6 +722,9 @@ export default {
     error (response) {
       // alert('error server code = ' + response.status)
       this.errorCode = response.status
+    },
+    keepProcess () {
+      this.process.keep = true
     },
     load () {
       var url = this.api + '/getProcess/' + this.id
