@@ -17,7 +17,8 @@
      "get_result": "Get result",
      "recorded_request": "Your request has been saved.\nIt will be processed as quickly as possible by our service.",
      "run": "end of debug",
-     "share_ciest2": "Share with CIEST2"
+     "share_ciest2": "Share with CIEST2",
+     "publish": "Publish"
    },
    "fr":{
      "abort": "Abandonner",
@@ -36,7 +37,8 @@
      "get_result": "Obtenir les résultats",
      "recorded_request": "Votre demande a été enregistrée.\nElle sera traitée le plus rapidement possible par nos services.",
      "run": "Fin du debug" ,
-     "share_ciest2": "Partager CIEST2"
+     "share_ciest2": "Partager CIEST2",
+     "publish": "Publier"
    }
 }
 </i18n>
@@ -45,8 +47,8 @@
       <div v-if="showPublish" class="publish-box">
         <div style="float:right;"><span class="gdm-close fa fa-close" @click="showPublish=false"></span></div>
         <h3 :style="{color:color}">Entrez l'url du nouveau répertoire</h3>
-        <input v-model="resultUrl" type="url" required style="min-width:380px;" @keyup="validUrl"/>
-         <input type="button" class="button" @click="publish" :disabled="invalidUrl" value="Publier" />
+        <input v-model="resultUrl" type="url"  style="min-width:380px;" @keyup="validUrl"/>
+         <input type="button" class="button" @click="publish" :disabled="invalidUrl" :value="process.isExample ? $t('save') : $t('publish')" />
          
       </div>
       <div  v-if="submitting" class="gdm-searching"><i class="fa fa-circle-o-notch animated"></i></div>
@@ -71,12 +73,13 @@
       <div v-else-if="process.status === 'PURGED' || process.status === 'ABORTED' || process.status === 'TERMINATED'">
          <a class="button" @click="duplicate"  :class="{disabled: !canEdit}">{{$t('duplicate')}}</a>
          <a class="button" v-if="!back && userId===process.userId && ciest2 && !isCiest2 && process.status==='TERMINATED'" @click="share"  :class="{disabled: !canEdit}">{{$t('share_ciest2')}}</a>
-         <a class="button" v-if="back && process.status ==='TERMINATED'" @click="showPublish=true"  :class="{disabled: !canEdit}">Publier</a>
+         <a class="button" v-if="back && process.status ==='TERMINATED' && !process.isExample" @click="showPublish=true"  :class="{disabled: !canEdit}">{{$t('publish')}}</a>
          <span v-if="process.group === 'SAR' && process.status === 'TERMINATED'">
-	         <a class="button" v-if="!back && userId === process.userId" 
-	         @click="requestPublish" :class="{disabled: process.keep}">Rendre public</a>
-           <a class="button" v-if="back && !process.keep">Ne pas purger</a>
-           <a class="button" v-else-if="back && process.keep">A purger</a>
+	         <a class="button" v-if="!back && userId === process.userId && !process.isExample" 
+	         @click="requestPublish" :class="{disabled: process.keep}">{{$t('publish')}}</a>
+           <a class="button" v-if="back && !process.isExample && !process.keep" @click="changeKeep">Ne pas purger</a>
+           <a class="button" v-else-if="back && !process.isExample && process.keep" @click="changeKeep">À purger</a>
+           <a class="button" v-if="back && process.isExample" @click="showPublish=true">Modifier url résultat</a>
          </span>
         
           <!--  GET RESULT IF NOT EXISTS -->
@@ -165,7 +168,7 @@ export default {
       showPublish: false,
       invalidUrl: true,
       getCount: 0,
-      searchResult: false
+      searchResult: false,
     }
   },
   computed: {
@@ -338,6 +341,32 @@ export default {
         this.submitting = false
       })
     },
+    changeKeep () {
+      this.submitting = true
+      this.$http.post(
+          this.api + '/changeKeep/' + this.process.id,
+          {keep: !this.process.keep },
+          {
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              credentials: true
+           }
+      ).then(function (resp) {
+        if (resp.body.success) {
+          this.$emit('keptProcess', !this.process.keep)
+        } else {
+          if (resp.body.error) {
+            alert(this.$i18n.t('error_occured') + ': ' +  resp.body.error)
+          }
+        }
+        this.submitting = false
+      }, function (resp) {
+        console.log('error request ', resp.status)
+        this.submitting = false
+      })
+    },
     duplicate () {
       this.submitting = true
       this.$http.post(
@@ -381,7 +410,7 @@ export default {
          console.log(resp)
          if(resp.body && resp.body.success) {
            alert(this.$i18n.t('recorded_request'))
-           this.$emit('keptProcess')
+           this.$emit('keptProcess', true)
          } else {
            if (resp.body.error) {
              alert(this.$i18n.t('error_occured') + ': ' +  resp.body.error)
@@ -438,8 +467,11 @@ export default {
       })
     },
     validUrl (e) {
-      console.log(e.target.validity.valid)
-     this.invalidUrl = !e.target.validity.valid
+      var invalid = false
+     if (!this.newUrl && this.process.isExample) {
+       invalid = true
+     }
+     this.invalidUrl = invalid && !e.target.validity.valid
     }
   }
 }

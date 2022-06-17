@@ -723,8 +723,8 @@ export default {
       // alert('error server code = ' + response.status)
       this.errorCode = response.status
     },
-    keepProcess () {
-      this.process.keep = true
+    keepProcess (value) {
+      this.process.keep = value
     },
     load () {
       var url = this.api + '/getProcess/' + this.id
