@@ -47,10 +47,10 @@
      <formater-search-box v-if="groups.length > 0" header-icon-class="fa fa-object-group" open-icon-class="fa fa-caret-right" :title="$t('service_group')" :deployed="false" type="empty" >
       <formater-select  :options="groups" :defaut="parameters.group" @input="groupChange" width="228px"></formater-select>
     </formater-search-box>
-     <formater-search-box header-icon-class="fa fa-cog" open-icon-class="fa fa-caret-right" title="Status" :deployed="false" type="empty" >
+     <formater-search-box  header-icon-class="fa fa-cog" open-icon-class="fa fa-caret-right" title="Status" :deployed="false" type="empty" >
       
       <div v-if="back"><span :style="{color: color}">{{$t('see_archived')}}</span>: <input v-model="archived" type="checkbox" @change="archivedChange"/></div>
-      <formater-select  :options="statusList" :defaut="parameters.status" @input="statusChange" width="228px"></formater-select>
+      <formater-select v-if="statusList.length > 0" :options="statusList" :defaut="parameters.status" @input="statusChange" width="228px"></formater-select>
     </formater-search-box>
      <formater-search-box header-icon-class="fa fa-hourglass-end" open-icon-class="fa fa-caret-right" :title="$t('process_extent')" :deployed="false" type="empty" >
        <b :style="{color: color}">{{$t('creation')}}</b>

@@ -153,6 +153,7 @@ export default {
       spatialChangeListener: null,
       selectProcessLayerListener: null,
       resizeListener: null,
+      popListener: null,
       selectedProcessId: null,
       order: {
         temporal: 1,
@@ -176,10 +177,28 @@ export default {
       defaultValues: {
         status: null
       },
-      timer: null
+      timer: null,
+      queryUrl: null,
+      count: 0
     }
   },
   created () {
+    this.queryUrl = document.URL;
+    var self = this
+    document.addEventListener('change', function() {
+    var currentPageUrl = document.URL
+      if(currentPageUrl && self.queryUrl != currentPageUrl) {
+        self.queryUrl = currentPageUrl
+//         self.extractParams()
+//         self.load()
+      }
+    });
+//     window.addEventListener('popstate', (event) => {
+//       console.log(event)
+//       console.log(history)
+//    self.extractParams()
+//    self.search(true)
+//     })
    this.extractParams()
    // extract params
    
@@ -187,7 +206,10 @@ export default {
    if (!this.group) {
      this.searchGroups()
    }
+//    this.popListener = this.urlChange.bind(this)
+//    window.addEventListener('popstate', this.popListener)
    this.spatialChangeListener = this.spatialChange.bind(this)
+
    document.addEventListener('fmt:spatialChangeEvent', this.spatialChangeListener)
    this.selectProcessLayerListener = this.selectedLayerChange.bind(this)
    document.addEventListener('gdm:selectProcessLayer', this.selectProcessLayerListener)
@@ -212,6 +234,8 @@ export default {
       clearInterval(this.timer)
       this.timer = null
     }
+    window.removeEventListener('popstate', this.popListener)
+    this.popListener = null
     document.removeEventListener('fmt:spatialChangeEvent', this.spatialChangeListener)
     this.spatialChangeListener = null
     document.removeEventListener('gdm:selectProcessLayer', this.selectProcessLayerListener) 
@@ -223,32 +247,81 @@ export default {
     this.resize()
   },
   methods: {
+     urlChange () {
+       this.extractParams()
+       this.search(true)
+   
+     },
+     buildQuery () {
+       var location = 'maxRecords=' + this.pagination.maxRecords + '&index=' + this.pagination.startIndex
+       if (this.parameters.user && this.back && !this.userId) {
+          location += '&userId=' + this.parameters.user.id
+       }
+       
+       if (this.parameters.service) {
+         location += '&serviceId=' + this.parameters.service.id
+       }
+       if (this.parameters.status) {
+         location += '&status=' + this.parameters.status
+       }
+       if (this.parameters.any) {
+         location += '&any=' + this.parameters.any
+       }
+       if (this.parameters.bbox) {
+         location += '&bbox=' + this.parameters.bbox
+       }
+       if (this.parameters.group && !this.group) {
+           location += '&group=' + this.parameters.group
+       }
+       if (this.parameters.archived) {
+         location += '&archived=1'
+       }
+       if (this.parameters.order) {
+         location += '&order=' + encodeURIComponent(this.parameters.order)
+       }
+       var self = this
+       var dateType = ['Start', 'End', 'tempStart', 'tempEnd', 'processStart', 'processEnd']
+       dateType.forEach(function (name) {
+         if (self.parameters[name] && self.parameters[name] != 'Invalid date') {
+           location += '&' + name.charAt(0).toLowerCase() + name.slice(1) + '=' + self.parameters[name]
+         }
+       })
+       return location
+     },
      extractParams () {
        var url = new URL(window.location.href)
        var maxRecords = url.searchParams.get('maxRecords')
        if (maxRecords) {
-         this.pagination.maxRecords = maxRecords
+         this.pagination.maxRecords = parseInt(maxRecords)
        }
        var index = url.searchParams.get('index')
        if (index) {
-         this.pagination.startIndex = index
+         this.pagination.startIndex = parseInt(index)
        }
        var userId = url.searchParams.get('userId')
        if (userId && !this.userId) {
-         this.parameters.user = { id: userId , email: 'User ' + userId}
+         this.parameters.user = { id: parseIn(userId) , email: 'User ' + userId}
+       } else {
+         this.parameters.user = null
        }
        var serviceId = url.searchParams.get('serviceId')
        if (serviceId) {
-         this.parameters.service = {id: serviceId, name : 'Service ' + serviceId}
+         this.parameters.service = {id: parseInt(serviceId), name : 'Service ' + serviceId}
+       } else {
+         this.parameters.service = null
        }
        var status = url.searchParams.get('status')
        if (status) {
          this.parameters.status = status
+       } else {
+         this.parameters.status = null
        }
        if (!this.groupId) {
          var group = url.searchParams.get('group')
          if (group) {
            this.parameters.group = group
+         } else {
+           this.parameters.group = null
          }
        }
        var archived = url.searchParams.get('archived')
@@ -257,67 +330,32 @@ export default {
        }
        
      },
-     search () {
+     search (popstate) {
        var headers = {}
        if (this.group) {
          headers.groupKey = this.group
        }
-       var location = 'maxRecords=' + this.pagination.maxRecords + '&index=' + this.pagination.startIndex
-	     var url = this.api + this.what + '?maxRecords=' + this.pagination.maxRecords + '&index=' + this.pagination.startIndex
+       var query = this.buildQuery()
+       const newURL = new URL(window.location.href)
+       newURL.search  = query
+	     var url = this.api + this.what 
 	     if (this.userId && this.back) {
-	       url += '&userId=' + this.userId
-	     } else if (this.parameters.user) {
-	       url += '&userId=' + this.parameters.user.id
-	       if (this.back) {
-	         location += '&userId=' + this.parameters.user.id
-	       }
-	     }
+	       query += '&userId=' + this.userId
+	     } 
 	     if (this.example) {
-	       url += '&example=1'
+	       query += '&example=1'
 	     }
-	     if (this.parameters.service) {
-	       url += '&serviceId=' + this.parameters.service.id
-	       location += '&serviceId=' + this.parameters.service.id
+       if (this.groupId) {
+         query += '&group=' + this.groupId
+       }
+
+	     query += '&lang=' + this.lang
+	     
+	     url += '?' + query
+	     if (window.history.pushState && !popstate && newURL.search !== window.location.search) {
+	       
+	       window.history.pushState({path: newURL.href }, '', newURL.href)
 	     }
-	     if (this.parameters.status) {
-	       url += '&status=' + this.parameters.status
-	       location += '&status=' + this.parameters.status
-	     }
-	     if (this.parameters.any) {
-	       url += '&any=' + this.parameters.any
-	       location += '&any=' + this.parameters.any
-	     }
-	     if (this.parameters.bbox) {
-	       url +='&bbox=' + this.parameters.bbox
-	       location += '&bbox=' + this.parameters.bbox
-	     }
-	     if (this.parameters.group) {
-	       url +='&group=' + this.parameters.group
-	       if (!this.group) {
-	         location += '&group=' + this.parameters.group
-	       }
-	     }
-	     if (this.parameters.archived) {
-	       url += '&archived=1'
-	       location += '&archived=1'
-	     }
-	     if (this.parameters.order) {
-	       url += '&order=' + encodeURIComponent(this.parameters.order)
-	       location += '&order=' + encodeURIComponent(this.parameters.order)
-	     }
-	     url += '&lang=' + this.lang
-	     var self = this
-	     var dateType = ['Start', 'End', 'tempStart', 'tempEnd', 'processStart', 'processEnd']
-	     dateType.forEach(function (name) {
-	       if (self.parameters[name] && self.parameters[name] != 'Invalid date') {
-	         url += '&' + name.charAt(0).toLowerCase() + name.slice(1) + '=' + self.parameters[name]
-	         location += url += '&' + name.charAt(0).toLowerCase() + name.slice(1) + '=' + self.parameters[name]
-	       }
-	     })
-	     if (window.history.pushState) { 
-	       const newURL = new URL(window.location.href)
-	       newURL.search  = location
-	       window.history.pushState({ path: newURL.href }, '', newURL.href)}
 	     this.$http.get(url, {credentials: true, headers: headers})
 	      .then(
 	          response => this.display(response),
@@ -353,6 +391,7 @@ export default {
 //           this.parameters.order += ', start ' + (this.order.date > 0 ? 'ASC' : 'DESC')
           
       }
+     // this.changeUrl()
       this.search()
     },
     archivedChange (value) {
