@@ -42,7 +42,7 @@
      </formater-search-box>
      
      <formater-search-box header-icon-class="fa fa-calendar" open-icon-class="fa fa-caret-right" :title="$t('temporal_extent')" :deployed="false" type="empty" >
-         <formater-temporal-search name="temp" lang="fr" :format="format" daymin="2014-04-03" @change="dateChange"></formater-temporal-search>
+         <formater-temporal-search name="temp" lang="fr" :format="format" :default-from="parameters.tempStart" :default-to="parameters.tempEnd" daymin="2014-04-03" @change="dateChange"></formater-temporal-search>
      </formater-search-box>
      <formater-search-box v-if="groups.length > 0" header-icon-class="fa fa-object-group" open-icon-class="fa fa-caret-right" :title="$t('service_group')" :deployed="false" type="empty" >
       <formater-select  :options="groups" :defaut="parameters.group" @input="groupChange" width="228px"></formater-select>
@@ -54,9 +54,11 @@
     </formater-search-box>
      <formater-search-box header-icon-class="fa fa-hourglass-end" open-icon-class="fa fa-caret-right" :title="$t('process_extent')" :deployed="false" type="empty" >
        <b :style="{color: color}">{{$t('creation')}}</b>
-       <formater-temporal-search name="" lang="fr" :format="format" daymin="2020-03-01" @change="dateChange"></formater-temporal-search>
+       <formater-temporal-search name="" lang="fr" :format="format" :default-to="parameters.End" :default-from="parameters.Start" 
+       daymin="2020-03-01" @change="dateChange"></formater-temporal-search>
        <b :style="{color: color}">{{$t('start')}}</b>
-       <formater-temporal-search name="process" lang="fr" :format="format" daymin="2020-03-01" @change="dateChange"></formater-temporal-search>
+       <formater-temporal-search name="process" lang="fr" :format="format" :default-to="parameters.processEnd" :default-from="parameters.processStart"
+        daymin="2020-03-01" @change="dateChange"></formater-temporal-search>
     </formater-search-box>
     
     <formater-search-box  header-icon-class="fa fa-filter" open-icon-class="fa fa-caret-right" :title="$t('filters')" :deployed="false" type="empty" >

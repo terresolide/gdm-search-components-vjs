@@ -172,7 +172,7 @@ export default {
         q: null,
         bbox: null,
         group: null,
-        order: 'start DESC, tempStart ASC'
+        order: 'start DESC'
       },
       defaultValues: {
         status: null
@@ -185,29 +185,32 @@ export default {
   created () {
     this.queryUrl = document.URL;
     var self = this
-    document.addEventListener('change', function() {
-    var currentPageUrl = document.URL
-      if(currentPageUrl && self.queryUrl != currentPageUrl) {
-        self.queryUrl = currentPageUrl
-//         self.extractParams()
-//         self.load()
-      }
-    });
+//     document.addEventListener('change', function(e) {
+//       var currentPageUrl = document.URL
+//       console.log(e)
+//       if(currentPageUrl && self.queryUrl != currentPageUrl) {
+//         self.queryUrl = currentPageUrl
+// /         self.extractParams()
+//         //
+//         console.log(currentPageUrl)
+//         console.log(window.location.search)
+//          self.search(self.buildQuery())
+//       }
+//     });
 //     window.addEventListener('popstate', (event) => {
 //       console.log(event)
 //       console.log(history)
-//    self.extractParams()
-//    self.search(true)
+    
 //     })
-   this.extractParams()
+  
    // extract params
    
    // launch url debug
    if (!this.group) {
      this.searchGroups()
    }
-//    this.popListener = this.urlChange.bind(this)
-//    window.addEventListener('popstate', this.popListener)
+   this.popListener = this.stateChange.bind(this)
+   window.addEventListener('popstate', this.popListener)
    this.spatialChangeListener = this.spatialChange.bind(this)
 
    document.addEventListener('fmt:spatialChangeEvent', this.spatialChangeListener)
@@ -219,15 +222,18 @@ export default {
    document.addEventListener('mapNodeChange', this.mapListener)
    this.launchUrl = this.api.substr(0, this.api.indexOf('api'))
    this.$i18n.locale = this.lang
+   this.extractParams()
+   var query = this.buildQuery()
+   this.search(query)
 //    moment.locale(this.lang)
 //    if (this.lang === 'en') {
 //      this.dateFormatDisplay = 'MM/DD/YYYY'
 //    } else {
 //      this.dateFormatDisplay = 'DD/MM/YYYY'
 //    }
-   var search = this.search
-   this.timer = setInterval(search, 300000)
-   this.search()
+//    var search = this.search
+//    this.timer = setInterval(search, 300000)
+//    this.search()
   },
   destroyed () {
     if (this.timer) {
@@ -247,13 +253,26 @@ export default {
     this.resize()
   },
   methods: {
-     urlChange () {
-       this.extractParams()
-       this.search(true)
+     stateChange () {
+       if (window.history && window.history.state) {
+         this.extractParams()
+         this.search(history.state.query)
+        }
+     },
+     changeQuery () {
+       var query = this.buildQuery()
+       const newURL = new URL(window.location.href)
+       newURL.search  = query
+       if (window.history.pushState && newURL.search !== window.location.search) {
+         
+         window.history.pushState({path: newURL.href, query: query }, '', newURL.href)
+         this.search(query)
+       }
+      // this.search(query)
    
      },
      buildQuery () {
-       var location = 'maxRecords=' + this.pagination.maxRecords + '&index=' + this.pagination.startIndex
+       var location = '?maxRecords=' + this.pagination.maxRecords + '&index=' + this.pagination.startIndex
        if (this.parameters.user && this.back && !this.userId) {
           location += '&userId=' + this.parameters.user.id
        }
@@ -292,11 +311,11 @@ export default {
        var url = new URL(window.location.href)
        var maxRecords = url.searchParams.get('maxRecords')
        if (maxRecords) {
-         this.pagination.maxRecords = parseInt(maxRecords)
+         this.$set(this.pagination, 'maxRecords', parseInt(maxRecords))
        }
        var index = url.searchParams.get('index')
        if (index) {
-         this.pagination.startIndex = parseInt(index)
+         this.$set(this.pagination, 'startIndex', parseInt(index))
        }
        var userId = url.searchParams.get('userId')
        if (userId && !this.userId) {
@@ -328,16 +347,56 @@ export default {
        if (archived) {
          this.parameters.archived = archived
        }
-       
+       var order = url.searchParams.get('order')
+       if (order) {
+         this.parameters.order = decodeURIComponent(order)
+         var orders = this.parameters.order.split(', ')
+         var ord = orders[0]
+         var self = this
+         // orders.forEach(function (ord) {
+           var part = ord.split(' ')
+	         switch (part[0]) {
+	           case 'start':
+	             self.order.date = part[1] === 'ASC' ? 1 : -1 
+	             self.orderBy = 'date'
+	             break
+	           case 'tempStart':
+	             self.order.temporal = part[1] === 'ASC' ? 1 : -1 
+	             self.orderBy = 'temporal'
+	            break
+	           case 'processStart':
+	             self.order.processStart = part[1] === 'ASC' ? 1 : -1 
+	             self.orderBy = 'processStart'
+	             break
+	         }
+       //  })
+       }
+       var self = this
+       var dateType = ['Start', 'End', 'tempStart', 'tempEnd', 'processStart', 'processEnd']
+       dateType.forEach(function (key) {
+         var name = key.charAt(0).toLowerCase() + key.slice(1)
+         var date = url.searchParams.get(name)
+         if (date) {
+           self.parameters[key] = date
+         } else {
+           self.parameters[key] = null
+         }
+       })
+       var bbox = url.searchParams.get('bbox')
+       if (bbox) {
+         this.parameters.bbox = bbox
+         this.parameters.jsonBbox = {}
+       } else {
+         this.parameters.bbox = null
+         this.parameters.jsonBbox = {}
+       }
      },
-     search (popstate) {
+     search (query) {
        var headers = {}
        if (this.group) {
          headers.groupKey = this.group
        }
-       var query = this.buildQuery()
-       const newURL = new URL(window.location.href)
-       newURL.search  = query
+      
 	     var url = this.api + this.what 
 	     if (this.userId && this.back) {
 	       query += '&userId=' + this.userId
@@ -351,11 +410,8 @@ export default {
 
 	     query += '&lang=' + this.lang
 	     
-	     url += '?' + query
-	     if (window.history.pushState && !popstate && newURL.search !== window.location.search) {
-	       
-	       window.history.pushState({path: newURL.href }, '', newURL.href)
-	     }
+	     url += query
+	    
 	     this.$http.get(url, {credentials: true, headers: headers})
 	      .then(
 	          response => this.display(response),
@@ -372,7 +428,7 @@ export default {
         case 'date':
           this.order.date = (-1) * this.order.date
           this.orderBy = 'date'
-          this.parameters.order = ' start ' + (this.order.date > 0 ? 'ASC' : 'DESC')
+          this.parameters.order = 'start ' + (this.order.date > 0 ? 'ASC' : 'DESC')
 //           this.parameters.order += ', tempStart ' + (this.order.temporal > 0 ? 'ASC' : 'DESC')
 //            this.parameters.order += ', processStart ' + (this.order.processStart > 0 ? 'ASC' : 'DESC')
           break
@@ -392,7 +448,7 @@ export default {
           
       }
      // this.changeUrl()
-      this.search()
+      this.changeQuery()
     },
     archivedChange (value) {
       if (value) {
@@ -400,14 +456,14 @@ export default {
       } else {
         delete this.parameters.archived
       }
-      this.search()
+      this.changeQuery()
     },
     dateChange (e) {
       console.log(e)
       var change = {'from': 'Start', 'to': 'End'}
       var name = e.name.replace('from','Start').replace('to', 'End')
       this.parameters[name] = e.value
-      this.search()
+      this.changeQuery()
     },
     display (response) {
       var pagination = response.body.properties
@@ -455,7 +511,7 @@ export default {
     },
     pageChange(values) {
       this.pagination = values
-      this.search()
+      this.changeQuery()
     },
     printDate (date, length) {
       if (!length) {
@@ -478,14 +534,14 @@ export default {
     },
     removeSelected(type) {
       this.parameters[type] = null
-      this.search()
+      this.changeQuery()
     },
     reset () {
       this.selectProcess(null)
       for (var prop in this.parameters) {
         this.parameters[prop] = null
       }
-      this.search()
+      this.changeQuery()
     },
     resize () {
       if (this.$el && this.$el.querySelector) {
@@ -529,7 +585,7 @@ export default {
       } else {
         this.parameters.service = service
       }
-      this.search()
+      this.changeQuery()
     },
     selectUser (user) {
       if (this.parameters.user && this.parameters.user.id === user.id) {
@@ -537,11 +593,11 @@ export default {
       } else {
         this.parameters.user = user
       }
-      this.search()
+      this.changeQuery()
     },
     groupChange(e) {
       this.parameters.group = e
-      this.search()
+      this.changeQuery()
     },
     spatialChange(e) {
       var event = new CustomEvent('aerisSearchEvent', {detail: {}})
@@ -551,11 +607,11 @@ export default {
       } else {
         this.parameters.bbox = null
       }
-      this.search()
+      this.changeQuery()
     },
     statusChange(e) {
       this.parameters.status = e
-      this.search()
+      this.changeQuery()
     },
     textChange (value) {
       if (value) {
@@ -563,7 +619,7 @@ export default {
       } else {
         this.parameters.any = null
       }
-      this.search()
+      this.changeQuery()
     }
     
     

@@ -25,7 +25,7 @@
   	<span class="fa fa-angle-left" :style="{background:color}" @click="changePage(-1)" ></span>
   </span>
   <span style="margin: 0 10px;" v-html="$tc('results', totalResults, {from: (totalResults === 0) ? 0 : startIndex + 1, to: to, notExactly: notExactly, count: totalResults})"></span>
-   (<formater-select name="recordPerPage" :options="recordsPerPage" :defaut="recordPerPage + ''" type="associative" @input="nbRecordChange" color="transparent"></formater-select>)
+   (<formater-select name="recordPerPage" :options="recordsPerPage" :defaut="defaultRecord + ''" type="associative" @input="nbRecordChange" color="transparent"></formater-select>)
    <span :class="{disabled: (!notExactly && (currentPage===nbPage || count=== 0) ? 'disabled': ''), 'mtdt-navigation':true}">
 	   <span class="fa fa-angle-right" :style="{background:color}" @click="changePage(1)" ></span>
 	   <span class="fa fa-angle-double-right" :style="{background:color}" @click="goToLast()"></span>
@@ -85,6 +85,9 @@ export default {
         list[option] = option + ' ' + self.$t('per_page')
       })
       return list
+    },
+    defaultRecord () {
+      return this.maxRecords
     }
   },
   created () {
