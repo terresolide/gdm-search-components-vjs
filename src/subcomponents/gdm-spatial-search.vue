@@ -60,6 +60,10 @@ export default {
     lang:{
       type: String,
       default: 'en'
+    },
+    polygon: {
+      type : String,
+      default: null
     }
   },
   data(){
@@ -79,6 +83,11 @@ export default {
   computed: {
    
   },
+  watch: {
+    polygon (newvalue) {
+      this.initBounds()
+    }
+  },
   destroyed: function() {
   
     document.removeEventListener('aerisResetEvent', this.resetEventListener);
@@ -93,6 +102,7 @@ export default {
     this.drawCloseListener = null
   },
   created: function () {
+    this.initBounds()
     this.$i18n.locale = this.lang
     this.resetEventListener = this.handleReset.bind(this) 
     document.addEventListener('aerisResetEvent', this.resetEventListener);
@@ -117,6 +127,30 @@ export default {
         south: this.south,
         east: this.east,
         west: this.west
+      }
+    },
+    initBounds () {
+      if (this.polygon) {
+        var part = this.polygon.match(/(POLYGON\(\()([0-9\-,. ]+)(\)\))/)
+        if (part.length > 2) {
+          var coords = part[2].split(',')
+          var lats = []
+          var lngs = []
+          coords.forEach(function (coord) {
+            var lnglat = coord.split(' ')
+            lngs.push(parseFloat(lnglat[0]))
+            lats.push(parseFloat(lnglat[1]))
+          })
+          this.east = Math.max(...lngs)
+          this.west = Math.min(...lngs)
+          this.north = Math.max(...lats)
+          this.south = Math.min(...lats)
+        }
+      } else {
+        this.east = ''
+        this.west = ''
+        this.north = ''
+        this.south = ''
       }
     },
     validForm () {

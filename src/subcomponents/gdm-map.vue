@@ -250,6 +250,7 @@ export default {
     initBbox () {
       if (this.bboxLayer) {
         this.bboxLayer.clearLayers()
+        this.bboxLayer.remove()
         this.bboxLayer = null
       }
       if (this.map && this.bbox) {

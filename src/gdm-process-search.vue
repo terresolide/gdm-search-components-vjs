@@ -385,10 +385,8 @@ export default {
        var bbox = url.searchParams.get('bbox')
        if (bbox) {
          this.parameters.bbox = bbox
-         this.parameters.jsonBbox = {}
        } else {
          this.parameters.bbox = null
-         this.parameters.jsonBbox = {}
        }
      },
      search (query) {
@@ -459,7 +457,6 @@ export default {
       this.changeQuery()
     },
     dateChange (e) {
-      console.log(e)
       var change = {'from': 'Start', 'to': 'End'}
       var name = e.name.replace('from','Start').replace('to', 'End')
       this.parameters[name] = e.value
