@@ -33,6 +33,7 @@
    <div class="column-left" >
     <gdm-form-process :lang="lang" :status="statusList" :groups="groups" :feature-collection="featureCollection" 
     :color="color" :user="parameters.user" :service="parameters.service" :height="height" :back="back"
+    :parameters="parameters"
      @remove="removeSelected" @dateChange="dateChange" @statusChange="statusChange" @groupChange="groupChange"
      @textChange="textChange" @archivedChange="archivedChange" @reset="reset"></gdm-form-process> 
    </div>
@@ -172,10 +173,16 @@ export default {
         group: null,
         order: 'start DESC, tempStart ASC'
       },
+      defaultValues: {
+        status: null
+      },
       timer: null
     }
   },
   created () {
+   this.extractParams()
+   // extract params
+   
    // launch url debug
    if (!this.group) {
      this.searchGroups()
@@ -216,40 +223,87 @@ export default {
     this.resize()
   },
   methods: {
+     extractParams () {
+       var url = new URL(window.location.href)
+       var maxRecords = url.searchParams.get('maxRecords')
+       if (maxRecords) {
+         this.pagination.maxRecords = maxRecords
+       }
+       var index = url.searchParams.get('index')
+       if (index) {
+         this.pagination.startIndex = index
+       }
+       var userId = url.searchParams.get('userId')
+       if (userId && !this.userId) {
+         this.parameters.user = { id: userId , email: 'User ' + userId}
+       }
+       var serviceId = url.searchParams.get('serviceId')
+       if (serviceId) {
+         this.parameters.service = {id: serviceId, name : 'Service ' + serviceId}
+       }
+       var status = url.searchParams.get('status')
+       if (status) {
+         this.parameters.status = status
+       }
+       if (!this.groupId) {
+         var group = url.searchParams.get('group')
+         if (group) {
+           this.parameters.group = group
+         }
+       }
+       var archived = url.searchParams.get('archived')
+       if (archived) {
+         this.parameters.archived = archived
+       }
+       
+     },
      search () {
        var headers = {}
        if (this.group) {
          headers.groupKey = this.group
        }
+       var location = 'maxRecords=' + this.pagination.maxRecords + '&index=' + this.pagination.startIndex
 	     var url = this.api + this.what + '?maxRecords=' + this.pagination.maxRecords + '&index=' + this.pagination.startIndex
 	     if (this.userId && this.back) {
 	       url += '&userId=' + this.userId
 	     } else if (this.parameters.user) {
 	       url += '&userId=' + this.parameters.user.id
+	       if (this.back) {
+	         location += '&userId=' + this.parameters.user.id
+	       }
 	     }
 	     if (this.example) {
 	       url += '&example=1'
 	     }
 	     if (this.parameters.service) {
 	       url += '&serviceId=' + this.parameters.service.id
+	       location += '&serviceId=' + this.parameters.service.id
 	     }
 	     if (this.parameters.status) {
 	       url += '&status=' + this.parameters.status
+	       location += '&status=' + this.parameters.status
 	     }
 	     if (this.parameters.any) {
 	       url += '&any=' + this.parameters.any
+	       location += '&any=' + this.parameters.any
 	     }
 	     if (this.parameters.bbox) {
 	       url +='&bbox=' + this.parameters.bbox
+	       location += '&bbox=' + this.parameters.bbox
 	     }
 	     if (this.parameters.group) {
 	       url +='&group=' + this.parameters.group
+	       if (!this.group) {
+	         location += '&group=' + this.parameters.group
+	       }
 	     }
 	     if (this.parameters.archived) {
 	       url += '&archived=1'
+	       location += '&archived=1'
 	     }
 	     if (this.parameters.order) {
 	       url += '&order=' + encodeURIComponent(this.parameters.order)
+	       location += '&order=' + encodeURIComponent(this.parameters.order)
 	     }
 	     url += '&lang=' + this.lang
 	     var self = this
@@ -257,8 +311,13 @@ export default {
 	     dateType.forEach(function (name) {
 	       if (self.parameters[name] && self.parameters[name] != 'Invalid date') {
 	         url += '&' + name.charAt(0).toLowerCase() + name.slice(1) + '=' + self.parameters[name]
+	         location += url += '&' + name.charAt(0).toLowerCase() + name.slice(1) + '=' + self.parameters[name]
 	       }
 	     })
+	     if (window.history.pushState) { 
+	       const newURL = new URL(window.location.href)
+	       newURL.search  = location
+	       window.history.pushState({ path: newURL.href }, '', newURL.href)}
 	     this.$http.get(url, {credentials: true, headers: headers})
 	      .then(
 	          response => this.display(response),

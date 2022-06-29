@@ -161,7 +161,7 @@ export default {
       default: null
     },
     selectedService: {
-      type: String,
+      type: Object,
       default: null
     },
     selectedUser: {

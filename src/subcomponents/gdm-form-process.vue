@@ -45,7 +45,7 @@
          <formater-temporal-search name="temp" lang="fr" :format="format" daymin="2014-04-03" @change="dateChange"></formater-temporal-search>
      </formater-search-box>
      <formater-search-box v-if="groups.length > 0" header-icon-class="fa fa-object-group" open-icon-class="fa fa-caret-right" :title="$t('service_group')" :deployed="false" type="empty" >
-      <formater-select  :options="groups" :defaut="null" @input="groupChange" width="228px"></formater-select>
+      <formater-select  :options="groups" :defaut="parameters.group" @input="groupChange" width="228px"></formater-select>
     </formater-search-box>
      <formater-search-box header-icon-class="fa fa-cog" open-icon-class="fa fa-caret-right" title="Status" :deployed="false" type="empty" >
       
@@ -118,6 +118,10 @@ export default {
       type: Object,
       default: null
     },
+    parameters: {
+      type: Object,
+      default: function () { return {}}
+    },
     back: {
       type: Boolean,
       default: false
@@ -144,6 +148,8 @@ export default {
     }
   },
   created () {
+    console.log(this.parameters)
+    this.archived = this.parameters.archived
     this.$i18n.locale = this.lang
     if (this.lang === 'fr') {
       this.format = 'DD/MM/YYYY'
@@ -169,10 +175,7 @@ export default {
       format: 'DD/MM/YYYY',
       textSearch: null,
       dateFormat: 'DD/MM/YYYY',
-      pattern: '(0?[1-9]|[12][0-9]|3[01])\/(0?[1-9]|1[012])\/[0-9]{4}',
-      parameters: {
-        status: null
-      }
+      pattern: '(0?[1-9]|[12][0-9]|3[01])\/(0?[1-9]|1[012])\/[0-9]{4}'
     }
   },
   methods: {
