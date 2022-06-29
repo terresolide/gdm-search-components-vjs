@@ -88,6 +88,20 @@ import moment from 'moment'
 import GdmDrawBbox from './subcomponents/gdm-draw-bbox.vue'
 import GdmProcessStatus from './subcomponents/gdm-process-status.vue'
 import GdmProcessRow from './subcomponents/gdm-process-row.vue'
+const parseParams = (querystring) => {
+  // parse query string
+  const params = new URLSearchParams(querystring);
+  const obj = {};
+  // iterate over all keys
+  for (const key of params.keys()) {
+      if (params.getAll(key).length > 1) {
+          obj[key] = params.getAll(key);
+      } else {
+          obj[key] = params.get(key);
+      }
+  }
+  return obj;
+};
 export default {
   name: 'GdmProcessSearch',
   components: {
@@ -136,6 +150,12 @@ export default {
       default: false
     }
   },
+  watch: {
+    $route (newvalue) {
+      var query = newvalue.fullPath.substring(newvalue.fullPath.indexOf('?'))
+      this.search(query)
+    }
+  },
   data () {
     return {
       dateFormat: 'YYYY-MM-DD hh:mm:ss',
@@ -177,13 +197,10 @@ export default {
       defaultValues: {
         status: null
       },
-      timer: null,
-      queryUrl: null,
-      count: 0
+      timer: null
     }
   },
   created () {
-    this.queryUrl = document.URL;
     var self = this
 //     document.addEventListener('change', function(e) {
 //       var currentPageUrl = document.URL
@@ -222,8 +239,14 @@ export default {
    document.addEventListener('mapNodeChange', this.mapListener)
    this.launchUrl = this.api.substr(0, this.api.indexOf('api'))
    this.$i18n.locale = this.lang
-   this.extractParams()
-   var query = this.buildQuery()
+   var query = ''
+   if (this.$route) {
+     this.extractRouteParams()
+     query = this.$route.fullPath.substring(this.$route.fullPath.indexOf('?'))
+   } else {
+     this.extractParams(window.location.href)
+     query = this.buildQuery()
+   }
    this.search(query)
 //    moment.locale(this.lang)
 //    if (this.lang === 'en') {
@@ -255,18 +278,23 @@ export default {
   methods: {
      stateChange () {
        if (window.history && window.history.state) {
-         this.extractParams()
+         this.extractParams(window.location.href)
          this.search(history.state.query)
         }
      },
      changeQuery () {
        var query = this.buildQuery()
-       const newURL = new URL(window.location.href)
-       newURL.search  = query
-       if (window.history.pushState && newURL.search !== window.location.search) {
-         
-         window.history.pushState({path: newURL.href, query: query }, '', newURL.href)
-         this.search(query)
+       if (this.$router) {
+         var route = this.$route
+         console.log(route)
+         this.$router.push({name: route.name, params: route.params, query: parseParams(query)})
+       } else {
+	       const newURL = new URL(window.location.href)
+	       newURL.search  = query
+	       if (window.history.pushState && newURL.search !== window.location.search) {
+	         window.history.pushState({path: newURL.href, query: query }, '', newURL.href)
+	         this.search(query)
+	       }
        }
       // this.search(query)
    
@@ -307,8 +335,13 @@ export default {
        })
        return location
      },
-     extractParams () {
-       var url = new URL(window.location.href)
+     extractRouteParams () {
+       var path = 'https://localhost' + this.$route.fullPath.substring(this.$route.fullPath.indexOf('?'))
+       console.log(path)
+       this.extractParams(path)
+     },
+     extractParams (path) {
+       var url = new URL(path)
        var maxRecords = url.searchParams.get('maxRecords')
        if (maxRecords) {
          this.$set(this.pagination, 'maxRecords', parseInt(maxRecords))
