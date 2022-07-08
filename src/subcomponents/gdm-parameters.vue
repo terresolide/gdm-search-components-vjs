@@ -559,8 +559,10 @@ export default {
       // emit event
       this.parameters.forEach(function (parameter) {
          if (parameter.emit) {
-            var event = new CustomEvent(parameter.emit, {detail: {value: parameter.value}})
-            document.dispatchEvent(event)
+           setTimeout(function () {
+             var event = new CustomEvent(parameter.emit, {detail: {value: parameter.value}})
+             document.dispatchEvent(event)
+           }, 0)
          }
       })
 //       if (this.complexes.length === 0) {
