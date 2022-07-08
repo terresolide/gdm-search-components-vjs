@@ -213,6 +213,16 @@ export default {
       }
     },
     change (parameter) {
+      if (parameter.type === 'multipleCheckbox') {
+        if (parameter.required) {
+          var nodes = this.$el.querySelectorAll('input[name="' + this.prefix + parameter.name + '[]"]')
+          var required = this.values[this.prefix + parameter.name].length === 0
+          nodes.forEach(function(node) {
+            node.required = required
+            node.classList.remove('invalid')
+          })
+        }
+      }
       var event0 = new CustomEvent('parameterChange')
       document.dispatchEvent(event0)
       if (parameter.emit) {
