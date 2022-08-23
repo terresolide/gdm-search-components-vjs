@@ -81,20 +81,20 @@ module.exports = {
   },
   devServer: {
    // https: true,
-    historyApiFallback: true,
-    noInfo: true
+    historyApiFallback: true //,
+   // noInfo: true
   },
   performance: {
     hints: false
   },
-  devtool: '#eval-source-map'
+  devtool: 'eval-source-map'
 }
 if (process.env.NODE_ENV === 'development') {
   module.exports.mode ="development"
 	module.exports.output.filename='build.js'
 }
 if (process.env.NODE_ENV === 'production') {
-  module.exports.devtool = '#source-map';
+  module.exports.devtool = 'source-map';
   module.exports.optimization= {
     minimize: true
   }

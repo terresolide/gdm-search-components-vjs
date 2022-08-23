@@ -44,8 +44,8 @@
      </div>
      <div v-else >
        <gdm-paging :start-index="pagination.startIndex" :max-records="pagination.maxRecords"  
-       :count="pagination.count" :total-results="pagination.totalResults"
-       :lang="lang" :color="color" @change="pageChange"></gdm-paging>
+       :count="pagination.count" :color="color" :total-results="pagination.totalResults"
+       :lang="lang" @change="pageChange"></gdm-paging>
       <div  :style="{background:$shadeColor(color, 0.8)}" class="gdm-process-header">
          <div class="gdm-process-header-column-1">{{$t('identifiers')}}</div>
          <div class="gdm-process-header-column-2">Status</div>

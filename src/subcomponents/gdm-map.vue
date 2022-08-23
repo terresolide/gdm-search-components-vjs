@@ -13,8 +13,8 @@
 <script>
 var L = require("leaflet");
 L.Control.Gdmlayer = require('../modules/leaflet.control.gdmlayer.js')
-L.Control.Fullscreen = require('formater-metadata-vjs/src/modules/leaflet.control.fullscreen.js')
-L.Control.Legend = require('formater-metadata-vjs/src/modules/leaflet.control.legend.js')
+L.Control.Fullscreen = require('formater-commons-components-vjs/src/leaflet/leaflet.control.fullscreen.js')
+L.Control.Legend = require('formater-commons-components-vjs/src/leaflet/leaflet.control.legend.js')
 require('../modules/leaflet.control.opacity.js')
 require('leaflet-imageoverlay-rotated')
 // import GdmSerieNavigation from './gdm-serie-navigation.vue'
@@ -480,7 +480,7 @@ export default {
 }
 </script>
 <style src="leaflet/dist/leaflet.css"></style>
-<style src="formater-metadata-vjs/src/assets/css/fontello.css"></style>
+<style src="formater-commons-components-vjs/src/assets/css/fontello.css"></style>
 
 <style src="formater-commons-components-vjs/src/assets/css/formater-icon.css"></style>
 <style>

@@ -22,7 +22,7 @@ Vue.use(VueTools)
 // import GdmProcessView from './gdm-process-view.vue'
 // import GdmRestrictTo from './gdm-restrict-to.vue'
 // import GdmStat from './gdm-stat.vue'
-import AerisTheme from 'aeris-commons-components-vjs/src/aeris-theme/aeris-theme.vue'
+// import AerisTheme from 'aeris-commons-components-vjs/src/aeris-theme/aeris-theme.vue'
 
 ljs.addAliases({
   dep: [
@@ -56,6 +56,6 @@ ljs.load('dep', function() {
  // Vue.customElement('gdm-process-view', GdmProcessView)
  // Vue.customElement('gdm-restrict-to', GdmRestrictTo)
  // Vue.customElement('gdm-stat', GdmStat)
-  Vue.customElement('aeris-theme', AerisTheme)
+ // Vue.customElement('aeris-theme', AerisTheme)
 })
     	  
