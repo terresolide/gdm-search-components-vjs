@@ -1,6 +1,6 @@
 {
   "name": "gdm-search-components-vjs",
-  "version": "9.6.3",
+  "version": "9.7.0",
   "description": "GDM Search Components",
   "production": {
     "url": "https://cdn.jsdelivr.net/gh/terresolide"
@@ -17,7 +17,7 @@
   "license": "gpl",
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --progress --open --hot",
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
+    "build": "cross-env NODE_ENV=production webpack --progress"
   },
   "dependencies": {
     "formater-commons-components-vjs": "github:terresolide/formater-commons-components-vjs",
