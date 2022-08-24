@@ -38,7 +38,7 @@
       <gdm-map :feature-collection="featureCollection"  fullscreen="fmtLargeMap"></gdm-map>
    
      <formater-search-box :color="color" header-icon-class="fa fa-globe" open-icon-class="fa fa-caret-right" :title="$t('spatial_extent')" :deployed="false" type="empty" >
-       <gdm-spatial-search :lang="lang" :polygon="parameters.bbox"></gdm-spatial-search>
+       <gdm-spatial-search :lang="lang" :color="color" :polygon="parameters.bbox"></gdm-spatial-search>
      </formater-search-box>
      
      <formater-search-box :color="color" header-icon-class="fa fa-calendar" open-icon-class="fa fa-caret-right" :title="$t('temporal_extent')" :deployed="false" type="empty" >
