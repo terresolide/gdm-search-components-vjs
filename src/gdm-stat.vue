@@ -13,58 +13,7 @@
 <gdm-stat-form ref="form" :mode="mode" :services="services" :groups="groups" 
 @servicesChange="initServices" @search="search" @draw="draw"></gdm-stat-form>
 
-<!-- <div style="margin-left:20px;">
-  <div class="user-search" :class="{'user-search-large': mode === 'job' || mode === 'product' || mode === 'ciest2'}" v-if="mode !== 'service'">
-    <label>Du</label> <input v-model="startDate" type="date" @change="search()">
-    <label>au</label> <input v-model="endDate" type="date" @change="search()">
-    <label>Par</label> 
-    <select v-model="by" @change="draw()">
-      <option value="day">Jour</option>
-      <option value="month">Mois</option>
-      <option value="year">Year</option>
-    </select>
-    <span v-if="mode === 'connection'">
-       <label>Par</label>
-       <select v-model="group" @change="draw()">
-           <option value="type">Type d'utilisateur</option>
-           <option value="pole">Pôle de données</option>
-       </select>
-    </span>
-    <span v-if="mode === 'job' || mode === 'ciest2'">
-      <label>Statut</label>
-      <select v-model="status" @change="search()">
-        <option value="" >---</option>
-        <option value="ended">Terminé</option>
-        <option value="success">Terminé avec succès</option>
-        <option value="failed">En échec</option>
-        <option value="aborted">Abandonné</option>
-      </select>
-      </span>
-     <span v-if="mode === 'job' || mode === 'product' || mode === 'ciest2'">
-       <label>Groupe</label>
-      <select v-model="selectedGroup" @change="changeGroup()">
-         <option value="">TOUS</option>
-         <option v-for="(group, key) in groups" :value="key">
-            {{key}}
-         </option>
-      </select>
-      <label>Service</label>
-      <select v-model="selectedService" @change="search()">
-         <option value="">TOUS</option>
-         <option v-for="service in selectedServices" :value="service.id">
-            {{service.name}}
-         </option>
-      </select>
-     </span>
-     <span v-if="mode === 'job'">
-      <label>Type utilisateur</label>
-      <input type="checkbox" v-model="userType" @change="search()"/>
-    </span>
-   
-  </div>
-  <div v-else>
-  Il ne s'agit pas d'un historique. L'accès aux services d'un utilisateur peut changer au cours du temps et l'information historique n'est pas enregistrée.
-  </div> -->
+
   <!-- RESULTS -->
   <!-- MODE CONNECTION -->
   <div v-show="mode === 'connection'">
@@ -1365,18 +1314,7 @@ export default {
       this.drawJobs(e)
     },
     treatmentCiest2 (data, e) {
-      console.log(e)
       var _this = this
-//       if (this.services.length === 0) {
-//         this.services = data.services
-//         this.services.forEach(function (sv) {
-//           if (!_this.groups[sv.group]) {
-//             _this.groups[sv.group] = [sv]
-//           } else {
-//             _this.groups[sv.group].push(sv)
-//           }
-//         })
-//       }
       
       this.ciest2.data = {days: {}, months: {}, years: {}}
       var first = true
