@@ -60,6 +60,10 @@ export default {
       type: Number,
       default: 0
     },
+    lidar: {
+      type: Object,
+      default: null,
+    },
     serviceName: {
       type: String,
       default: null
@@ -76,6 +80,7 @@ export default {
       controlLegend:null,
       controlOpacity: null,
       featureGroup: null,
+      lidarFeature: null,
       bboxLayer: null,
       bboxTile: null,
       defaultRectangleOptions: {
@@ -121,6 +126,25 @@ export default {
     },
     serieIndex (index) {
       this.serieDateChange(index)
+    },
+    lidar (newvalue) {
+      
+      if (newvalue) {
+        this.lidarFeature = L.geoJSON(newvalue, {style: function (feature) {
+          return {
+            interactive: false,
+            fillColor:'darkgreen', 
+            fillOpacity:0.05, 
+            stroke: true, 
+            weight:1, 
+            color: 'darkgreen'
+          }}
+        }).addTo(this.map)
+      } else if (this.lidarFeature) {
+        this.lidarFeature.remove()
+        this.lidarFeature = null;
+      }
+     
     }
   },
   created () {

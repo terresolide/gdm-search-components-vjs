@@ -6,6 +6,7 @@
      "owner": "Owner",
      "cost": "Cost",
      "created": "Created",
+     "display_on_map": "Display footprint on map",
      "edit": "Edit",
      "last_update": "Updated",
      "map_layers": "Map layers",
@@ -27,6 +28,7 @@
      "owner": "Propriétaire",
      "cost": "Coût",
      "created": "Création",
+     "display_on_map": "Afficher l'emprise sur la carte",
      "edit": "Modifier",
      "last_update": "Maj",
      "map_layers": "Couches cartographiques",
@@ -63,7 +65,7 @@
 		   <div class="header-1">
 		     <div class="gdm-map-container">
 		      <gdm-map ref="map" :bbox="process.feature" :images="imageLayers" :tile="feature.properties.bboxTile"
-		      :service-name="process.serviceName" :series="series" :serie-index="serieIndex" :lang="lang" @dateChange="dateSerieChange" @tioReady="tioImagesReady"
+		      :service-name="process.serviceName" :series="series" :serie-index="serieIndex" :lidar="lidar" :lang="lang" @dateChange="dateSerieChange" @tioReady="tioImagesReady"
 		      fullscreen="fmtLargeMap" :remove-height="8" @loadingLayer="loadingChange" @imageAdded="imageAdded" @imageRemoved="imageRemoved"
 		      @mousemove="mousemove"></gdm-map>
 		     </div>
@@ -184,6 +186,15 @@
 				  </div>
 			  </div>  
 			 <div class="gdm-list-images" >
+			  <span v-if="process.lidar" class="gdm-lidar">
+			     <h2 :style="{color:color}">LiDAR</h2>
+			     <div >
+			       <span class="fa fa-globe"   :style="{color: lidar ? 'darkgreen' :'black'}"
+			        :title="$t('display_on_map')" @click="displayLidar"></span>
+			        {{ process.lidar.properties.filename}} 
+			        (<em style="color:#333;">{{date2str(process.lidar.properties.date, 'll')}}</em>)
+			     </div>
+			  </span>
 			  <h2 :style="{color:color}">{{images.length}} images</h2>
 			  <div v-if="images.length > 0">
 				  <div  v-for="image in images" class="gdm-images-child" >
@@ -328,6 +339,7 @@ export default {
       parameters: {},
       position: {},
       feature: null,
+      lidar: null,
       process: null,
       errorCode: null,
       // INPUT IMAGES
@@ -352,6 +364,13 @@ export default {
     }
   },
   methods: {
+    displayLidar () {
+      if (!this.lidar) {
+        this.lidar = this.process.lidar
+      } else {
+        this.lidar = null
+      }
+    },
     mousemove (val) {
       this.mouseposition = val
     },
@@ -862,9 +881,14 @@ border: 4px solid lightgrey;
   width:calc(100% - 30px);
   margin:0 auto;
 }
-.gdm-process-view h2 {
+.gdm-process-view h2,
+span.gdm-lidar h2 {
   padding: 10px 0;
   font-weight:700;
+}
+span.gdm-lidar .fa {
+  margin-right:10px;
+  cursor: pointer;
 }
 .gdm-process-header h1,
 .gdm-process-header h2 {
@@ -960,9 +984,11 @@ span.gdm-information {
    vertical-align:top;
    width:calc(100% - 410px);
    min-width:630px;
+   font-size: 0.9rem;
    
  }
- .gdm-list-images > div {
+ .gdm-list-images > div,
+ span.gdm-lidar > div {
    max-height:500px; 
    overflow-y:auto;
    overflow-x:hidden;
