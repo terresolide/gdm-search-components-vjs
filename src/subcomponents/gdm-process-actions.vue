@@ -80,7 +80,10 @@
 	         @click="requestPublish" :class="{disabled: process.keep}">{{$t('publish')}}</a>
            <a class="button" v-if="back && !process.isExample && !process.keep" @click="changeKeep">Ne pas purger</a>
            <a class="button" v-else-if="back && !process.isExample && process.keep" @click="changeKeep">À purger</a>
-         
+           <!--  button purge -->
+          <a class="button" v-if="!process.isExample && !process.keep" @click="purge"  :class="{disabled: !canEdit}">
+           <i class="fa fa-trash"></i> {{$t('purge')}}</a>
+        
          </span>
         
           <!--  GET RESULT IF NOT EXISTS -->
@@ -92,6 +95,8 @@
         <a class="button"  @click="dismiss" :class="{disabled: disabled}" :disabled="disabled">
            <span>{{$t('abort')}}</span>
         </a>
+         <a class="button" @click="duplicate"  :class="{disabled: !canEdit}">{{$t('duplicate')}}</a>
+        
         <a class="button" v-if="back" @click="switchDebug" :title="$t('debug')">
         <i class="fa fa-arrow-right"></i>
         DEBUG
@@ -226,8 +231,6 @@ export default {
   mounted () {
     this.isExample = this.process.isExample 
     this.launchTimer()
-    console.log(this.userId)
-    console.log(this.process.userId)
   },
   methods:{
     launchTimer () {
@@ -399,7 +402,26 @@ export default {
         location.reload()
       }, function (e) {
         this.submitting = false
-        alert(this.$i18n.t('error_occured' + ': ' + 'DISCONNECTED ?'))
+        alert(this.$i18n.t('error_occured') + ': DISCONNECTED ?')
+      })
+    },
+    purge () {
+      this.submitting = true
+      this.$http.post(
+          this.api + '/purge/' + this.process.id,
+          {id: this.process.id},
+          {credentials: true, emulateJSON: true})
+      .then(function (resp) {
+        this.submitting = false
+        if (resp.body && resp.body.error) {
+          console.log(resp.body.error)
+          alert(this.$i18n.t('error_occured') + ': ' + resp.body.error)
+        } else {
+         location.reload()
+        }
+      }, function (e) {
+        this.submitting = false
+        alert(this.$i18n.t('error_occured') + ': DISCONNECTED ?')
       })
     },
     requestPublish () {
