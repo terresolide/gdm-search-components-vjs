@@ -54,6 +54,9 @@ ljs.load('dep', function() {
   Vue.customElement('gdm-stat', () => new Promise((resolve) => {
     require(['./gdm-stat.vue'], (GdmStat) => resolve(GdmStat.default))
   }))
+  Vue.customElement('gdm-earthquake', () => new Promise((resolve) => {
+    require(['./gdm-earthquake.vue'], (GdmEarthquake) => resolve(GdmEarthquake.default))
+  }))
  // Vue.customElement('gdm-process-search', GdmProcessSearch)
  // Vue.customElement('gdm-manage-step', GdmManageStep)
  // Vue.customElement('gdm-process-view', GdmProcessView)
