@@ -41,6 +41,16 @@
        this.addBaseLayer(layer, this.tiles[key].name)
      }
    },
+   addButton (obj) {
+    var div = document.createElement('input',name)
+    div.setAttribute('type', 'button')
+    div.setAttribute('value', this.lang === 'fr' ? 'Initialiser' : 'Reset')
+    div.style.textAlign = 'center'
+     L.DomEvent.on(div, 'click', funct)
+     var container =  this._overlaysList 
+    container.appendChild(div)
+    
+   }, 
    addBboxLayer () {
      return
      this.bbox = L.layerGroup()
@@ -115,6 +125,16 @@
       } else {
         L.Control.Layers.prototype._addItem.call(this, obj)
       }
+   /*   if (obj.layer.last) {
+         var div = document.createElement('input',obj.layer.last.name)
+        div.setAttribute('type', 'button')
+        div.setAttribute('value', obj.layer.last.title)
+        div.style.textAlign = 'center'
+        var _this = this
+        div.addEventListener('click', obj.layer.last.funct)
+        var container =  this._overlaysList 
+        container.appendChild(div)
+      } */
    },
    /**
     * Overwrite _onInputClick to remove the other layers (serie or image)
