@@ -8,7 +8,16 @@ div.leaflet-left.leaflet-top a.leaflet-control-earthquakes {
   width: 30px;
   height: 30px;
   line-height: 30px;
-  background-image: url('../images/earthquakes-2.png')
+  border-radius:5px;
+  background-image: url('../images/earthquakes-2.png');
+  cursor:pointer;
+}
+div.leaflet-left.leaflet-top a.leaflet-control-earthquakes:hover {
+	background-color: #f4f4f4;
+}
+div.leaflet-earthquakes-button {
+	margin-top: 5px;
+	
 }
 div.leaflet-popup-content h3 {
   margin: 0 0 5px 0;

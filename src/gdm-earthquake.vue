@@ -52,7 +52,7 @@ export default {
     this.initMap()
     this.initDrawControl()
     usgsSearch.setLang(this.lang)
-     usgsSearch.addTo(this.map)
+     usgsSearch.addTo(this.map, this.controlLayer)
     
    
   },

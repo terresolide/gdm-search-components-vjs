@@ -19,8 +19,9 @@ L.Control.Earthquakes = L.Control.extend({
     var _this = this
     L.DomEvent.on(el, 'click', function (e) {
       if (_this.handler) {
-        _this.handler()
+        _this.handler(e)
       }
+      L.DomEvent.disableClickPropagation(el)
     }, _this);
 
     return el;
@@ -41,6 +42,29 @@ L.Control.earthquakeslayer = L.Control.Layers.extend({
         this._overlaysList.appendChild(div)
       }
       L.Control.Layers.prototype._addItem.call(this, obj)
+     if (obj.layer.last ) {
+       var div = document.createElement('div')
+       if (obj.layer.last.classname) {
+         div.classList.add(obj.layer.last.classname)
+       }
+       if (obj.layer.last.funct) {
+         div.style.textAlign = 'center'
+         var input = document.createElement('input')
+         input.setAttribute('type', 'button')
+         input.setAttribute('value', obj.layer.last.name)
+         if (obj.layer.last.title) {
+           input.setAttribute('title', obj.layer.last.title)
+         }
+         input.addEventListener('click', function (e) {
+           obj.layer.last.funct(e)
+           e.stopPropagation()
+         }, {once: true, useCapture: true})
+          div.appendChild(input)
+       } else {
+         div.innerHTML = '<b>' + obj.layer.last.name + '</b>'
+       }
+      this._overlaysList.appendChild(div)
+    }
     }
  })
 
@@ -73,23 +97,29 @@ export default {
     this.lang = lang
     moment.locale(this.lang)
   },
-  addTo (map) {
+  addTo (map, controlLayer) {
     this.map = map
     this.initEarthquakeLayers()
-    this.addControl()
+   
+    this.addControl(controlLayer)
   },
-  addControl () {
-    this.controlLayer =  new L.Control.earthquakeslayer(null, null,{position: 'topleft'})
-    this.controlLayer.addTo(this.map)
+  addControl (controlLayer) {
+     if (controlLayer) {
+      this.controlLayer = controlLayer
+    } else {
+      this.controlLayer =  new L.Control.earthquakeslayer(null, null,{position: 'topleft'})
+      this.controlLayer.addTo(this.map)
+    }
     for (var key in this.groupFeatures) {
       this.controlLayer.addOverlay(this.groupFeatures[key], this.title(key))
     }
-    var self = this
+ /*   var self = this
     L.control.earthquakes({
       position: 'topleft',
+
       name: this.lang === 'fr' ? 'Initialiser couche séismes' : 'Reset earthquake layers',
       funct: function (e) {self.reset(true)}
-    }).addTo(this.map);
+    }).addTo(this.map); */
 //    var self = this
 //    this.controlLayer.addOverlay({button: true, layer:null, title: this.lang === 'fr' ? 'initialiser' : 'reset', funct: function () {
 //      self.reset(true)
@@ -212,9 +242,19 @@ export default {
       }
       if (key === "8") {
         var self = this
+        var title = 'information'
+        if (this.lang === 'fr') {
+          title = 'Les couches des séismes sont réinitialisées lorsque les dates changent\n'
+          title += 'mais pas lorsque la bounding box change'
+        } else {
+          title = 'Earthquake layers are reset when dates change\n'
+          title += 'but not when bounding box changes'
+        }
         this.groupFeatures[key].last = {
           button: true,
-          title: this.lang === 'fr' ? 'initialiser' : 'reset', 
+          classname: 'leaflet-earthquakes-button',
+          name: this.lang === 'fr' ? 'Initialiser' : 'Reset', 
+          title: title,
           funct: function () {
             self.reset(true)
           }

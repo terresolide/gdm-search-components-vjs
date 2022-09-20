@@ -125,6 +125,29 @@
       } else {
         L.Control.Layers.prototype._addItem.call(this, obj)
       }
+      if (obj.layer.last ) {
+         var div = document.createElement('div')
+         if (obj.layer.last.classname) {
+           div.classList.add(obj.layer.last.classname)
+         }
+         if (obj.layer.last.funct) {
+           div.style.textAlign = 'center'
+           var input = document.createElement('input')
+           input.setAttribute('type', 'button')
+           input.setAttribute('value', obj.layer.last.name)
+           if (obj.layer.last.title) {
+             input.setAttribute('title', obj.layer.last.title)
+           }
+           input.addEventListener('click', function (e) {
+             obj.layer.last.funct(e)
+             e.stopPropagation()
+           }, {once: true, useCapture: true})
+            div.appendChild(input)
+         } else {
+           div.innerHTML = '<b>' + obj.layer.last.name + '</b>'
+         }
+        this._overlaysList.appendChild(div)
+      }
    /*   if (obj.layer.last) {
          var div = document.createElement('input',obj.layer.last.name)
         div.setAttribute('type', 'button')
