@@ -73,6 +73,7 @@ export default {
   api: 'https://earthquake.usgs.gov/fdsnws/event/1/query',
   www: 'https://earthquake.usgs.gov/',
   map: null,
+  separtor: false,
   controlLayer: null,
   groupFeatures: {
     "4": null,
@@ -97,6 +98,9 @@ export default {
   setLang (lang) {
     this.lang = lang
     moment.locale(this.lang)
+  },
+  addSeparator () {
+    this.separator = true
   },
   addTo (map, controlLayer) {
     this.map = map
@@ -242,8 +246,14 @@ export default {
       if (key === "4") {
         title = '<a class="usgs" href="' + this.www + '" target="_blank" alt="USGS" title="USGS Earthquake Hazards Program"></a> '
         title += this.lang === 'fr' ? 'Séismes' : 'Earthquakes'
-
-        this.groupFeatures[key].first = title
+        if (this.separator) {
+          this.groupFeatures[key].first = {
+            separator: true,
+            title: title
+          }
+        } else {
+          this.groupFeatures[key].first = title
+        }
       }
       if (key === "8") {
         var self = this

@@ -79,10 +79,19 @@
     * (single image or serie image)
     */
    _addItem: function (obj) {
+       var container =  this._overlaysList ;
       if (obj.layer.first) {
+        if (typeof obj.layer.first === 'object') {
+          title = obj.layer.first.title
+          var div = document.createElement('div')
+          div.className = 'leaflet-control-layers-separator'
+          container.appendChild(div)
+        } else {
+          title = obj.layer.first
+        }
         // insert the title if there is a first attribute (containing title)
         var div = document.createElement('b')
-        div.innerHTML = obj.layer.first
+        div.innerHTML = title
         this._overlaysList.appendChild(div)
       }
       if (obj.layer.images) {
@@ -115,7 +124,7 @@
             holder.appendChild(input);
             holder.appendChild(name);
             div.appendChild(label)
-            var container =  _this._overlaysList ;
+           
             container.appendChild(div);
   
             _this._checkDisabledLayers();
