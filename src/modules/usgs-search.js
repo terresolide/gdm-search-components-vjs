@@ -249,10 +249,10 @@ export default {
         var self = this
         title = 'information'
         if (this.lang === 'fr') {
-          title = 'Les couches des séismes sont réinitialisées lorsque les dates changent\n'
-          title += 'mais pas lorsque la bounding box change'
+          title = 'Les couches des séismes sont automatiquement réinitialisées lorsqu\' une date est modifiée '
+          title += 'mais pas lors de la modification de l\'emprise géographique'
         } else {
-          title = 'Earthquake layers are reset when dates change\n'
+          title = 'Earthquake layers are automatically reset when dates change '
           title += 'but not when bounding box changes'
         }
         this.groupFeatures[key].last = {
@@ -317,9 +317,9 @@ export default {
       })
   },
   title (key) {
-    var title = key + '< Magn ≤' + (parseInt(key) + 1)
+    var title = key + ' < Magn ≤ ' + (parseInt(key) + 1)
     if (key === '8') {
-      title = key + '< Magn '
+      title = key + ' < Magn '
     }
     return title
   }
