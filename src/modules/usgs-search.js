@@ -71,6 +71,7 @@ L.Control.earthquakeslayer = L.Control.Layers.extend({
 export default {
   lang: 'en',
   api: 'https://earthquake.usgs.gov/fdsnws/event/1/query',
+  www: 'https://earthquake.usgs.gov/',
   map: null,
   controlLayer: null,
   groupFeatures: {
@@ -237,12 +238,16 @@ export default {
       this.groupFeatures[key].on('add', function (e) {
         self.search(key, 1)
       })
+      var title = ''
       if (key === "4") {
-        this.groupFeatures[key].first = this.lang === 'fr' ? 'Séismes' : 'Earthquakes'
+        title = '<a class="usgs" href="' + this.www + '" target="_blank" alt="USGS" title="USGS Earthquake Hazards Program"></a> '
+        title += this.lang === 'fr' ? 'Séismes' : 'Earthquakes'
+
+        this.groupFeatures[key].first = title
       }
       if (key === "8") {
         var self = this
-        var title = 'information'
+        title = 'information'
         if (this.lang === 'fr') {
           title = 'Les couches des séismes sont réinitialisées lorsque les dates changent\n'
           title += 'mais pas lorsque la bounding box change'

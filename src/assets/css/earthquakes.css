@@ -22,3 +22,14 @@ div.leaflet-earthquakes-button {
 div.leaflet-popup-content h3 {
   margin: 0 0 5px 0;
 }
+a.usgs  {
+	display: inline-block;
+	width:43px;
+	height:12px;
+	background-image: url('../images/usgs-logo.png');
+	background-repeat:no-repeat;
+	opacity:0.8;
+}
+a.usgs:hover {
+	opacity:1;
+}
