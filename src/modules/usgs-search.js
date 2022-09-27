@@ -286,6 +286,9 @@ export default {
       if (token !== this.searchIndex) {
         return
       }
+      if (index === 1) {
+        this.groupFeatures[key].clearLayers()
+      }
       // this.groupFeatures["5"] = L.layerGroup()
       var self = this
       // this.groupFeatures["5"].addTo(this.map)

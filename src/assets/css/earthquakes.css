@@ -30,6 +30,9 @@ a.usgs  {
 	background-repeat:no-repeat;
 	opacity:0.8;
 }
-a.usgs:hover {
+div[id="app"] a.usgs:hover {
+	background-image: url('../images/usgs-logo.png');
+	background-repeat:no-repeat;
+	background-color:none;
 	opacity:1;
 }

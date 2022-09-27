@@ -41,16 +41,6 @@
        this.addBaseLayer(layer, this.tiles[key].name)
      }
    },
-   addButton (obj) {
-    var div = document.createElement('input',name)
-    div.setAttribute('type', 'button')
-    div.setAttribute('value', this.lang === 'fr' ? 'Initialiser' : 'Reset')
-    div.style.textAlign = 'center'
-     L.DomEvent.on(div, 'click', funct)
-     var container =  this._overlaysList 
-    container.appendChild(div)
-    
-   }, 
    addBboxLayer () {
      return
      this.bbox = L.layerGroup()

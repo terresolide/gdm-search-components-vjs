@@ -53,7 +53,7 @@ export default {
     this.initDrawControl()
     usgsSearch.setLang(this.lang)
     usgsSearch.addSeparator()
-     usgsSearch.addTo(this.map, this.controlLayer)
+    usgsSearch.addTo(this.map, this.controlLayer)
     
    
   },
