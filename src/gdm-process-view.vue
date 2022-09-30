@@ -461,6 +461,34 @@ export default {
         return moment(date).format(format)
       }
     },
+    createSarImage (key, prop, name, result, dir, bbox, footprint, type, text) {
+      var image = {}
+      image.title = name
+      if(result.bbox) {
+        image.bbox = result.bbox
+      } else {
+         image.bbox = bbox
+      }
+      image.type = type
+      image.legend = dir + key + '/legend_' + name + '_runw.png' 
+      if (text) {
+        image.first = text
+        text = null
+      }
+      image.footprint = footprint
+      image.checked = false
+      for(var file in result) {
+        if (typeof result[file] === 'string' &&
+            result[file].substr(-3) === 'png') {
+          image.png = dir + key + '/' + result[file]
+        }
+        if (typeof result[file] === 'string' &&
+            result[file].substr(-4) === 'tiff') {
+          image.tif = dir + key + '/' + result[file]
+        }
+      }
+      return image
+    },
     addResult (result) {
       if (result && result.thumbnails) {
         result.thumbnails.sort(function (a, b) {
@@ -500,31 +528,8 @@ export default {
 		           var text = this.$i18n.t('common')
 		           for (var name in result[key][prop]) {
 		             if (name.indexOf('geo') >= 0) {
-			             var image = {}
-		               image.title = name
-		               if(result[key][prop][name].bbox) {
-		                 image.bbox = result[key][prop][name].bbox
-		               } else {
-		                  image.bbox = bbox
-		               }
-		               image.type = 'image'
-		               image.legend = result.dir + key + '/legend_' + name + '_runw.png' 
-		               if (text) {
-		                 image.first = text
-		                 text = null
-		               }
-		               image.footprint = footprint
-		               image.checked = false
-		               for(var file in result[key][prop][name]) {
-				             if (typeof result[key][prop][name][file] === 'string' &&
-				                 result[key][prop][name][file].substr(-3) === 'png') {
-				               image.png = result.dir + key + '/' + result[key][prop][name][file]
-				             }
-				             if (typeof result[key][prop][name][file] === 'string' &&
-				                 result[key][prop][name][file].substr(-4) === 'tiff') {
-		                   image.tif = result.dir + key + '/' + result[key][prop][name][file]
-		                 }
-		               }
+		               var image = this.createSarImage(key, prop, name, result[key][prop][name], result.dir, bbox, footprint, 'image', text)
+		               text = null
 			             imageLayers.push(image)
 		             }
 		           }
@@ -533,37 +538,43 @@ export default {
                // array series
                
                for (var name in result[key]['Time_Serie']) {
-                 if (name.indexOf('geo') >= 0 && result[key]['Time_Serie'][name].serie)
+                 if (name.indexOf('geo') >= 0 )
                  {
-                   if (!series) {
-                     series = {}
+                   if (result[key]['Time_Serie'][name].serie) {
+                     if (!series) {
+                       series = {}
+                     }
+                     series[name] = {
+                         images: []
+                     }
+                     for(var date in result[key]['Time_Serie'][name].serie) 
+                     {
+                       series[name].images.push(
+                         {
+                           date: date,
+                           png: result.dir + key + '/' + result[key]['Time_Serie'][name].serie[date]
+                         }
+                       )
+                     }
+                     // create image layer
+                     image = {
+				               checked: false,
+				               title: name,
+				               bbox: bbox,
+				               type: 'serie',
+				               png: series[name].images[this.serieIndex].png,
+				               legend: result.dir + key + '/legend_' + name + '_runw.png' 
+				             }
+				             if (text) {
+				               image.first = text
+				               text = null
+				             }
+                     imageLayers.push(image)
+                   } else {
+                     var image = this.createSarImage(key, prop, name, result[key][prop][name], result.dir, bbox, footprint, 'serie', text)
+                     text = null
+                     imageLayers.push(image)
                    }
-                   series[name] = {
-                       images: []
-                   }
-                   for(var date in result[key]['Time_Serie'][name].serie) 
-                   {
-                     series[name].images.push(
-                       {
-                         date: date,
-                         png: result.dir + key + '/' + result[key]['Time_Serie'][name].serie[date]
-                       }
-                     )
-                   }
-                   // create image layer
-                   image = {
-				             checked: false,
-				             title: name,
-				             bbox: bbox,
-				             type: 'serie',
-				             png: series[name].images[this.serieIndex].png,
-				             legend: result.dir + key + '/legend_' + name + '_runw.png' 
-				           }
-				           if (text) {
-				             image.first = text
-				             text = null
-				           }
-                   imageLayers.push(image)
                  }
                }
 		           if (!this.series) {
