@@ -271,6 +271,9 @@ export default {
     initUsed () {
       this.required = this.describe.required
       this.used = this.describe.default
+      if (this.describe.hasOwnProperty('disabled')) {
+        this.disabled = this.describe.disabled
+      }
       if (this.type === 'complexeReturn') {
         this.required = false
       }
