@@ -230,9 +230,11 @@ export default {
     },
     resetEarthquakeLayers () {
       for (var key in this.groupFeatures) {
-        this.groupFeatures[key].clearLayers()
-        if (this.map.hasLayer(this.groupFeatures[key])) {
+        if (this.groupFeatures[key]) {
+          this.groupFeatures[key].clearLayers()
+          if (this.map.hasLayer(this.groupFeatures[key])) {
             this.groupFeatures[key].remove()
+          }
         }
       }
     },
