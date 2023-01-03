@@ -226,8 +226,7 @@ export default {
    if (!this.group) {
      this.searchGroups()
    }
-   this.popListener = this.stateChange.bind(this)
-   window.addEventListener('popstate', this.popListener)
+   
    this.spatialChangeListener = this.spatialChange.bind(this)
 
    document.addEventListener('fmt:spatialChangeEvent', this.spatialChangeListener)
@@ -244,6 +243,8 @@ export default {
      this.extractRouteParams()
      query = this.$route.fullPath.substring(this.$route.fullPath.indexOf('?'))
    } else {
+     this.popListener = this.stateChange.bind(this)
+     window.addEventListener('popstate', this.popListener)
      this.extractParams(window.location.href)
      query = this.buildQuery()
    }
@@ -263,24 +264,28 @@ export default {
       clearInterval(this.timer)
       this.timer = null
     }
-    window.removeEventListener('popstate', this.popListener)
-    this.popListener = null
+    if (this.popListener) {
+	    window.removeEventListener('popstate', this.popListener)
+	    this.popListener = null
+    }
     document.removeEventListener('fmt:spatialChangeEvent', this.spatialChangeListener)
     this.spatialChangeListener = null
     document.removeEventListener('gdm:selectProcessLayer', this.selectProcessLayerListener) 
     this.selectProcessLayerListener = null
     window.removeEventListener('resize', this.resizeListener)
     this.resizeListener = null
+    
   },
   mounted () {
     this.resize()
   },
   methods: {
      stateChange () {
-       if (window.history && window.history.state) {
+      // if (window.history && window.history.state) {
          this.extractParams(window.location.href)
-         this.search(history.state.query)
-        }
+         var query = this.buildQuery()
+         this.search(query)
+      //  }
      },
      changeQuery () {
        var query = this.buildQuery()
@@ -412,7 +417,7 @@ export default {
          if (date) {
            self.parameters[key] = date
          } else {
-           self.parameters[key] = null
+           self.parameters[key] = ''
          }
        })
        var bbox = url.searchParams.get('bbox')
