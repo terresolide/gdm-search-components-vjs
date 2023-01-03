@@ -152,6 +152,7 @@ export default {
   },
   watch: {
     $route (newvalue) {
+      this.extractRouteParams()
       var query = newvalue.fullPath.substring(newvalue.fullPath.indexOf('?'))
       this.search(query)
     }
@@ -342,7 +343,6 @@ export default {
      },
      extractRouteParams () {
        var path = 'https://localhost' + this.$route.fullPath.substring(this.$route.fullPath.indexOf('?'))
-       console.log(path)
        this.extractParams(path)
      },
      extractParams (path) {
