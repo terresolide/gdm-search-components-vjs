@@ -1,9 +1,8 @@
-div.leaflet-left.leaflet-top a.leaflet-control-layers-toggle {
+/** div.leaflet-left.leaflet-top a.leaflet-control-layers-toggle {
   width: 30px;
   height: 30px;
   line-height: 30px;
-  background-image: url('../images/earthquakes.png')
-}
+}**/
 div.leaflet-left.leaflet-top a.leaflet-control-earthquakes {
   width: 30px;
   height: 30px;
