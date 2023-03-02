@@ -8,7 +8,6 @@ import GdmPaging from './src/gdm-paging.vue'
 import GdmProcessView from './src/gdm-process-view.vue'
 import GdmRestrictTo from './src/gdm-restrict-to.vue'
 import GdmStat from './src/gdm-stat.vue'
-
 import GdmServiceStatus from './src/subcomponents/gdm-service-status.vue'
 
 export {GdmProcessSearch, GdmManageStep, GdmPaging, GdmProcessView, GdmRestrictTo, GdmStat}
