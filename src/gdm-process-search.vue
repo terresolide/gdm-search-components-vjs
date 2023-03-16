@@ -1,7 +1,7 @@
 <i18n>
 {
   "en": {
-    "process_dates": "Job information",
+    "process_dates": "Dates",
     "identifiers": "Identifiers",
     "image_dates": "Date of  <span>images&nbsp;<i class='fa {class} {active}'></i></span>",
     "temporal_extent": "Temporal <span>extent&nbsp;<i class='fa {class} {active}'></i></span>",
@@ -10,10 +10,11 @@
     "unauthorized": "Access Unauthorized",
     "forbidden": "Access Forbidden: deconnected?",
     "creation": "Created",
-    "start": "Start"
+    "start": "Start",
+    "status": "Status"
   },
   "fr": {
-    "process_dates": "Job information",
+    "process_dates": "Dates",
     "identifiers": "Identifiants",
     "image_dates": "Date des  <span>images&nbsp;<i class='fa {class} {active}'></i></span>",
     "temporal_extent": "Etendue  <span>temporelle&nbsp;<i class='fa {class} {active}'></i></span>",
@@ -22,7 +23,8 @@
     "unauthorized": "Accès non autorisé à cette ressource",
     "forbidden": "Access interdit: deconnecté?",
     "creation": "Création",
-    "start": "Début"
+    "start": "Début",
+    "status": "Statut"
   }
 }
 </i18n>
@@ -48,7 +50,7 @@
        :lang="lang" @change="pageChange"></gdm-paging>
       <div  :style="{background:$shadeColor(color, 0.8)}" class="gdm-process-header">
          <div class="gdm-process-header-column-1">{{$t('identifiers')}}</div>
-         <div class="gdm-process-header-column-2">Status</div>
+         <div class="gdm-process-header-column-2">{{$t('status')}}</div>
          <div class="gdm-process-header-column-3">
             {{$t('process_dates')}}<br/> 
             <span class="fa-button"  @click="orderChange('date')">
@@ -602,12 +604,12 @@ export default {
       nodes.forEach(function(node) {
         node.classList.remove('selected')
       })
-      if (featureId !== selectedProcessId) {
+      if (parseInt(featureId) !== selectedProcessId) {
         var nodes = document.querySelectorAll('.row' + featureId)
         nodes.forEach(function (node) {
           node.classList.add('selected')
         })
-        this.selectedProcessId = featureId
+        this.selectedProcessId = parseInt(featureId)
       } else {
         this.selectedProcessId = null
       }

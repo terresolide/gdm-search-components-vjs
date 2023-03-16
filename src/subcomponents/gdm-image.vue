@@ -9,15 +9,21 @@
     "display_satellite": "Show approximate \nsatellite position",
     "duplicate": "Duplicate",
     "hide_image": "Hide image",
-    "geo_processing_level": "Geometric processing level",
+    "geometric": "Geometric",
+    "ground_sample_dist": "Ground sample distance",
+    "incidence": "Incidence",
+    "incidence_across_track": "Incidence Across track",
+    "incidence_along_track": "Incidence Along track",
+    "incidence_overall": "Incidence Overall",
     "nb_bands": "Nb bands",
     "no_image": "NO IMAGE FOR THIS DATE",
+    "orientation": "Orientation",
     "platform": "Platform",
     "producer": "Producer",
     "product_type": "Product Type",
     "processing_center": "Processing Center",
     "processing_level": "Processing Level",
-    "radio_processing_level": "Radiometric processing level",
+    "radiometric": "Radiometric",
     "relative_orbit": "Relative Orbit",
     "remove_image": "Remove the image\nfrom your library",
     "remove": "Remove",
@@ -26,9 +32,15 @@
     "select_last_date": "Last date",
     "show_image": "Display on map",
     "spectral_band": "Spectral band",
+    "spectral_processing": "Spectral Processing",
     "snow_cover": "Snow cover",
     "size": "Size",
+    "sun_azimuth": "Sun azimuth",
+    "sun_elevation": "Sun elevation",
     "unselect_image": "Unselect image",
+    "viewing": "Viewing",
+    "viewing_across_track": "across track",
+    "viewing_along_track": "along track",
     "zoom_in": "Zoom in",
     "zoom_out": "Zoom out",
     "zoom_to": "Zoom to the footprint"
@@ -42,16 +54,23 @@
      "duplicate": "Doublon",
      "hide_image": "Cacher",
      "nb_bands": "Nb bandes",
-     "columns_rows": "Col/lignes",
-     "geo_processing_level": "Niv. traitement géométrique",
+     "columns_rows": "Colonnes/lignes",
+     "geometric": "Géométrique",
+     "ground_sample_dist": "Résolution spatiale",
+     "incidence": "Angle d'incidence",
+     "incidence_across_track": "à travers l’orbite",
+     "incidence_along_track": "le long de l’orbite",
+     "incidence_overall": "moyen",
      "no_image": "AUCUNE IMAGE POUR CETTE DATE",
+     "orientation": "Orientation azimutale",
      "platform": "Plateforme",
      "producer": "Producteur",
      "product_type": "Type de Produit",
      "processing_center": "Centre de traitement",
      "processing_level": "Niveau de traitement",
+     "producer": "Producteur",
      "relative_orbit": "Orbite relative",
-     "radio_processing_level": "Niv. traitement radiométrique",
+     "radiometric": "Radiométrique",
      "remove_image": "Supprimer l'image\nde votre bibliothèque",
      "remove": "Suppr.",
      "select_first_date": "Date de début",
@@ -60,8 +79,14 @@
      "show_image": "Afficher",
      "snow_cover": "Couverture neigeuse",
      "spectral_band": "Bande spectrale",
+     "spectral_processing": "Mode de traitement spectral",
      "size": "Taille",
+     "sun_azimuth": "Angle azimutal du soleil",
+     "sun_elevation": "Angle d'élévation du soleil",
      "unselect_image": "Désélectionner cette image",
+     "viewing": "Angle de vue",
+     "viewing_across_track": "à travers l'orbite",
+     "viewing_along_track": "le long de l'orbite",
      "zoom_in": "Zoomer",
      "zoom_out": "Dézoomer",
      "zoom_to": "Zoomer sur l'emprise"
@@ -100,17 +125,22 @@
        <div v-else-if="type === 'PLEIADES'">
           <div><label>Instrument: </label>{{image.instrument}}</div>
           <div>
-           <label>Processing level: </label>
+           <label>{{$t('processing_level')}}: </label>
             <ul >
 	            <li>
-	            <label>Geometric: </label>{{image.processingLevel}}
+	            <label>{{$t('geometric')}}: </label>{{image.processingLevel}}
 	            </li>
 	            
               <li  v-if="image.radiometricProcessingLevel" >
-                <label>Radiometric: </label>{{image.radiometricProcessingLevel}}
+                <label>{{$t('radiometric')}}: </label>{{image.radiometricProcessingLevel}}
               </li>
             </ul>
          </div>
+          <div style="padding-top:2px">
+           <label>{{$t('ground_sample_dist')}}:</label> {{printFloat(angles.groundSampleDistance.across)}} x {{printFloat(angles.groundSampleDistance.along)}}
+         </div>
+         <div style="margin-top:2px;"><label>{{$t('orientation')}}:</label> {{printFloat(angles.azimuth)}}°</div>
+        
     </div>
     </div>
 	</div>
@@ -124,28 +154,27 @@
        <div><label>{{$t('processing_level')}} : </label>{{image.processingLevel}}</div>
     </div>
     <div v-else-if="type === 'PLEIADES' && angles" >
-	    <div><label>Orientation:</label> {{printFloat(angles.azimuth)}}°</div>
-	    <div> <ul style="padding-left:0;padding-top:2px;" >
-	        <li><label>Incidence Across track:</label> {{printFloat(angles.incidence.acrossTrack)}}°</li>
-	        <li><label>Incidence Along track:</label> {{printFloat(angles.incidence.alongTrack)}}°</li>
-	        <li><label>Incidence Overall:</label> {{printFloat(angles.incidence.angle)}}°</li>
+	    <div> <label>{{$t('incidence')}}:</label>
+	    <ul style="" >
+	        <li><label>&rarr; {{$t('incidence_across_track')}}:</label> {{printFloat(angles.incidence.acrossTrack)}}°</li>
+	        <li><label>&rarr; {{$t('incidence_along_track')}}:</label> {{printFloat(angles.incidence.alongTrack)}}°</li>
+	        <li><label>&rarr; {{$t('incidence_overall')}}:</label> {{printFloat(angles.incidence.angle)}}°</li>
+	      </ul>
+	    </div>
+	    <div style="margin-top:2px;">
+	      <label>{{$t('viewing')}}</label>
+	      <ul style="padding-left:" >
+	        <li><label>&rarr; {{$t('viewing_across_track')}}:</label> {{printFloat(angles.viewing.acrossTrack)}}°</li>
+	        <li><label>&rarr; {{$t('viewing_along_track')}}:</label> {{printFloat(angles.viewing.alongTrack)}}°</li>
 	      </ul>
 	    </div>
 	    <div>
-	      <ul style="padding-left:0;padding-top:2px;" >
-	        <li><label>Viewing Across track:</label> {{printFloat(angles.viewing.acrossTrack)}}°</li>
-	        <li><label>Viewing Along track:</label> {{printFloat(angles.viewing.alongTrack)}}°</li>
-	      </ul>
-	    </div>
-	    <div>
-        <ul style="padding-left:0;padding-top:2px;" >
-          <li><label>Sun azimuth:</label> {{printFloat(angles.sunAzimuth)}}°</li>
-          <li><label>Sun elevation:</label> {{printFloat(angles.sunElevation)}}°</li>
+        <ul style="padding-left:0;padding-top:3px;" >
+          <li><label>{{$t('sun_azimuth')}}:</label> {{printFloat(angles.sunAzimuth)}}°</li>
+          <li><label>{{$t('sun_elevation')}}:</label> {{printFloat(angles.sunElevation)}}°</li>
         </ul>
       </div>
-      <div style="padding-top:2px">
-      <label>Ground sample dist.:</label> {{printFloat(angles.groundSampleDistance.across)}} x {{printFloat(angles.groundSampleDistance.along)}}
-      </div>
+     
     </div>
   </div>
 	<div v-if="image.productIdentifier && mode === 'S2ST-STACK'" class="gdm-image-4 gdm-fields" >
@@ -165,10 +194,13 @@
     </div>
 	</div>
 	<div v-if="image.productIdentifier && type === 'PLEIADES'" class="gdm-image-4  gdm-fields" >
-	    <div><label>Producer: </label>{{image.producer}}</div>
+	    <div><label>{{$t('producer')}}: </label>{{image.producer}}</div>
       <div><label>Format : </label>{{image.format}}<span v-if="image.encoding"> ({{image.encoding}}bits)</span></div>
-      <div><label>Columns/Rows: </label>{{image.dimensions.cols}} /  {{image.dimensions.rows}}</div>
-      <div v-if="image.spectralProcessing"><label>Spectral Processing: </label> {{image.spectralProcessing}}</div>
+      <div><label>{{$t('columns_rows')}}: </label>{{image.dimensions.cols}} /  {{image.dimensions.rows}}</div>
+      <div v-if="image.spectralProcessing">
+          <label>{{$t('spectral_processing')}}: </label> 
+          {{image.spectralProcessing}}
+      </div>
       <div class="gdm-stereo" v-if="stereo && stereo.length > 0" style="margin-top:5px; padding:3px;color:black;">
         <div v-for="st in stereo">
         &delta;<sub>{{st.name}}</sub> = {{printFloat(st.angle)}}°, B/H<sub>{{st.name}}</sub> = {{printFloat(st.bh)}}

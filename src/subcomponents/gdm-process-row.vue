@@ -19,7 +19,7 @@
 }
 </i18n>
 <template>
-<div class="gdm-process-row" :class="{selected: selected === process.properties.id}" @mouseenter="highlight()" @click="selectProcess()">
+<div class="gdm-process-row" :class="{selected: selected === parseInt(process.properties.id)}" @mouseenter="highlight()" @click="selectProcess()">
    <div class="gdm-process-identifier">  {{process.properties.id.toString().padStart(5,'0')}}<span  v-if="process.properties.token">-{{process.properties.token}}</span></div>
    <div class="gdm-process-column-1">
 	   <div class="toSelect" :class="{selectedService: selectedService}" 
@@ -157,7 +157,7 @@ export default {
       default: 'en'
     },
     selected: {
-      type: String,
+      type: Number,
       default: null
     },
     selectedService: {

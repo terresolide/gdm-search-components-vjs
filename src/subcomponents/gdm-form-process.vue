@@ -10,7 +10,8 @@
      "see_archived": "See archived jobs",
      "service_group": "Service group",
      "creation": "Creation",
-     "start": "Start"
+     "start": "Start",
+     "status": "Status"
    },
    "fr":{
      "process_extent": "Dates du calcul",
@@ -23,7 +24,8 @@
      "see_archived": "Voir les jobs archivés",
      "service_group": "Groupe de services",
      "creation": "Création",
-     "start": "Lancement"
+     "start": "Lancement",
+     "status": "Statut"
     }
 }
 </i18n>
@@ -44,10 +46,10 @@
      <formater-search-box :color="color" header-icon-class="fa fa-calendar" open-icon-class="fa fa-caret-right" :title="$t('temporal_extent')" :deployed="false" type="empty" >
          <formater-temporal-search name="temp" lang="fr" :color="color" :format="format" :default-from="parameters.tempStart" :default-to="parameters.tempEnd" daymin="2014-04-03" @change="dateChange"></formater-temporal-search>
      </formater-search-box>
-     <formater-search-box :color="color" v-if="groups.length > 0" header-icon-class="fa fa-object-group" open-icon-class="fa fa-caret-right" :title="$t('service_group')" :deployed="false" type="empty" >
+     <formater-search-box  :color="color" v-if="groups.length > 0 && back" header-icon-class="fa fa-object-group" open-icon-class="fa fa-caret-right" :title="$t('service_group')" :deployed="false" type="empty" >
       <formater-select  :color="color" :options="groups" :defaut="parameters.group" @input="groupChange" width="228px"></formater-select>
     </formater-search-box>
-     <formater-search-box  :color="color" header-icon-class="fa fa-cog" open-icon-class="fa fa-caret-right" title="Status" :deployed="false" type="empty" >
+     <formater-search-box v-if="back" :color="color" header-icon-class="fa fa-cog" open-icon-class="fa fa-caret-right" title="Status" :deployed="false" type="empty" >
       
       <div v-if="back"><span :style="{color: color}">{{$t('see_archived')}}</span>: <input v-model="archived" type="checkbox" @change="archivedChange"/></div>
       <formater-select v-if="statusList.length > 0" :color="color" :options="statusList" :defaut="parameters.status" @input="statusChange" width="228px"></formater-select>
@@ -61,7 +63,7 @@
         daymin="2020-03-01" @change="dateChange"></formater-temporal-search>
     </formater-search-box>
     
-    <formater-search-box  :color="color" header-icon-class="fa fa-filter" open-icon-class="fa fa-caret-right" :title="$t('filters')" :deployed="false" type="empty" >
+    <formater-search-box v-if="back" :color="color" header-icon-class="fa fa-filter" open-icon-class="fa fa-caret-right" :title="$t('filters')" :deployed="false" type="empty" >
      <div style="margin-left:10px;min-height:70px;">
      <div v-if="!user && !service" style="font-style:italic;color:grey;">{{$t('no_filter')}}</div>
      <div v-if="user" class="selectedUser">{{user.email}}<span class="fa fa-close" @click="removeFilter('user')"></span></div>
