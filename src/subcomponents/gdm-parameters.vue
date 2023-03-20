@@ -98,7 +98,7 @@
      </div>
      <input v-if="parameter.type === 'date'" type="date"  :name="prefix + parameter.name" v-model="values[prefix + parameter.name]" 
          style="max-width:135px;"   :required="parameter.required" :min="parameter.min" :max="parameter.max" 
-         :disabled="mode === 'view' || parameter.disabled" @change="change(parameter)"/>
+         :disabled="mode === 'view' || parameter.disabled" @change="change(parameter)" :lang="lang == 'fr' ? 'fr-FR' : 'en-US'"/>
    
      <div v-if="parameter.type === 'text'">
           <input type="text" :required="parameter.required" :name="prefix + parameter.name" :pattern="parameter.pattern" v-model="values[prefix + parameter.name]" 

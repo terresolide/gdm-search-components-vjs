@@ -3,17 +3,29 @@
   "en": {
     "clear_data": "All results will be deleted on this date",
     "created": "Created",
+    "collection": "Collection",
     "consult": "Consult",
+    "dsmopt_default_correlation": "Uncorrelated threshold ",
+    "dsmopt_use_roi": "Use ROI",
+    "dsmopt_roi_sizex": "ROI size X",
+    "dsmopt_roi_sizey": "ROI size Y",
     "end": "Job end",
     "remove_process": "Remove the job",
+    "squareCenter": "Product center",
     "start": "Job start"
 }, 
   "fr": {
     "clear_data": "Tous les résultats seront effacés à cette date",
     "created": "Création",
+    "collection": "Collection",
     "consult": "Consulter",
+    "dsmopt_default_correlation": "Seuil de dé-corrélation",
+    "dsmopt_use_roi": "Utilisation d'une Zone d'Intérêt",
+    "dsmopt_roi_sizex": "Taille de la zone en X",
+    "dsmopt_roi_sizey": "Taille de la zone en Y",
     "end": "Fin",
     "remove_process": "Supprimer le job",
+    "squareCenter": "Centre du produit",
     "start": "Début"
   }
 }
@@ -95,7 +107,7 @@
                 <div v-if="process.properties[type]" >
                   <div v-for="(value, prop) in process.properties[type]" 
                   v-if="prop !== 'bbox' && prop !== 'providerName' && value">
-                    <div><b>{{prop}}:</b> {{value}}</div>
+                    <div><b>{{$t(prop)}}:</b> {{value}}</div>
                   </div>
                </div>
              </div>
@@ -109,7 +121,7 @@
      <div class="infos" >
              <div v-if="process.properties.parameters && Object.keys(process.properties.parameters).length < 10"  >
                 <div v-for="(value, prop) in process.properties.parameters" >
-                  <div><b>{{prop}}:</b> {{value}}</div>
+                  <div><b>{{$t(prop)}}:</b> {{value}}</div>
                 </div>
              </div>
              <div v-else>
@@ -119,8 +131,8 @@
                 <div v-for="prop in ['correl_split_date', 'correl_input_mode', 'correl_correlator', 'do_analysis', 'do_correction_filtering']" >
                   <div v-if="process.properties.parameters.hasOwnProperty(prop)"><b>{{$hypens2camel(prop)}}:</b> {{process.properties.parameters[prop]}}</div>
                 </div>
-                <div v-for="prop in ['dsmopt_ortho', 'dsmopt_default_correlation', 'dsmopt_export_l93', 'dsmopt_use_roi', 'dsmopt_roi_sizex', 'dsmopt_roi_sizey']" >
-                  <div v-if="process.properties.parameters.hasOwnProperty(prop)"><b>{{$hypens2camel(prop.replace('dsmopt_', ''))}}:</b> {{process.properties.parameters[prop]}}</div>
+                <div v-for="prop in ['dsmopt_default_correlation','dsmopt_use_roi', 'dsmopt_roi_sizex', 'dsmopt_roi_sizey']" >
+                  <div v-if="process.properties.parameters.hasOwnProperty(prop)"><b>{{$t(prop)}}:</b> {{process.properties.parameters[prop]}}</div>
                 </div>
              </div>
            </div>
