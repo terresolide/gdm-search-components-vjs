@@ -244,7 +244,7 @@ export default {
    var query = ''
    if (this.$route) {
      this.extractRouteParams()
-     query = this.$route.fullPath.substring(this.$route.fullPath.indexOf('?'))
+     // query = this.$route.fullPath.substring(this.$route.fullPath.indexOf('?'))
    } else {
      this.popListener = this.stateChange.bind(this)
      window.addEventListener('popstate', this.popListener)
