@@ -309,8 +309,12 @@ export default {
      },
      buildQuery () {
        var location = '?maxRecords=' + this.pagination.maxRecords + '&index=' + this.pagination.startIndex
-       if (this.parameters.user && this.back && !this.userId) {
+      
+       if (this.parameters.user && !this.userId) {
           location += '&userId=' + this.parameters.user.id
+       }
+       if (this.userId) {
+         location += '&userId=' + this.userId
        }
        
        if (this.parameters.service) {
@@ -359,7 +363,7 @@ export default {
        }
        var userId = url.searchParams.get('userId')
        if (userId && !this.userId) {
-         this.parameters.user = { id: parseIn(userId) , email: 'User ' + userId}
+         this.parameters.user = { id: parseInt(userId) , email: 'User ' + userId}
        } else {
          this.parameters.user = null
        }
@@ -456,7 +460,7 @@ export default {
 	          response => this.error(response))
     },
     searchGroups () {
-      this.$http.get(this.api + 'getGroups', {credentials: true})
+      this.$http.get(this.api + 'groups', {credentials: true})
       .then(
           response => this.groups = response.body,
           response => console.log('error getGroups'))

@@ -250,7 +250,7 @@ export default {
     getResult () {
       this.searchResult = true
       this.submitting = true
-      this.$http.get(this.api + '/getResult/' + this.process.id, {credentials: true})
+      this.$http.post(this.api + '/process/' + this.process.id + '/result', {credentials: true})
       .then(function (resp) {
         console.log('get result')
         var _this = this
@@ -264,7 +264,7 @@ export default {
       })
     },
     getStatus () {
-      this.$http.get(this.api + '/getStatus/' + this.process.id, {credentials: true})
+      this.$http.get(this.api + '/process/' + this.process.id + '/status', {credentials: true})
       .then(function (resp) {
         this.emitStatusChange(resp.body, 4)
       }, function (e) {
@@ -283,7 +283,7 @@ export default {
         }, 3000)
         return
       }
-      this.$http.get(this.api + '/getStatusInDepth/' + this.process.id, {credentials: true})
+      this.$http.post(this.api + '/process/' + this.process.id + '/status', {credentials: true})
       .then(function (resp) {
         this.emitStatusChange(resp.body, 10)
       }, function (e) {
@@ -306,7 +306,7 @@ export default {
     launch () {
      this.submitting = true
      this.$http.post(
-         this.api + '/launch/' + this.process.id,
+         this.api + '/process/' + this.process.id + '/start',
          this.process,
          {
            headers: {
@@ -324,7 +324,7 @@ export default {
     },
     evaluate () {
       this.submitting = true
-      this.$http.get(this.api + '/evaluate/' + this.process.id, {credentials: true})
+      this.$http.post(this.api + '/process/' + this.process.id + '/evaluate', {credentials: true})
       .then(function (resp) {
         this.$emit('statusChange', resp.body)
         this.submitting = false
@@ -337,7 +337,7 @@ export default {
         return
       }
       this.submitting = true
-      this.$http.get(this.api + '/dismiss/' + this.process.id, {credentials: true})
+      this.$http.post(this.api + '/process/' + this.process.id + '/dismiss', {credentials: true})
       .then(function (resp) {
         this.$emit('statusChange', resp.body)
         this.submitting = false
@@ -348,7 +348,7 @@ export default {
     changeKeep () {
       this.submitting = true
       this.$http.post(
-          this.api + '/changeKeep/' + this.process.id,
+          this.api + '/process/' + this.process.id + '/keep',
           {keep: !this.process.keep },
           {
               headers: {
@@ -374,7 +374,7 @@ export default {
     duplicate () {
       this.submitting = true
       this.$http.post(
-          this.api + '/duplicate/' + this.process.id,
+          this.api + '/process/' + this.process.id + '/duplicate',
           this.process,
           {
               headers: {
@@ -395,7 +395,7 @@ export default {
     publish () {
       this.submitting = true
       this.$http.post(
-          this.api + '/publish/' + this.process.id,
+          this.api + '/process/' + this.process.id + '/publish',
           {url: this.resultUrl},
           {credentials: true, emulateJSON: true})
       .then(function (resp) {
@@ -408,7 +408,7 @@ export default {
     purge () {
       this.submitting = true
       this.$http.post(
-          this.api + '/purge/' + this.process.id,
+          this.api + '/process/' + this.process.id + '/purge',
           {id: this.process.id},
           {credentials: true, emulateJSON: true})
       .then(function (resp) {
@@ -447,7 +447,7 @@ export default {
     },
     share () {
       this.submitting = true
-      this.$http.get(this.api + '/share/' + this.process.id, {credentials: true})
+      this.$http.post(this.api + '/process/' + this.process.id + '/share', {credentials: true})
       .then(function (resp) {
         this.$emit('ownerChange', resp.body)
         this.isCiest2 = true

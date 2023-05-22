@@ -280,7 +280,7 @@ export default {
   },
   watch: {
     userId (newvalue) {
-      this.getToken()
+     // this.getToken()
       this.load()
     }
   },
@@ -321,7 +321,7 @@ export default {
   created () {
     this.$i18n.locale = this.lang
     moment.locale(this.lang)
-    this.getToken()
+   // this.getToken()
     this.load()
   },
   mounted () {
@@ -353,8 +353,10 @@ export default {
       series: null,
       serieIndex: 0,
       serieName: null,
-      token: null,
+     // token: null,
+      // image type among PEPS, PLEIADES...
       type: 'PEPS',
+      // URL of file which describe parameters
       describe: null,
       stereo: null,
       fullscreen: false,
@@ -758,19 +760,18 @@ export default {
       this.process.keep = value
     },
     load () {
-      var url = this.api + '/getProcess/' + this.id
+      var url = this.api + '/process/' + this.id
       this.$http.get(url, {credentials: true})
       .then(
           response => this.display(response.body),
           response => this.error(response))
-      var url = this.api + '/getAllStatus/' + this.lang
+      var url = this.api + '/process/status/' + this.lang
       this.$http.get(url, {credentials: true})
       .then(
           response => this.setStatusList(response.body),
           response => this.error(response))
     },
-    setDescribe (srv) {
-    },
+   
     setStatusList (status) {
       if (!status.error) {
         this.statusList = status
