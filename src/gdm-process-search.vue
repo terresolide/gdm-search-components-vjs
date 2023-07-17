@@ -133,7 +133,7 @@ export default {
     },
     what: {
       type: String,
-      default: 'getProcess'
+      default: 'process'
     },
     userId: {
       type: Number,
@@ -460,7 +460,7 @@ export default {
 	          response => this.error(response))
     },
     searchGroups () {
-      this.$http.get(this.api + 'groups', {credentials: true})
+      this.$http.get(this.api + 'groups?short=1', {credentials: true})
       .then(
           response => this.groups = response.body,
           response => console.log('error getGroups'))

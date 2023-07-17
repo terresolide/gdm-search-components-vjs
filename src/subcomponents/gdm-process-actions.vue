@@ -87,7 +87,7 @@
          </span>
         
           <!--  GET RESULT IF NOT EXISTS -->
-          <a class="button" v-if="process.status === 'TERMINATED' && back && !process.result" @click="getResult" :class="{disabled: searchResult}">{{$t('get_result')}}</a>
+          <a class="button" v-if="process.status === 'TERMINATED' && !process.result.bbox" @click="getResult" :class="{disabled: searchResult}">{{$t('get_result')}}</a>
       </div>
        
       <div v-else-if="process.status === 'RUNNING' || process.status === 'PRE-RUN' || process.status === 'ACCEPTED'">
@@ -283,7 +283,7 @@ export default {
         }, 3000)
         return
       }
-      this.$http.post(this.api + '/process/' + this.process.id + '/status', {credentials: true})
+      this.$http.post(this.api + '/process/' + this.process.id + '/status', [], {credentials: true})
       .then(function (resp) {
         this.emitStatusChange(resp.body, 10)
       }, function (e) {
@@ -324,7 +324,7 @@ export default {
     },
     evaluate () {
       this.submitting = true
-      this.$http.post(this.api + '/process/' + this.process.id + '/evaluate', {credentials: true})
+      this.$http.post(this.api + '/process/' + this.process.id + '/evaluate', [], {credentials: true})
       .then(function (resp) {
         this.$emit('statusChange', resp.body)
         this.submitting = false
@@ -337,7 +337,7 @@ export default {
         return
       }
       this.submitting = true
-      this.$http.post(this.api + '/process/' + this.process.id + '/dismiss', {credentials: true})
+      this.$http.post(this.api + '/process/' + this.process.id + '/dismiss', [], {credentials: true})
       .then(function (resp) {
         this.$emit('statusChange', resp.body)
         this.submitting = false
@@ -447,7 +447,7 @@ export default {
     },
     share () {
       this.submitting = true
-      this.$http.post(this.api + '/process/' + this.process.id + '/share', {credentials: true})
+      this.$http.post(this.api + '/process/' + this.process.id + '/share', [], {credentials: true})
       .then(function (resp) {
         this.$emit('ownerChange', resp.body)
         this.isCiest2 = true
