@@ -175,6 +175,9 @@ export default {
   watch: {
     result (newvalue) {
       this.initCmdCurl(newvalue)
+    },
+    images (newvalue) {
+      console.log(newvalue)
     }
   },
   computed: {

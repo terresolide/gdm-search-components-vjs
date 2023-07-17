@@ -252,12 +252,8 @@ export default {
       this.submitting = true
       this.$http.post(this.api + '/process/' + this.process.id + '/result', {credentials: true})
       .then(function (resp) {
-        console.log('get result')
-        var _this = this
-        setTimeout(function () {
-          _this.submitting = false
-          _this.getStatus()
-        }, 10000)
+        this.$emit('processChange', resp.body)
+        this.submitting = false
       }, function (e) {
         this.submitting = false
         

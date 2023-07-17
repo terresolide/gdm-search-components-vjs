@@ -492,6 +492,7 @@ export default {
       return image
     },
     addResult (result) {
+      console.log(result)
       if (result && result.thumbnails) {
         result.thumbnails.sort(function (a, b) {
           return a.title > b.title ? 1 : -1
@@ -505,7 +506,7 @@ export default {
           }
         })
         this.imageLayers = imageLayers
-      } else if (result && !this.imageLayers){
+      } else if (result.bbox && !this.imageLayers){
         // treatment result SAR
         var subswath = null
         var imageLayers = []
@@ -811,6 +812,11 @@ export default {
 	        this.$set(this.process, 'result', detail.result)
 		      this.addResult(detail.result)  
 	      }
+        // gdm-sar
+        if (this.process.result.dir && !this.process.result.bbox && detail.result && detail.result.bbox) {
+          this.$set(this.process, 'result', detail.result)
+          this.addResult(detail.result)
+        }
       }
     }
   }
