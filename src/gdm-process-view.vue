@@ -506,7 +506,7 @@ export default {
           }
         })
         this.imageLayers = imageLayers
-      } else if (result.bbox && !this.imageLayers){
+      } else if (result && result.bbox && !this.imageLayers){
         // treatment result SAR
         var subswath = null
         var imageLayers = []
