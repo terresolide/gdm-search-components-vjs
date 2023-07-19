@@ -75,6 +75,7 @@
          <a class="button" v-if="!back && userId===process.userId && ciest2 && !isCiest2 && process.status==='TERMINATED'" @click="share"  :class="{disabled: !canEdit}">{{$t('share_ciest2')}}</a>
          <a class="button" v-if="back && process.status ==='TERMINATED' && !process.isExample" @click="showPublish=true"  :class="{disabled: !canEdit}">{{$t('publish')}}</a>
           <a class="button" v-if="back && process.isExample && process.status ==='TERMINATED'" @click="showPublish=true">Modifier url résultat</a>
+         <!--  for SAR TERMINATED process -->
          <span v-if="process.group === 'SAR' && process.status === 'TERMINATED'">
 	         <a class="button" v-if="!back && userId === process.userId && !process.isExample" 
 	         @click="requestPublish" :class="{disabled: process.keep}">{{$t('publish')}}</a>
@@ -84,10 +85,9 @@
           <a class="button" v-if="!process.isExample && !process.keep" @click="purge"  :class="{disabled: !canEdit}">
            <i class="fa fa-trash"></i> {{$t('purge')}}</a>
         
-         </span>
-        
           <!--  GET RESULT IF NOT EXISTS -->
-          <a class="button" v-if="process.status === 'TERMINATED' && !process.result.bbox" @click="getResult" :class="{disabled: searchResult}">{{$t('get_result')}}</a>
+          <a class="button" v-if="process.result && !process.result.bbox" @click="getResult" :class="{disabled: searchResult}">{{$t('get_result')}}</a>
+       </span>
       </div>
        
       <div v-else-if="process.status === 'RUNNING' || process.status === 'PRE-RUN' || process.status === 'ACCEPTED'">
