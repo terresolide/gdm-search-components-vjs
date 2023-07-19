@@ -810,7 +810,7 @@ export default {
       })
     },
     getClassification () {
-      var url = this.appUrl + '/auth/getClassification'
+      var url = this.appUrl + '/api/users/types?full=yes'
       this.$http.get(url, {
 //         headers: {
 //           'Accept-Language': 'fr'
