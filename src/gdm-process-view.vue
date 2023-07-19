@@ -813,7 +813,7 @@ export default {
 		      this.addResult(detail.result)  
 	      }
         // gdm-sar
-        if (this.process.result.dir && !this.process.result.bbox && detail.result && detail.result.bbox) {
+        if (this.process.result && this.process.result.dir && !this.process.result.bbox && detail.result && detail.result.bbox) {
           this.$set(this.process, 'result', detail.result)
           this.addResult(detail.result)
         }
