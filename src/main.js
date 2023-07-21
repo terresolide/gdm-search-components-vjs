@@ -17,12 +17,6 @@ Vue.use(VueResource);
 import {VueTools} from 'formater-commons-components-vjs'
 Vue.use(VueTools)
 
-// import GdmProcessSearch from './gdm-process-search.vue'
-// import GdmManageStep from './gdm-manage-step.vue'
-// import GdmProcessView from './gdm-process-view.vue'
-// import GdmRestrictTo from './gdm-restrict-to.vue'
-// import GdmStat from './gdm-stat.vue'
-// import AerisTheme from 'aeris-commons-components-vjs/src/aeris-theme/aeris-theme.vue'
 
 ljs.addAliases({
   dep: [
@@ -60,11 +54,5 @@ ljs.load('dep', function() {
   Vue.customElement('gdm-test', () => new Promise((resolve) => {
     require(['./subcomponents/gdm-test.vue'], (GdmEarthquake) => resolve(GdmEarthquake.default))
   }))
- // Vue.customElement('gdm-process-search', GdmProcessSearch)
- // Vue.customElement('gdm-manage-step', GdmManageStep)
- // Vue.customElement('gdm-process-view', GdmProcessView)
- // Vue.customElement('gdm-restrict-to', GdmRestrictTo)
- // Vue.customElement('gdm-stat', GdmStat)
- // Vue.customElement('aeris-theme', AerisTheme)
 })
     	  

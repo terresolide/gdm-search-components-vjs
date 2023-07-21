@@ -794,7 +794,7 @@ export default {
       this.drawHistogram('download', 'Téléchargement FTP', categories, series, options)
     },
     getServices () {
-      var url = this.appUrl + '/auth/getServices'
+      var url = this.appUrl + '/api/services/list'
       this.$http.get(url)
       .then(function (response) {
         this.services = response.body.services
@@ -812,9 +812,9 @@ export default {
     getClassification () {
       var url = this.appUrl + '/api/users/types?full=yes'
       this.$http.get(url, {
-//         headers: {
-//           'Accept-Language': 'fr'
-//         }
+        headers: {
+          'Accept-Language': 'fr'
+        }
       })
       .then(function (response) {
         this.initialize(response.body)
@@ -963,7 +963,7 @@ export default {
         params.push('end=' + e.endDate)
       }
       url += params.join('&')
-      this.$http.get(url)
+      this.$http.get(url, {credentials: true})
       .then(function (response) {
         this.treatmentConnection(response.body, e)
       })
@@ -993,7 +993,7 @@ export default {
         params.push(e.groupBy + '=1')
       }
       url += params.join('&')
-      this.$http.get(url)
+      this.$http.get(url, {credentials: true})
       .then(function (response) {
         this.treatmentJobs(response.body, e)
       })
@@ -1011,13 +1011,13 @@ export default {
         params.push('service=' + e.service)
       }
       url += params.join('&')
-      this.$http.get(url)
+      this.$http.get(url, {credentials: true})
       .then(function (response) {
         this.treatmentProducts(response.body, e)
       })
     },
     searchService () {
-      this.$http.get(this.appUrl + '/statistics/serviceUsers')
+      this.$http.get(this.appUrl + '/statistics/serviceUsers', {credentials: true})
       .then(function (response) {
         this.treatmentServices(response.body)
       })
@@ -1038,7 +1038,7 @@ export default {
         params.push('service=' + e.service)
       }
       url += params.join('&')
-      this.$http.get(url)
+      this.$http.get(url, {credentials: true})
       .then(function (response) {
         this.treatmentCiest2(response.body, e)
       })

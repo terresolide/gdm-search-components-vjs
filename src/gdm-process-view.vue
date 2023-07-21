@@ -385,13 +385,13 @@ export default {
     loadingChange (value) {
       this.loadingLayer = value
     },
-    getToken () {
-      this.$http.get(this.api + '/getToken', {credentials: true})
-      .then(
-         (resp) => { this.token = resp.body.token },
-         (resp) => { console.log('ERROR GET TOKEN') }
-      )
-    },
+//     getToken () {
+//       this.$http.get(this.api + '/getToken', {credentials: true})
+//       .then(
+//          (resp) => { this.token = resp.body.token },
+//          (resp) => { console.log('ERROR GET TOKEN') }
+//       )
+//     },
     toggleImage (e) {
       var image = this.imageLayers[e.index]
       if (e.hasOwnProperty('indexImage')) {
@@ -766,8 +766,9 @@ export default {
       .then(
           response => this.display(response.body),
           response => this.error(response))
-      var url = this.api + '/process/status/' + this.lang
-      this.$http.get(url, {credentials: true})
+      var url = this.api + '/process/status'
+      this.$http.get(url,
+          {headers: {'accept-language': this.lang}, credentials: true})
       .then(
           response => this.setStatusList(response.body),
           response => this.error(response))

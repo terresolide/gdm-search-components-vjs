@@ -434,7 +434,9 @@ export default {
        }
      },
      search (query) {
-       var headers = {}
+       var headers = {
+           'Accept-Language': this.lang
+       }
        if (this.group) {
          headers.groupKey = this.group
        }
@@ -449,8 +451,6 @@ export default {
        if (this.groupId) {
          query += '&group=' + this.groupId
        }
-
-	     query += '&lang=' + this.lang
 	     
 	     url += query
 	    
