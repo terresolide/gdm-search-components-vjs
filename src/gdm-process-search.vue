@@ -569,9 +569,9 @@ export default {
 //       .then( this.search())
 //     },
     removeProcess (id) {
-      var url = this.api + 'removeProcess/' + id
-      this.$http.get(url, {credentials: true})
-      .then(resp => {this.search()})
+      var url = this.api + 'process/' + id
+      this.$http.delete(url, {credentials: true})
+      .then(resp => {this.search('')})
     },
     removeSelected(type) {
       this.parameters[type] = null
