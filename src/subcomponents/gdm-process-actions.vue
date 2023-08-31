@@ -3,6 +3,7 @@
    "en":{
      "abort": "Abort",
      "confirm_abort": "This action is final.\nAre you sure you want to continue?",
+     "continue_publish": "You request a publication of your results.\nIf this request is accepted, your results will appear from the interface under the \"public results\" tab.\nDo you want to continue?",
      "refresh": "Refresh",
      "edit": "Edit",
      "launch": "Launch",
@@ -23,6 +24,7 @@
    "fr":{
      "abort": "Abandonner",
      "confirm_abort": "Cette action est définitive.\nVoulez-vous continuer?",
+     "continue_publish": "Vous demandez une publication de vos résultats.\nSi cette demande est acceptée, vos résultats apparaîtront depuis l'interface sous l'onglet \"résultats publics\".\nVoulez-vous continuer?",
      "refresh": "Actualiser",
      "edit": "Editer",
      "launch": "Lancer",
@@ -421,6 +423,9 @@ export default {
       })
     },
     requestPublish () {
+      if (!window.confirm(this.$i18n.t('continue_publish'))) {
+        return
+      }
       this.submitting = true
       this.$http.get(
           this.api.replace('api', 'requests') + '/publish/' + this.process.id,
