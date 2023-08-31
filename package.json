@@ -22,6 +22,7 @@
   "dependencies": {
     "formater-commons-components-vjs": "github:terresolide/formater-commons-components-vjs",
     "gdm-tio-vjs": "github:terresolide/gdm-tio-vjs",
+    "highcharts": "^11.1.0",
     "install": "^0.13.0",
     "leaflet": "^1.7.1",
     "leaflet-draw": "^1.0.4",

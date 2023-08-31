@@ -393,6 +393,9 @@ export default {
 //       )
 //     },
     toggleImage (e) {
+      if (!this.imageLayers || this.imageLayers === 'undefined') {
+        return
+      }
       var image = this.imageLayers[e.index]
       if (e.hasOwnProperty('indexImage')) {
         if (image.checked && image.indexImage === e.indexImage) {
@@ -857,6 +860,9 @@ export default {
    } *
 div[id="view"] .gdm-process-view div.gdm-process-header {
   max-height:none;
+}
+.gdm-process-view h1 {
+  font-size: 1.7rem;
 }
 .gdm-process-view .gdm-process-header a.button{
    display: inline-block;

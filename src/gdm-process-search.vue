@@ -728,8 +728,8 @@ display: grid;
    text-align:left;
    font-weight:700;
    border: 1px solid lightgrey;
-   min-height:20px;
-   max-height:55px;
+   max-height: 35px;
+padding: 5px 0;
 }
 .gdm-process-header-column-1 {
   grid-column: 1;

@@ -182,6 +182,9 @@ export default {
   },
   computed: {
     serieName () {
+      if (!this.images) {
+        return null
+      }
       var find = this.images.find(img => img.checked)
       if (find) {
         return find.title
