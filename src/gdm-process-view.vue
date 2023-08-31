@@ -862,7 +862,8 @@ div[id="view"] .gdm-process-view div.gdm-process-header {
   max-height:none;
 }
 .gdm-process-view h1 {
-  font-size: 1.7rem;
+  font-size: 1.7em;
+  text-transform:uppercase;
 }
 .gdm-process-view .gdm-process-header a.button{
    display: inline-block;
