@@ -668,6 +668,9 @@ export default {
 }
 </script>
 <style>
+.gdm-process-search {
+  font-family: Roboto, sans-serif;
+}
 .button{
     font-family: Arial;
     font-size: 1em;

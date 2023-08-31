@@ -827,6 +827,9 @@ export default {
 }
 </script>
 <style>
+.gdm-process-view {
+  font-family: Roboto, sans-serif;
+}
 .gdm-process-view .gdm-warning {
    margin-top: 60px;
 }
