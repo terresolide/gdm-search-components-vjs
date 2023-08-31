@@ -45,7 +45,7 @@
 	          {{process.properties.email}}
 	       </div>
 	   </div>
-	   <div v-if="process.properties.processusName">({{process.properties.processusName}})</div>
+	   <div v-if="process.properties.processusName" style="overflow-wrap: break-word;">({{process.properties.processusName}})</div>
    </div>
    <div class="gdm-process-column-2">
       <gdm-process-status :status="process.properties.status" :status-list="statusList" 
