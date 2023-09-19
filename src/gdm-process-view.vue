@@ -571,6 +571,10 @@ export default {
 				               png: series[name].images[this.serieIndex].png,
 				               legend: result.dir + key + '/legend_' + name + '_runw.png' 
 				             }
+                     var tif = result[key]['Time_Serie'][name].tiff || result[key]['Time_Serie'][name].tif
+                     if (tif) {
+                       image.tif = result.dir + key + '/' + tif
+                     }
 				             if (text) {
 				               image.first = text
 				               text = null

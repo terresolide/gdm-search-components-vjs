@@ -2,6 +2,7 @@
 {
    "en":{
      "abort": "Abort",
+     "before_get_result": "You will download the backup_product.json file from the results directory.\nIt may not exist yet!\nDo you want to continue?",
      "confirm_abort": "This action is final.\nAre you sure you want to continue?",
      "continue_publish": "You request a publication of your results.\nIf this request is accepted, your results will appear from the interface under the \"public results\" tab.\nDo you want to continue?",
      "refresh": "Refresh",
@@ -23,6 +24,7 @@
    },
    "fr":{
      "abort": "Abandonner",
+     "before_get_result": "Vous allez télécharger le fichier backup_product.json du répertoire des résultats.\nIl est possible qu'il n'existe pas encore!\nVoulez-vous continuer?",
      "confirm_abort": "Cette action est définitive.\nVoulez-vous continuer?",
      "continue_publish": "Vous demandez une publication de vos résultats.\nSi cette demande est acceptée, vos résultats apparaîtront depuis l'interface sous l'onglet \"résultats publics\".\nVoulez-vous continuer?",
      "refresh": "Actualiser",
@@ -250,15 +252,17 @@ export default {
       this.getStatusInDepth()
     },
     getResult () {
+      if (!window.confirm(this.$i18n.t('before_get_result'))) {
+        return
+      }
       this.searchResult = true
       this.submitting = true
-      this.$http.post(this.api + '/process/' + this.process.id + '/result', {credentials: true})
+      this.$http.post(this.api + '/process/' + this.process.id + '/result',{}, {credentials: true})
       .then(function (resp) {
         this.$emit('processChange', resp.body)
         this.submitting = false
       }, function (e) {
         this.submitting = false
-        
       })
     },
     getStatus () {

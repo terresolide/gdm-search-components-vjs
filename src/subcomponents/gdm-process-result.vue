@@ -109,7 +109,7 @@
          <h4 v-if="image.first" :style="{color:color}" style="margin-bottom:0;">{{image.first}}</h4>
          <div>
           <i class="fa" style="vertical-align:top;":class="image.checked ?'fa-eye':'fa-eye-slash'" @click="toggleImage(index)"></i> 
-          <a v-if="image.tif" :href="image.tif" class="fa fa-download" :title="$t('download')" style="padding:0 5px;color:black;"></a>
+          <a v-if="image.tif" :href="image.tif" class="fa fa-download" :title="$t('download')" style="padding:0 5px;color:black;"></a> 
           <div style="display:inline-block;margin:0;max-width:calc(100% - 20px);">{{image.title}}</div>
         </div>
      <!--  <div style="font-size:0.9rem;">
