@@ -17,7 +17,7 @@ h3 {
   -->
   <script>
     var access = {"machin": {"GDM-SAR": "xxx"}}
-
+    var groupRoles = ["CIEST2", "ISDeform"];
   </script>
     <!-- 
   <gdm-earthquake title="Séismes" lang="fr"></gdm-earthquake>
@@ -29,8 +29,8 @@ h3 {
   <gdm-process-view id="311" color="#191970" user-id="1"  ciest2="true" api="https://demo.formater/gdm/api"  lang="fr"></gdm-process-view>
  
  -->
- 
-  <gdm-process-view id="258" color="#191970"   user-id="1"  ciest2="true" user-example-id="3" back="true" api="https://demo.formater/gdm/api"  lang="fr"></gdm-process-view>
+ <!-- 
+  <gdm-process-view id="1319" color="#191970"   user-id="1"  ciest2="true" user-example-id="3" back="true" api="https://demo.formater/gdm/api"  lang="fr"></gdm-process-view>
    -->  
      <!-- 
  <gdm-stat app-url="https://demo.formater/gdm"></gdm-stat>
@@ -38,8 +38,8 @@ h3 {
   <!--
  <gdm-process-search color="#550000"   back="true"  what="process/me" api="https://demo.formater/gdm/api/" url="http://localhost:8080/#/process/" lang="fr" ></gdm-process-search> 
    -->
-  <!-- 
-   <gdm-process-search color="#808000" lang="fr"  example="true" group="MNS" what="getUserProcess" api="https://demo.formater/gdm/api/" url="http://localhost:8080/#/process/" lang="fr" back="false"></gdm-process-search> 
+  
+   <gdm-process-search color="#808000" lang="fr"   group="MNS" what="process/me" roles="CIEST2,ISDeform" api="https://demo.formater/gdm/api/" url="http://localhost:8080/#/process/" lang="fr" back="false"></gdm-process-search> 
   -->
   <!--
    <gdm-process-search color="#808000" lang="fr"   api="https://demo.formater/gdm/api/" url="http://localhost:8080/#/process/" lang="fr" back="true"></gdm-process-search> 

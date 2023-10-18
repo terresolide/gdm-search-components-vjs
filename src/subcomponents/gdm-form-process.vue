@@ -11,7 +11,8 @@
      "service_group": "Service group",
      "creation": "Creation",
      "start": "Start",
-     "status": "Status"
+     "status": "Status",
+     "team": "Team"
    },
    "fr":{
      "process_extent": "Dates du calcul",
@@ -25,7 +26,8 @@
      "service_group": "Groupe de services",
      "creation": "Création",
      "start": "Lancement",
-     "status": "Statut"
+     "status": "Statut",
+     "team": "Équipe"
     }
 }
 </i18n>
@@ -46,8 +48,12 @@
      <formater-search-box :color="color" header-icon-class="fa fa-calendar" open-icon-class="fa fa-caret-right" :title="$t('temporal_extent')" :deployed="false" type="empty" >
          <formater-temporal-search name="temp" lang="fr" :color="color" :format="format" :default-from="parameters.tempStart" :default-to="parameters.tempEnd" daymin="2014-04-03" @change="dateChange"></formater-temporal-search>
      </formater-search-box>
-     <formater-search-box  :color="color" v-if="groups.length > 0 && back" header-icon-class="fa fa-object-group" open-icon-class="fa fa-caret-right" :title="$t('service_group')" :deployed="false" type="empty" >
+      <formater-search-box  :color="color" v-if="groups.length > 0 && back" header-icon-class="fa fa-object-group" open-icon-class="fa fa-caret-right" :title="$t('service_group')" :deployed="false" type="empty" >
       <formater-select  :color="color" :options="groups" :defaut="parameters.group" @input="groupChange" width="228px"></formater-select>
+    </formater-search-box>
+     <formater-search-box v-if="Object.keys(teams).length > 0" :color="color" header-icon-class="fa fa-users" open-icon-class="fa fa-caret-right" :title="$t('team')" :deployed="false" type="empty" >
+      
+      <formater-select :color="color" :options="teams" :defaut="parameters.team" @input="teamChange" type="associative" width="228px"></formater-select>
     </formater-search-box>
      <formater-search-box v-if="back" :color="color" header-icon-class="fa fa-cog" open-icon-class="fa fa-caret-right" title="Status" :deployed="false" type="empty" >
       
@@ -110,6 +116,10 @@ export default {
       type: Array,
       default: () => []
     },
+    teams: {
+      type: Object,
+      default: () => {}
+    },
     color: {
       type: String,
       default: '#808080'
@@ -159,7 +169,6 @@ export default {
     } else {
       this.format = 'MM/DD/YYYY'
     }
-    
   },
   mounted () {
   },
@@ -210,6 +219,12 @@ export default {
         e = null
       }
       this.$emit('groupChange', e)
+    },
+    teamChange(e) {
+      if (e === '---') {
+        e = null
+      }
+      this.$emit('teamChange', e)
     },
     statusChange(e) {
       if (e === '---') {

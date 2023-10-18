@@ -35,9 +35,9 @@
    <div class="column-left" >
     <gdm-form-process :lang="lang" :status="statusList" :groups="groups" :feature-collection="featureCollection" 
     :color="color" :user="parameters.user" :service="parameters.service" :height="height" :back="back"
-    :parameters="parameters"
+    :parameters="parameters" :teams="teams"
      @remove="removeSelected" @dateChange="dateChange" @statusChange="statusChange" @groupChange="groupChange"
-     @textChange="textChange" @archivedChange="archivedChange" @reset="reset"></gdm-form-process> 
+     @teamChange="teamChange" @textChange="textChange" @archivedChange="archivedChange" @reset="reset"></gdm-form-process> 
    </div>
    <div class="column-right" >
    <div id="fmtLargeMap" style="width:calc(100%);"></div>
@@ -139,6 +139,10 @@ export default {
       type: Number,
       default: null
     },
+    roles: {
+      type: String|Array,
+      default: ''
+    },
     color: {
       type: String,
       default: '#808080'
@@ -151,6 +155,25 @@ export default {
       type: Boolean,
       default: false
     }
+  },
+  computed: {
+     teams () {
+       var roles = []
+       if (typeof this.roles ==='string' || this.roles instanceof String) {
+         roles = this.roles.split(',')
+       } else {
+         roles = this.roles
+       }
+       var returns = {}
+       if (roles.length > 0) {
+         returns['---'] = '---'
+         returns['no'] = 'Aucune'
+         roles.forEach(function (r) {
+           returns[r] = r
+         })
+       }
+       return returns
+     }
   },
   watch: {
     $route (newvalue) {
@@ -195,6 +218,7 @@ export default {
         q: null,
         bbox: null,
         group: null,
+        team: null,
         order: 'start DESC'
       },
       defaultValues: {
@@ -334,6 +358,9 @@ export default {
        }
        if (this.parameters.archived) {
          location += '&archived=1'
+       }
+       if (this.parameters.team) {
+         location += '&team=' + this.parameters.team
        }
        if (this.parameters.order) {
          location += '&order=' + encodeURIComponent(this.parameters.order)
@@ -497,6 +524,14 @@ export default {
         this.parameters.archived = value
       } else {
         delete this.parameters.archived
+      }
+      this.changeQuery()
+    },
+    teamChange (value) {
+      if (value) {
+        this.parameters.team = value
+      } else {
+        delete this.parameters.team
       }
       this.changeQuery()
     },
