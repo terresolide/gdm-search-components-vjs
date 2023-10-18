@@ -53,7 +53,7 @@
     </formater-search-box>
      <formater-search-box v-if="Object.keys(teams).length > 0" :color="color" header-icon-class="fa fa-users" open-icon-class="fa fa-caret-right" :title="$t('team')" :deployed="false" type="empty" >
       
-      <formater-select :color="color" :options="teams" :defaut="parameters.team" @input="teamChange" type="associative" width="228px"></formater-select>
+      <formater-select :color="color" name="team" :options="teams" :set-value="parameters.team" @input="teamChange" type="associative" width="228px"></formater-select>
     </formater-search-box>
      <formater-search-box v-if="back" :color="color" header-icon-class="fa fa-cog" open-icon-class="fa fa-caret-right" title="Status" :deployed="false" type="empty" >
       
@@ -222,8 +222,9 @@ export default {
     },
     teamChange(e) {
       if (e === '---') {
-        e = null
+        e = ''
       }
+      console.log(e)
       this.$emit('teamChange', e)
     },
     statusChange(e) {

@@ -166,7 +166,7 @@ export default {
        }
        var returns = {}
        if (roles.length > 0) {
-         returns['---'] = '---'
+         returns[''] = '---'
          returns['no'] = 'Aucune'
          roles.forEach(function (r) {
            returns[r] = r
@@ -406,6 +406,12 @@ export default {
        } else {
          this.parameters.status = null
        }
+       var team = url.searchParams.get('team')
+       if (team) {
+         this.$set(this.parameters, 'team',  team)
+       } else {
+         this.$set(this.parameters, 'team', '')
+       }
        if (!this.groupId) {
          var group = url.searchParams.get('group')
          if (group) {
@@ -531,7 +537,7 @@ export default {
       if (value) {
         this.parameters.team = value
       } else {
-        delete this.parameters.team
+        this.parameters.team = ''
       }
       this.changeQuery()
     },
