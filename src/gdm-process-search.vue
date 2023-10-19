@@ -166,7 +166,7 @@ export default {
        }
        var returns = {}
        if (roles.length > 0) {
-         returns[''] = '---'
+         returns['0'] = '---'
          returns['no'] = 'Aucune'
          roles.forEach(function (r) {
            returns[r] = r
@@ -218,7 +218,7 @@ export default {
         q: null,
         bbox: null,
         group: null,
-        team: null,
+        team: '0',
         order: 'start DESC'
       },
       defaultValues: {
@@ -359,7 +359,7 @@ export default {
        if (this.parameters.archived) {
          location += '&archived=1'
        }
-       if (this.parameters.team) {
+       if (this.parameters.team && this.parameters.team !== '0') {
          location += '&team=' + this.parameters.team
        }
        if (this.parameters.order) {
@@ -410,7 +410,7 @@ export default {
        if (team) {
          this.$set(this.parameters, 'team',  team)
        } else {
-         this.$set(this.parameters, 'team', '')
+         this.$set(this.parameters, 'team', '0')
        }
        if (!this.groupId) {
          var group = url.searchParams.get('group')
