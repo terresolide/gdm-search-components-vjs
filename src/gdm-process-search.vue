@@ -7,6 +7,7 @@
     "temporal_extent": "Temporal <span>extent&nbsp;<i class='fa {class} {active}'></i></span>",
     "parameters": "Parameters",
     "no_process": "No process",
+    "no_team": "No team",
     "unauthorized": "Access Unauthorized",
     "forbidden": "Access Forbidden: deconnected?",
     "creation": "Created",
@@ -20,6 +21,7 @@
     "temporal_extent": "Etendue  <span>temporelle&nbsp;<i class='fa {class} {active}'></i></span>",
     "parameters": "Paramètres",
     "no_process": "Aucun calcul",
+    "no_team": "Aucune équipe",
     "unauthorized": "Accès non autorisé à cette ressource",
     "forbidden": "Access interdit: deconnecté?",
     "creation": "Création",
@@ -74,7 +76,7 @@
       <div @mouseleave="highlight(null)" :style="{height: listHeight + 'px'}" style="border:1px solid lightgrey; overflow:auto;">
        <gdm-process-row v-if="featureCollection" v-for="(feature, key) in featureCollection.features" :key="key" 
        :process="feature" :selected="selectedProcessId" :back="back" :selected-service="parameters.service" @selectService="selectService"
-       :user-id="userId" :selected-user="parameters.user" @selectUser="selectUser"
+       :user-id="idUser" :selected-user="parameters.user" @selectUser="selectUser"
        :status-list="statusList" :url="url" :group="group" :lang="lang"
        @highlight="highlight" @selectProcess="selectProcess" @removeProcess="removeProcess"></gdm-process-row>
       </div>
@@ -167,12 +169,19 @@ export default {
        var returns = {}
        if (roles.length > 0) {
          returns['0'] = '---'
-         returns['no'] = 'Aucune'
+         returns['no'] = this.$i18n.t('no_team')
          roles.forEach(function (r) {
            returns[r] = r
          })
        }
        return returns
+     },
+     idUser () {
+       if (this.$store) {
+         return this.$store.getters['user/id']
+       } else {
+         return this.userId
+       }
      }
   },
   watch: {
