@@ -119,7 +119,7 @@
 		     :step-id="process.stepId" :log="log" :back="back" :steps="process.serviceSteps" ></gdm-process-progress>
 		  </div>
 		  <div class="header-2-3">
-		      <div><b>{{$t('owner')}}:</b> {{process.email}}</div>
+		      <div><b>{{$t('owner')}}:</b> {{process.email}} <span v-if="process.team">({{process.team}})</span></div>
 		      <div v-if="process.cost > 0" >
 		        <b>{{$t('cost')}}:</b>
 		        <span v-if="['WAITING', 'EVALUATED'].indexOf(process.status) >= 0">
@@ -152,8 +152,8 @@
 		   <div class="header-4">--> 
 		   <div class="process-actions">
 		     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" :color="color"
-		     :process="process" :user-id="userId" :can-edit="hasAccessService && !pleiadeRemoved" :lang="lang" :ciest2="ciest2" @processChange="statusChange" 
-		     @statusChange="statusChange" @ownerChange="userChange" @duplicate="duplicate"
+		     :process="process" :user-id="userId" :can-edit="hasAccessService && !pleiadeRemoved" :lang="lang" :teams="teams" @processChange="statusChange" 
+		     @statusChange="statusChange" @teamChange="teamChange" @duplicate="duplicate"
 		     @keptProcess="keepProcess">
 		     </gdm-process-actions>
 		   </div>
@@ -261,9 +261,10 @@ export default {
       type: String,
       default: ''
     },
-    ciest2: {
-      type: Boolean,
-      default: false
+    // group roles
+    roles: {
+      type: String|Array,
+      default: ''
     },
     userId: {
       type: Number,
@@ -299,7 +300,7 @@ export default {
       return null
     },
     hasAccessService () {
-      console.log(this.access)
+      return true
       if (this.back) {
         return true
       }
@@ -316,6 +317,14 @@ export default {
         }
       }
       return false
+    },
+    teams () {
+      var roles = []
+      if (typeof this.roles ==='string' || this.roles instanceof String) {
+        return this.roles.split(',')
+      } else {
+        return this.roles
+      }
     }
   },
   created () {
@@ -789,7 +798,7 @@ export default {
         this.headerHeight = this.$el.querySelector('.gdm-process-header').clientHeight
       }
     },
-    userChange (process) {
+    teamChange (process) {
       this.process = Object.assign(this.process, process)
       this.feature = Object.assign(this.feature, process.feature)
       

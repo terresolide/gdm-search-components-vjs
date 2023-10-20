@@ -19,7 +19,7 @@
      "get_result": "Get result",
      "recorded_request": "Your request has been saved.\nIt will be processed as quickly as possible by our service.",
      "run": "end of debug",
-     "share_ciest2": "Share with CIEST2",
+     "share": "Share",
      "publish": "Publish"
    },
    "fr":{
@@ -41,13 +41,24 @@
      "get_result": "Obtenir les résultats",
      "recorded_request": "Votre demande a été enregistrée.\nElle sera traitée le plus rapidement possible par nos services.",
      "run": "Fin du debug" ,
-     "share_ciest2": "Partager CIEST2",
+     "share": "Partager",
      "publish": "Publier"
    }
 }
 </i18n>
 <template>
 <span class="gdm-process-actions" v-if="process && (userId || back)" >
+      <div v-show="showShare" class="gdm-share" >
+	      <h3 :style="{color:color}">{{$t('share')}}</h3>
+	      Avec les membres de l'équipe
+	      <select v-model="shared">
+	         <option v-for="team in teams" :value="team">{{team}}</option>
+	      </select>
+	      <div style="text-align:right;margin:10px 20px;">
+	         <a class="button small" @click="showShare=false">Annuler</a>
+	         <a class="button small"  @click="share">{{$t('share')}}</a>
+	      </div>
+      </div>
       <div v-if="showPublish" class="publish-box">
         <div style="float:right;"><span class="gdm-close fa fa-close" @click="showPublish=false"></span></div>
         <h3 :style="{color:color}">Entrez l'url du nouveau répertoire</h3>
@@ -76,7 +87,7 @@
       <!--  PURGED NOTHING TO DO => CREATE NEW PROCESS WITH THIS-->
       <div v-else-if="process.status === 'PURGED' || process.status === 'ABORTED' || process.status === 'TERMINATED'">
          <a class="button" @click="duplicate"  :class="{disabled: !canEdit}">{{$t('duplicate')}}</a>
-         <a class="button" v-if="!back && userId===process.userId && ciest2 && !isCiest2 && process.status==='TERMINATED'" @click="share"  :class="{disabled: !canEdit}">{{$t('share_ciest2')}}</a>
+         <a class="button" v-if="userId===process.userId && teams.length > 0 && !process.team" @click="showShare=true"  :class="{disabled: !canEdit}">{{$t('share')}}</a>
          <a class="button" v-if="back && process.status ==='TERMINATED' && !process.isExample" @click="showPublish=true"  :class="{disabled: !canEdit}">{{$t('publish')}}</a>
           <a class="button" v-if="back && process.isExample && process.status ==='TERMINATED'" @click="showPublish=true">Modifier url résultat</a>
          <!--  for SAR TERMINATED process -->
@@ -146,9 +157,9 @@ export default {
       type: String,
       default: ''
     },
-    ciest2: {
-      type: Boolean,
-      default: false
+    teams: {
+      type: Array,
+      default: () => []
     },
     userId: {
       type: Number,
@@ -172,7 +183,8 @@ export default {
       submitting: false,
       status: null,
       timer: null,
-      isCiest2: false,
+      shared: null,
+      showShare: false,
       isExample: false,
       resultUrl: null,
       showPublish: false,
@@ -233,7 +245,10 @@ export default {
     this.$i18n.locale = this.lang
   },
   mounted () {
-    this.isExample = this.process.isExample 
+    this.isExample = this.process.isExample
+    if (this.teams.length > 0) {
+      this.shared = this.teams[0]
+    }
     this.launchTimer()
   },
   methods:{
@@ -452,13 +467,14 @@ export default {
     },
     share () {
       this.submitting = true
-      this.$http.post(this.api + '/process/' + this.process.id + '/share', [], {credentials: true})
+      this.$http.post(this.api + '/process/' + this.process.id + '/share', {team: this.shared}, {credentials: true})
       .then(function (resp) {
-        this.$emit('ownerChange', resp.body)
-        this.isCiest2 = true
+        this.$emit('teamChange', resp.body)
         this.submitting = false
+        this.showShare = false
       }, function (e) {
         this.submitting = false
+        this.showShare = false
       })
     },
     switchDebug() {
@@ -525,7 +541,8 @@ export default {
   left:50%;
   z-index:30;
 }
-.publish-box {
+.publish-box,
+.gdm-share {
      position:absolute;
      padding: 0 10px 10px 10px;
      border:2px solid #CCC;
