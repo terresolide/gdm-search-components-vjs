@@ -156,6 +156,10 @@ export default {
       type: String,
       default: ''
     },
+    isPrivate: {
+      type: Boolean,
+      default: false
+    },
     teams: {
       type: Array,
       default: () => []
@@ -217,7 +221,7 @@ export default {
     },
     hasCredit () {
       if (this.process) {
-        return parseInt(this.process.cost) <= parseInt(this.process.quota)
+        return this.isPrivate || (parseInt(this.process.cost) <= parseInt(this.process.quota))
       } else {
         return false
       }

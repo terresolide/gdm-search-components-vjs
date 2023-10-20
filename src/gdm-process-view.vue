@@ -123,10 +123,10 @@
 		      <div v-if="process.cost > 0" >
 		        <b>{{$t('cost')}}:</b>
 		        <span v-if="['WAITING', 'EVALUATED'].indexOf(process.status) >= 0">
-			        <span :style="{color: process.cost > process.quota ? 'red' : 'black' }">
+			        <span :style="{color: !isPrivate && process.cost > process.quota ? 'red' : 'black' }">
 			           <span v-if="process.serviceName.indexOf('SAR') >= 0"> <b>{{process.cost.toLocaleString()}}&nbsp;{{$t('units')}}</b> </span>
 			           <span v-else> <b>{{process.cost.toLocaleString()}}&nbsp;CPU&nbsp;{{$t('seconds')}}</b></span>
-				         <span >/ {{process.quota.toLocaleString()}}</span>
+				         <span v-if="!isPrivate" >/ {{process.quota.toLocaleString()}}</span>
 			        </span>
 			         <div v-if="back && process.cost > process.quota">
 	                 <a class="button"  :href="url + 'users/view/' + process.userId">{{$t('edit')}}</a>
@@ -152,7 +152,7 @@
 		   <div class="header-4">--> 
 		   <div class="process-actions">
 		     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" :color="color"
-		     :process="process" :user-id="userId" :can-edit="hasAccessService && !pleiadeRemoved" :lang="lang" :teams="teams" @processChange="statusChange" 
+		     :process="process" :user-id="userId" is-private="isPrivate" :can-edit="hasAccessService && !pleiadeRemoved" :lang="lang" :teams="teams" @processChange="statusChange" 
 		     @statusChange="statusChange" @teamChange="teamChange" @duplicate="duplicate"
 		     @keptProcess="keepProcess">
 		     </gdm-process-actions>
@@ -270,6 +270,10 @@ export default {
       type: Number,
       default: null
     },
+    isPrivate: {
+      type: Boolean,
+      default: false
+    },
     access: {
       type: Object,
       default: () => {}
@@ -318,7 +322,9 @@ export default {
       return false
     },
     teams () {
-      var roles = []
+      if (!this.roles) {
+        return []
+      }
       if (typeof this.roles ==='string' || this.roles instanceof String) {
         return this.roles.split(',')
       } else {
