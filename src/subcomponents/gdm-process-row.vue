@@ -36,18 +36,18 @@
    <span v-if="process.properties.processusName">{{process.properties.processusName}}</span>
    </div>
    <div class="gdm-process-column-1">
-	   <div class="toSelect" :class="{selectedService: selectedService}" 
+	   <div class="toSelect" :class="{selected: selectedService}" 
 	      @click="selectService($event)">
 	      {{process.properties.serviceName}}
 	   </div>
 	   <div v-if="userId && (back || ['MNS', 'DSM'].indexOf(group) < 0)">{{process.properties.email}}</div>
 	   <div v-else>
-	       <div class="toSelect" :class="{selectedUser: selectedUser}" 
+	       <div class="toSelect" :class="{selected: selectedUser}" 
 	       @click="selectUser($event)">
 	          {{process.properties.email}}
 	       </div>
 	   </div>
-	   <div v-if="process.properties.team"  class="toSelect short" :class="{selectedTeam: selectedTeam}" @click="selectTeam($event)">
+	   <div v-if="process.properties.team"  class="toSelect short" :class="{selected: selectedTeam === process.properties.team}" @click="selectTeam($event)">
 	          {{process.properties.team}}
 	   </div>
    </div>
@@ -180,6 +180,10 @@ export default {
       type: Object,
       default: null
     },
+    selectedTeam: {
+      type: String,
+      default: null
+    },
     selectedUser: {
       type: Object,
       default: null
@@ -197,6 +201,27 @@ export default {
       default:null
     }
   },
+//   watch: {
+//     $route (newvalue) {
+//       var query = newvalue.query
+//       console.log(query)
+//       if (query.serviceId) {
+//         this.selectedService = query.serviceId
+//       } else {
+//         this.selectedService = null
+//       }
+//       if (query.userid) {
+//         this.selectedUser = query.userid
+//       } else {
+//         this.selectedUser = null
+//       }
+//       if (query.team && query.team !== 'no') {
+//         this.selectedTeam = query.team
+//       } else {
+//         this.selectedTeam = null
+//       }
+//     }
+//  },
   computed: {
     canRemove () {
       if (!this.back && this.userId !== parseInt(this.process.properties.userId)) {
@@ -212,6 +237,9 @@ export default {
     return {
       dateFormat: 'YYYY-MM-DD hh:mm:ss',
       dateFormatDisplay: 'DD/MM/YYYY',
+//       selectedService: null,
+//       selectedUser: null,
+//       selectedTeam: null
     }
   },
   created () {
@@ -244,6 +272,10 @@ export default {
     },
     selectService(e) {
       this.$emit('selectService', {id: this.process.properties.serviceId, name: this.process.properties.serviceName})
+      e.stopPropagation()
+    },
+    selectTeam(e) {
+      this.$emit('selectTeam', this.process.properties.team)
       e.stopPropagation()
     },
     selectUser(e) {
@@ -343,13 +375,12 @@ div.toSelect {
 div.toSelect:hover {
  background: #e5e5e5;
 }
-div.toSelect.selectedUser,
-div.toSelect.selectedService{
+
+div.toSelect.selected{
  background: #f7f1ef;
  border-color:darkred;
 }
-div.toSelect.selectedUser:hover,
-div.toSelect.selectedService:hover  {
+div.toSelect.selected:hover  {
  background: #f9eae6;
 }
 .gdm-process-row span.date-purge {

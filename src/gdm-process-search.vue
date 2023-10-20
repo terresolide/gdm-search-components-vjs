@@ -76,7 +76,7 @@
       <div @mouseleave="highlight(null)" :style="{height: listHeight + 'px'}" style="border:1px solid lightgrey; overflow:auto;">
        <gdm-process-row v-if="featureCollection" v-for="(feature, key) in featureCollection.features" :key="key" 
        :process="feature" :selected="selectedProcessId" :back="back" :selected-service="parameters.service" @selectService="selectService"
-       :user-id="idUser" :selected-user="parameters.user" @selectUser="selectUser"
+       :user-id="idUser" :selected-team="parameters.team" :selected-user="parameters.user" @selectTeam="selectTeam" @selectUser="selectUser"
        :status-list="statusList" :url="url" :group="group" :lang="lang"
        @highlight="highlight" @selectProcess="selectProcess" @removeProcess="removeProcess"></gdm-process-row>
       </div>
@@ -675,6 +675,14 @@ export default {
         this.parameters.service = null
       } else {
         this.parameters.service = service
+      }
+      this.changeQuery()
+    },
+    selectTeam (team) {
+      if (this.parameters.team && this.parameters.team === team) {
+        this.parameters.team = '0'
+      } else {
+        this.parameters.team = team
       }
       this.changeQuery()
     },
