@@ -32,7 +32,9 @@
 </i18n>
 <template>
 <div class="gdm-process-row" :class="{selected: selected === parseInt(process.properties.id)}" @mouseenter="highlight()" @click="selectProcess()">
-   <div class="gdm-process-identifier">  {{process.properties.id.toString().padStart(5,'0')}}<span  v-if="process.properties.token">-{{process.properties.token}}</span></div>
+   <div class="gdm-process-identifier">  {{process.properties.id.toString().padStart(5,'0')}}<span  v-if="process.properties.token">-{{process.properties.token}}</span>
+   <span v-if="process.properties.processusName">{{process.properties.processusName}}</span>
+   </div>
    <div class="gdm-process-column-1">
 	   <div class="toSelect" :class="{selectedService: selectedService}" 
 	      @click="selectService($event)">
@@ -45,7 +47,9 @@
 	          {{process.properties.email}}
 	       </div>
 	   </div>
-	   <div v-if="process.properties.processusName" style="overflow-wrap: break-word;">({{process.properties.processusName}})</div>
+	   <div v-if="process.properties.team"  class="toSelect short" :class="{selectedTeam: selectedTeam}" @click="selectTeam($event)">
+	          {{process.properties.team}}
+	   </div>
    </div>
    <div class="gdm-process-column-2">
       <gdm-process-status :status="process.properties.status" :status-list="statusList" 
@@ -251,14 +255,16 @@ export default {
 </script>
 <style>
 .gdm-process-row {
-display: grid;
+  display: grid;
   grid-template-columns: minmax(180px,1fr) 110px minmax(190px,1fr) minmax(100px, 1fr) minmax(150px, 1fr) minmax(150px, 1fr) 30px;
   grid-gap: 5px;
-  grid-template-rows: 10px 100px; 
-  /*grid-auto-rows: minmax(100px, auto);*/
+  row-gap: 5px;
+ /* grid-template-rows: 20px 100px;*/ 
+  grid-auto-rows: minmax(10px, auto);
   font-size:0.9em;
   border-bottom:1px solid lightgrey;
   cursor: pointer;
+  padding: 5px 0;
 }
 .gdm-process-row:hover {
   background: #EFF6F6;
@@ -271,7 +277,7 @@ display: grid;
   grid-row: 1;
   font-weight:600;
   font-size:0.9em;
-   padding-left:5px;
+  padding-left: 5px;
 }
 .gdm-process-column-1 {
   grid-column: 1;
@@ -329,6 +335,10 @@ div.toSelect {
   max-width: 250px;
   white-space:normal;
   word-break: break-all;
+}
+.toSelect.short {
+   display:inline-block;
+   padding:2px 3px;
 }
 div.toSelect:hover {
  background: #e5e5e5;
