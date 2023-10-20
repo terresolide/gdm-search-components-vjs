@@ -300,7 +300,6 @@ export default {
       return null
     },
     hasAccessService () {
-      return true
       if (this.back) {
         return true
       }
