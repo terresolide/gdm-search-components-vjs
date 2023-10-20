@@ -809,7 +809,7 @@ div[id="app"] .gdm-tooltip a:hover {
 }
 .gdm-parameters div.disabled input[type="text"] {
   background: #F3F3F3;
-  pointer-events: none;
+  /* pointer-events: none;*/
   color: #777;
 } 
 .gdm-parameters input[type="checkbox"] {

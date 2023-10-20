@@ -138,7 +138,7 @@
 		         </span>
 		         
 		      </div>
-		      <div v-if="process.cost <= 0 || ['WAITING', 'EVALUATED'].indexOf(process.status) < 0">
+		      <div v-if="!isPrivate && (process.cost <= 0 || ['WAITING', 'EVALUATED'].indexOf(process.status) < 0)">
 		      <b>{{$t('owner_credit')}}:</b> 
 			      <span v-if="process.serviceName.indexOf('SAR') >= 0">{{process.quota.toLocaleString()}}&nbsp;{{$t('units')}}</span>
 			      <span v-else>{{process.quota.toLocaleString()}}&nbsp;CPU&nbsp;{{$t('seconds')}}</span>
