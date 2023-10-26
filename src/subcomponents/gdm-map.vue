@@ -112,6 +112,9 @@ export default {
     }
   },
   watch: {
+    bbox (newvalue) {
+      this.initBbox()
+    },
     featureCollection(newCollections) {
        this.initFeatureCollection()
     },
