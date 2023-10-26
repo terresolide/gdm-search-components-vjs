@@ -6,7 +6,7 @@
    :keys="tio.img.keys" :maximum="tio.img.max" :lang="lang" @close="tio.showGraph=false"></tio-graph>
 
 	 <div id="fmtMap" class="mtdt-small"></div>
-	 <div class="gdm-mouseposition" >{{mouseposition}}</div>
+	 <!--  <div class="gdm-mouseposition" >{{mouseposition}}</div> -->
 
  </span>
 </template>
@@ -252,6 +252,7 @@ export default {
       }
       this.controlLegend = new L.Control.Legend(this.$i18n.locale, function (uuid) { return 'i' + uuid;})
       this.controlLegend.addTo(this.map)
+      L.control.scale().addTo(this.map)
       // deploy legend by default
       this.controlLegend._container.classList.add('expand')
       this.controlOpacity = new L.Control.Opacity(this.$i18n.locale)

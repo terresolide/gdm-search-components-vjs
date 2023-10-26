@@ -33,6 +33,9 @@ ljs.load('dep', function() {
 //  Vue.customElement('gdm-spatial-search', () => new Promise((resolve) => {
 //    require(['./subcomponents/gdm-spatial-search.vue'], (GdmSpatialSearch) => resolve(GdmSpatialSearch.default))
 //  }))
+  Vue.customElement('gdm-process-sar', () => new Promise((resolve) => {
+    require(['./gdm-process-sar.vue'], (GdmProcessSar) => resolve(GdmProcessSar.default))
+  }))
   Vue.customElement('gdm-process-search', () => new Promise((resolve) => {
     require(['./gdm-process-search.vue'], (GdmProcessSearch) => resolve(GdmProcessSearch.default))
   }))

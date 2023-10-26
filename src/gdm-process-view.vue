@@ -878,7 +878,7 @@ export default {
    left: 50%;
    transform: translate(-50%, 0);
    z-index: 10000;
-   } *
+   } 
 div[id="view"] .gdm-process-view div.gdm-process-header {
   max-height:none;
 }
