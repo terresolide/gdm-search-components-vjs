@@ -60,7 +60,7 @@ export default {
   data() {
     return {
       bbox: null,
-      series: {},
+      series: null,
       serieName: null,
       serieIndex: null,
       imageLayers: [],
@@ -93,6 +93,7 @@ export default {
     },
     treatment(resp) {
       this.result = resp.body
+      var dir = this.result.dir
       console.log(this.result.footprint)
       this.bbox = {
           type: 'Feature',
@@ -117,12 +118,41 @@ export default {
         }
       }
       if (resp.body.Time_Serie) {
+        var text = this.$i18n.t('time_serie')
         for(var key in resp.body.Time_Serie) {
-          var text = this.$i18n.t('common')
+          console.log('time serie', key)
           if (key.indexOf('geo') >= 0) {
-            if (resp.body.Time_Serie[key].serie) {
-              this.series[key] = resp.body.Time_Serie[key].serie
+            if (!this.series) {
+              this.series = {}
+            } 
+            var image = resp.body.Time_Serie[key]
+            image.type = 'serie'
+	          if (resp.body.Time_Serie[key].serie) {
+	           
+	           
+	            var images = []
+	            for(var i in resp.body.Time_Serie[key].serie) {
+	              images.push({
+	                date: resp.body.Time_Serie[key].serie[i].date,
+	                png: dir + resp.body.Time_Serie[key].serie[i].png
+	              })
+	            }
+	            this.series[key]= {
+	                images: images
+	            }
+	            delete image.serie
             }
+            image.checked = false
+            image.png = dir + image.png
+            image.tif = dir + (image.tif || image.tiff)
+            image.legend = dir + image.legend
+            image.title = key
+            image.first = text
+            text = null
+            if (!image.bbox) {
+              image.bbox = this.result.bbox
+            }
+            this.imageLayers.push(image)
           }
         }
       }
@@ -140,6 +170,7 @@ export default {
       if (image.png) {
         image.png = dir + image.png
       }
+      image.tif = dir + (image.tif || image.tiff)
       if (group) {
         image.first = group
       }
