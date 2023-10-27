@@ -516,6 +516,9 @@ export default {
         if (parameter.listeners && parameter.type.indexOf('complexe') < 0) {
           parameter.listeners.forEach(function (listener) {
             listener.funct = function (e) {
+              if (listener.hasOwnProperty('options')) {
+                 parameter.options = e.detail.options
+              }
               if (listener.show) {
                 if (e.detail.value === listener.show) {
                   parameter.show = true
@@ -755,7 +758,6 @@ div[id="app"] .gdm-tooltip a:hover {
    height: 19px;
    max-width: 180px;
    border-style:inset;
-   padding: 1px 0;
    box-sizing: border-box;
    /* -webkit-writing-mode: horizontal-tb !important;
     text-rendering: auto;*/
@@ -770,7 +772,7 @@ div[id="app"] .gdm-tooltip a:hover {
     cursor: text;
     margin: 0em;
     /*font: 400 13.3333px Arial;*/
-    padding: 1px 0px;
+    padding: 1px;
     border-width: 1px;
     border-style: inset;
     border-color: -internal-light-dark-color(rgb(118, 118, 118), rgb(195, 195, 195));
@@ -791,7 +793,7 @@ div[id="app"] .gdm-tooltip a:hover {
   box-shadow: 1px 1px 5px red;
 }
 .gdm-parameters input[type="text"] {
-  padding: 1px 2px;
+  padding: 1px 2px 1px 5px;
 }
 .gdm-parameters input[type="number"] {
   max-width: 70px;
@@ -834,7 +836,7 @@ div[id="app"] .gdm-tooltip a:hover {
     background-color: -internal-light-dark-color(white, black);
     cursor: default;
     margin: 0em;
-    padding:0;
+    padding:0 0 0 5px;
     font: 400 13.3333px Arial;
     border-radius: 0px;
     border-width: 1px;
