@@ -98,11 +98,23 @@ export default {
         return
       }
       var name = Object.keys(this.series)[0]
-      var date = this.series[this.serieName].images[index].date.substring(0, 8)
-      var date2 = this.series[this.serieName].images[index].date.substring(9)
-      this.serieDate = moment(date, 'YYYYMMDD').format('ll') 
-      if (date2) {
-        this.serieDate += ' &rarr; ' + moment(date2, 'YYYYMMDD').format('ll')
+      if (this.series[this.serieName].images[index].date) {
+	      if (this.series[this.serieName].images[index].date.indexOf('-') >= 0) {
+	        var date = this.series[this.serieName].images[index].date
+	        this.serieDate = moment(date, 'YYYY-MM-DD').format('ll') 
+	      } else {
+		      var date = this.series[this.serieName].images[index].date.substring(0, 8)
+		      var date2 = this.series[this.serieName].images[index].date.substring(9)
+		      this.serieDate = moment(date, 'YYYYMMDD').format('ll') 
+	      }
+	      if (date2) {
+	        this.serieDate += ' &rarr; ' + moment(date2, 'YYYYMMDD').format('ll')
+	      }
+      } else if (this.series[this.serieName].images[index].startDate) {
+        var date = this.series[this.serieName].images[index].startDate
+        this.serieDate = moment(date, 'YYYY-MM-DD').format('ll') 
+        var date2 = this.series[this.serieName].images[index].completionDate
+        this.serieDate += ' &rarr; ' + moment(date, 'YYYY-MM-DD').format('ll') 
       }
 //       } else {
 //         this.serieDate += '<br />' + moment(date2, 'YYYYMMDD').format('ll')

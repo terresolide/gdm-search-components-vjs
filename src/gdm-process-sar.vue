@@ -1,9 +1,15 @@
 <i18n>
 {
   "fr": {
+    "commons": "Produits communs",
+    "interferograms": "Interférogrammes",
+    "time_serie": "Séries temporelles",
     "title": "Visualisation des résultats"
   },
   "en": {
+    "commons": "Common products",
+    "interferograms": "Interferograms",
+    "time_serie": "Time series",
     "title": "Result vizualisation"
   }
 }
@@ -16,7 +22,7 @@
      <div v-if="mouseposition" class="gdm-mouseposition" >{{mouseposition}}</div>
    </div>
    <div>
-     <h2 :style="{color: color}">{{$t('title')}}</h2>
+     <h2 :style="{color: color}">{{theTitle}}</h2>
      <div>
 	     <div style="width:45%;display:inline-block;text-align:left;float:right;vertical-align:top;">
 	         <gdm-process-result  :result="result" :series="series" service-name="GDM-SAR"
@@ -26,6 +32,7 @@
 	     </div>
 	     <div style="max-width:50%;height:500px;">
 	        <gdm-map ref="map" :bbox="bbox" :images="imageLayers" @imageAdded="imageAdded"
+	        :series="series" :serie-index="serieIndex" :lang="lang"  @loadingLayer="loadingChange" @dateChange="dateSerieChange"
 	        @imageRemoved="imageRemoved" fullscreen="fmtLargeMap" :remove-height="8" @mousemove="mousemove"></gdm-map>
 	     </div>
      </div>
@@ -55,6 +62,15 @@ export default {
     lang: {
       type: String,
       default: 'fr'
+    }
+  },
+  computed: {
+    theTitle () {
+      if (this.title) {
+        return this.title
+      } else {
+        return this.$i18n.t('title')
+      }
     }
   },
   data() {
@@ -87,12 +103,17 @@ export default {
       this.mouseposition = val
     },
     dateSerieChange (index) {
-      if (!this.loadingLayer) {
+       console.log(index)
+      //if (!this.loadingLayer) {
         this.serieIndex = index
-      }
+      //}
+    },
+    loadingChange (value) {
+      this.loadingLayer = value
     },
     treatment(resp) {
       this.result = resp.body
+      console.log(resp.body)
       var dir = this.result.dir
       console.log(this.result.footprint)
       this.bbox = {
@@ -102,56 +123,92 @@ export default {
             coordinates: [this.result.footprint]
           }
       }
-      if (resp.body.series) {
-        this.series = resp.body.series
-      }
-      if (resp.body.Common_Product) {
-        var text = this.$i18n.t('common')
-        for(var key in resp.body.Common_Product) {
+     
+      if (resp.body.commons) {
+        var text = this.$i18n.t('commons')
+        for(var key in resp.body.commons) {
           if (key.indexOf('geo') >=0) {
-            console.log(resp.body.Common_Product[key])
-            var image = this.createSarImage(key, resp.body.Common_Product[key], text, 'image')
+            console.log(resp.body.commons[key])
+            var image = this.createSarImage(key, resp.body.commons[key], text, 'image')
             console.log(image)
             text = null
             this.imageLayers.push(image)
           }
         }
       }
-      if (resp.body.Time_Serie) {
+      if (resp.body.interferograms) {
+        var text = this.$i18n.t('interferograms')
+        for(var key in resp.body.interferograms) {
+          if (key.indexOf('geo') >= 0) {
+           
+            var image = {
+                first: text,
+                type: 'list',
+                checked: false,
+                title: key,
+                name: key,
+                bbox: this.result.bbox
+            }
+            text = null
+            var images = []
+            for(var i in resp.body.interferograms[key]) {
+              images.push({
+                startDate: resp.body.interferograms[key][i].startDate,
+                completionDate: resp.body.interferograms[key][i].completionDate,
+                png: dir + resp.body.interferograms[key][i].png
+              })
+            }
+            image.png = dir + resp.body.interferograms[key][0].png
+            image.legend = dir + resp.body.interferograms[key][0].legend
+            if (!this.series) {
+              this.series = {}
+            } 
+            this.series[key]= {
+                images: images
+            }
+            this.imageLayers.push(image)
+          }
+        }
+      }
+      if (resp.body.series) {
         var text = this.$i18n.t('time_serie')
-        for(var key in resp.body.Time_Serie) {
-          console.log('time serie', key)
+        for(var key in resp.body.series) {
           if (key.indexOf('geo') >= 0) {
             if (!this.series) {
               this.series = {}
             } 
-            var image = resp.body.Time_Serie[key]
+            var image = resp.body.series[key]
             image.type = 'serie'
-	          if (resp.body.Time_Serie[key].serie) {
+	          if (resp.body.series[key].serie) {
 	           
 	           
 	            var images = []
-	            for(var i in resp.body.Time_Serie[key].serie) {
+	            for(var i in resp.body.series[key].serie) {
 	              images.push({
-	                date: resp.body.Time_Serie[key].serie[i].date,
-	                png: dir + resp.body.Time_Serie[key].serie[i].png
+	                date: resp.body.series[key].serie[i].date,
+	                png: dir + resp.body.series[key].serie[i].png
 	              })
 	            }
-	            this.series[key]= {
-	                images: images
+	            if (images.length > 0) {
+		            this.series[key]= {
+		                images: images
+		            }
+		           
+		            delete image.serie
 	            }
-	            delete image.serie
             }
             image.checked = false
             image.png = dir + image.png
             image.tif = dir + (image.tif || image.tiff)
             image.legend = dir + image.legend
             image.title = key
+            image.name = key
             image.first = text
             text = null
             if (!image.bbox) {
               image.bbox = this.result.bbox
             }
+           
             this.imageLayers.push(image)
           }
         }
@@ -245,7 +302,14 @@ export default {
    left: 50%;
    transform: translate(-50%, 0);
    z-index: 10000;
-   } 
+}
+.gdm-sar-visu .gdm-process-result > div {
+  display:block;
+  margin-top:20px;
+} 
+.gdm-sar-visu h4 {
+   padding:10px 0;
+}
 .gdm-sar-visu div.gdm-mouseposition {
   font-size:14px;
   left:120px;
