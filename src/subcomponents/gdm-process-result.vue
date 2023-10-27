@@ -100,7 +100,7 @@
 	      </div>
 
     </div>
-    <div v-if="series" style="width:48%;min-width:300px;">
+    <div v-if="series" style="max-width:330px;min-width:300px;">
       <div>
       <gdm-serie-navigation :series="series" :serie-name="serieName" :serie-index="serieIndex" :color="color" :lang="lang" :main="true" 
       @dateChange="dateSerieChange"></gdm-serie-navigation>
