@@ -51,7 +51,8 @@
 	 <div id="fmtLargeMap">
 	   <gdm-serie-navigation v-if="series" :series="series" :serie-index="serieIndex" :serie-name="serieName" :color="color" :lang="lang"
 	     :fullscreen="true" :loading="loadingLayer"  @dateChange="dateSerieChange"></gdm-serie-navigation>
-	    <div v-if="mouseposition" class="gdm-mouseposition" >{{mouseposition}}</div>
+    <div v-if="mouseposition" class="gdm-mouseposition" >{{mouseposition}}</div>
+
 	 </div>
 	 <div class="tio-instructions" v-show="showTioInstructions" @click="showTioInstructions=false">{{$t('tio_instructions')}}</div>
 	 <div >
@@ -66,7 +67,7 @@
 		     <div class="gdm-map-container">
 		      <gdm-map ref="map" :bbox="process.feature" :images="imageLayers" :tile="feature.properties.bboxTile"
 		      :service-name="process.serviceName" :series="series" :serie-index="serieIndex" :lidar="lidar" :lang="lang" @dateChange="dateSerieChange" @tioReady="tioImagesReady"
-		      fullscreen="fmtLargeMap" :remove-height="8" @loadingLayer="loadingChange" @imageAdded="imageAdded" @imageRemoved="imageRemoved"
+		      fullscreen="fmtLargeMap" :remove-height="3" @loadingLayer="loadingChange" @imageAdded="imageAdded" @imageRemoved="imageRemoved"
 		      @mousemove="mousemove"></gdm-map>
 		     </div>
 		      <div style="text-align:center;margin-top:10px;">
@@ -862,9 +863,9 @@ export default {
   box-shadow: 0 0px 3px rgba(0,0,0,0.5);
 }
 .gdm-process-view div[id="fmtLargeMap"] {
-  width:calc(100% - 6px);
-  top:0;
-  left:0;
+  width:calc(100% - 3px);
+  top:-3px;;
+  left:-3px;
   margin-bottom:0px;
   position:fixed;
   z-index:3000;

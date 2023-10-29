@@ -515,8 +515,8 @@ export default {
 .gdm-mouseposition {
      position:absolute;
      bottom:5px;
-     left:3px;
-     font-size:11px;
+     left:130px;
+  
      padding: 0 5px;
      color: #333;
      z-index:1;
