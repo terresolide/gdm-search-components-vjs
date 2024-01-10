@@ -208,7 +208,7 @@
 		</div>
 	</div>
 	<div v-else-if="errorCode" >
-	    <login-to-access v-if="!userId && !back"" :message="$t('no_accessible_process_user')"></login-to-access>
+	    <login-to-access v-if="!userId && !back" :message="$t('no_accessible_process_user')"></login-to-access>
 	    <login-to-access v-else :message="$t('no_accessible_process')"></login-to-access>
 	</div>
  </span>

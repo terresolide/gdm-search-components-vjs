@@ -346,7 +346,6 @@
       </div>
    </div>
  </div>
-</div>
 </template>
 <script>
 import * as Highcharts from 'highcharts'
