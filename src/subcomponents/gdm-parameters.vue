@@ -247,6 +247,11 @@ export default {
       if (typeof this.describe === 'string') {
         this.root = true
         this.load()
+      } else if (this.describe.root) {
+		this.root = true
+		this.parameters = this.describe.parameters
+		this.prefix = this.describe.prefix
+		this.extractChildValues()
       } else {
         this.parameters = this.describe.parameters
         this.title = this.tr(this.describe.title)
