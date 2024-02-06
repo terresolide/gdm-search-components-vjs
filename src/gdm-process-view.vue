@@ -287,19 +287,24 @@ export default {
   watch: {
     userId (newvalue) {
      // this.getToken()
-      this.load()
+     if (!this.process) {
+        this.load()
+     }
     }
   },
   computed: {
     seeResult () {
+      if (!this.process) {
+        return false
+      }
       return this.process.status === 'TERMINATED' && this.process.result
     },
     log () {
-      if (!this.process.log) {
+      if (!this.process || !this.process.log) {
         return null
       }
       if ((this.back || this.process.serviceName.indexOf('SAR') >= 0) && 
-          (this.process.status === 'RUNNING' || status === 'FAILED')) {
+          (this.process.status === 'RUNNING' || this.process.status === 'FAILED')) {
         return this.process.log
       }
       return null
