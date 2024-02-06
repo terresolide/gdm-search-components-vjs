@@ -836,6 +836,8 @@ export default {
         this.$set(this.process, 'end', detail.end)
         this.$set(this.process, 'processEnd', detail.processEnd)
         this.$set(this.process, 'processStart', detail.processStart)
+        this.$set(this.process, 'userId', detail.userId)
+        this.$set(this.process, 'email', detail.email)
         if (!this.process.result && detail.result) {
 	        this.$set(this.process, 'result', detail.result)
 		      this.addResult(detail.result)  

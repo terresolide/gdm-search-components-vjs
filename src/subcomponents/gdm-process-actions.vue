@@ -89,7 +89,7 @@
          <a class="button" @click="duplicate"  :class="{disabled: !canEdit}">{{$t('duplicate')}}</a>
          <a class="button" v-if="back && process.status ==='TERMINATED' && !process.isExample" @click="showPublish=true"  :class="{disabled: !canEdit}">{{$t('publish')}}</a>
           <a class="button" v-if="back && process.isExample && process.status ==='TERMINATED'" @click="showPublish=true">Modifier url résultat</a>
-          <a class="button" v-if="back && process.isExample && process.status ==='TERMINATED'" @click="unplublish">Dépublier</a>
+          <a class="button" v-if="back && process.isExample && process.status ==='TERMINATED'" @click="unpublish">Dépublier</a>
          
          <!--  for SAR TERMINATED process -->
          <span v-if="process.group === 'SAR' && process.status === 'TERMINATED'">
@@ -475,17 +475,16 @@ export default {
         return
       }
       this.submitting = true
-      this.$http.get(
+      this.$http.post(
           this.api + '/process/' + this.process.id + '/unpublish',
-         {credentials: true, emulateJSON: true})
+          [],
+         {credentials: true})
       .then(function (resp) {
-         console.log(resp)
          if(resp.body && resp.body.success) {
            alert('Le job est retourné à son utilisateur')
+            this.$emit('processChange', resp.body.process)
          } else {
-           if (resp.body.error) {
              alert('Une erreur s\'est produite!')
-           }
          }
          this.submitting = false
       }, function (e) {
