@@ -248,10 +248,10 @@ export default {
         this.root = true
         this.load()
       } else if (this.describe.root) {
-		this.root = true
-		this.parameters = this.describe.parameters
-		this.prefix = this.describe.prefix
-		this.extractChildValues()
+    		this.root = true
+    		this.parameters = this.describe.parameters
+    		this.prefix = this.describe.prefix
+    		this.extractChildValues()
       } else {
         this.parameters = this.describe.parameters
         this.title = this.tr(this.describe.title)
@@ -597,6 +597,9 @@ export default {
       this.$http.get(this.describe).then(function (response) {
         this.parameters = response.body.parameters
         this.prefix = response.body.prefix ? response.body.prefix : ''
+        if (response.body.constraints) {
+          this.$emit('constraints', response.body.constraints)
+        }
         this.extractChildValues()
       }, function (response) {
         console.log('error gdm-parameters - unknown file')
