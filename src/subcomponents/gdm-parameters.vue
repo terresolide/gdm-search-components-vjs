@@ -473,7 +473,7 @@ export default {
         var name = _this.prefix + parameter.name
         if (parameter.defaults) {
           // the defaults values for the parameters
-          var event = new CustomEvent('gdm-parameters:init', {detail: {name: name, values: parameter.defaults}})
+          var event = new CustomEvent('gdm-parameters:init', {detail: {name: name, values: parameter.defaults, init:true}})
           document.dispatchEvent(event)
         }
         // case json format
@@ -534,7 +534,7 @@ export default {
               if (listener.hasOwnProperty('or')) {
                 e.detail.value = e.detail.value || _this.values[_this.name]
               }
-              if (listener.hasOwnProperty('map') && listener.map[e.detail.value]) {
+              if (listener.hasOwnProperty('map') && listener.map[e.detail.value] && !e.detail.init) {
                 _this.$set(_this.values, name, listener.map[e.detail.value])
               }
               if (listener.hasOwnProperty('value')) {
@@ -581,7 +581,7 @@ export default {
       this.parameters.forEach(function (parameter) {
          if (parameter.emit) {
            setTimeout(function () {
-             var event = new CustomEvent(parameter.emit, {detail: {value: parameter.value}})
+             var event = new CustomEvent(parameter.emit, {detail: {value: parameter.value, init:true}})
              document.dispatchEvent(event)
            }, 0)
          }
