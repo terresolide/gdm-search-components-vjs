@@ -106,7 +106,7 @@
      </div>
      <input v-if="parameter.type === 'number'"
        type="number" :name="prefix + parameter.name" :min="parameter.min" :max="parameter.max" :step="parameter.step"
-        v-model="values[prefix + parameter.name]"  @change="change(parameter)" 
+        v-model="values[prefix + parameter.name]"  :required="required" @change="change(parameter)" 
         :disabled="mode === 'view' || parameter.disabled" :class="{disabled:(parameter.type === 'customTypeNumber') || parameter.disabled}"/>
      
      <input v-if="parameter.type === 'customTypeNumber'" type="text" :name="prefix + parameter.name" :pattern="parameter.pattern" style="max-width:80px;"
