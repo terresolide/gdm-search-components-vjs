@@ -462,7 +462,20 @@ list-style-type: none;
    grid-template-columns: 100px minmax(110px,2fr) minmax(150px,2fr) minmax(150px,2fr);
   grid-template-rows: 10px 135px; 
 }
-
+.gdm-image .gdm-full {
+  position:fixed;
+  height:auto;
+  top: calc(50% - 250px);
+  margin-left:90px;
+  padding: 20px;
+  background: #333;
+  border-radius: 5px;
+  cursor:pointer;
+}
+.gdm-image .gdm-full img {
+  min-width:500px;
+  min-height:500px;
+}
 .gdm-image .gdm-image-1 img {
   max-height:85px;
   max-width:85px;
