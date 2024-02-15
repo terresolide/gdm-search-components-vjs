@@ -121,7 +121,7 @@
     </span>
      <div v-if="parameter.type === 'customTypeText'">
         <input type="text" class="disabled" :name="prefix + parameter.name" v-model="values[prefix + parameter.name]"
-        :disabled="mode === 'view' || parameter.disabled"  placeholder="automatically filled" />
+        :disabled="mode === 'view' || parameter.disabled"  :required="parameter.required" placeholder="automatically filled" />
      </div>
      <span v-if="parameter.type === 'customInputImages' && mode !== 'view'"><b>{{parameter.count}}</b>
 	     <i v-if="parameter.min || parameter.max" style="font-size:0.9em;margin-left:10px;">

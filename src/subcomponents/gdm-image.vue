@@ -68,7 +68,6 @@
      "product_type": "Type de Produit",
      "processing_center": "Centre de traitement",
      "processing_level": "Niveau de traitement",
-     "producer": "Producteur",
      "relative_orbit": "Orbite relative",
      "radiometric": "Radiométrique",
      "remove_image": "Supprimer l'image\nde votre bibliothèque",
