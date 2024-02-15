@@ -797,7 +797,9 @@ div[id="app"] .gdm-tooltip a:hover {
    width: 180px;
 }
 .gdm-parameters input.invalid,
-.gdm-parameters select.invalid {
+.gdm-parameters select.invalid,
+.gdm-parameters input:invalid,
+.gdm-parameters select:invalid {
   box-shadow: 1px 1px 5px red;
 }
 .gdm-parameters input[type="text"] {
