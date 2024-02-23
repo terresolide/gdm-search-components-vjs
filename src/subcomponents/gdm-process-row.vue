@@ -9,6 +9,10 @@
     "dsmopt_use_roi": "Use ROI",
     "dsmopt_roi_sizex": "ROI size X",
     "dsmopt_roi_sizey": "ROI size Y",
+    "aspy_input_mode": "Input mode",
+    "aspy_run_stereo_pipeline": "Run stereo pipeline",
+    "aspy_output_epsg": "EPSG code for final products projection",
+    "aspy_output_res_factor": "Output resolution factor",
     "end": "Job end",
     "remove_process": "Remove the job",
     "squareCenter": "Product center",
@@ -23,6 +27,10 @@
     "dsmopt_use_roi": "Utilisation d'une Zone d'Intérêt",
     "dsmopt_roi_sizex": "Taille de la zone en X",
     "dsmopt_roi_sizey": "Taille de la zone en Y",
+    "aspy_input_mode": "Input mode",
+    "aspy_run_stereo_pipeline": "Run stereo pipeline",
+    "aspy_output_epsg": "EPSG code for final products projection",
+    "aspy_output_res_factor": "Output resolution factor",
     "end": "Fin",
     "remove_process": "Supprimer le job",
     "squareCenter": "Centre du produit",
@@ -136,6 +144,10 @@
                   <div v-if="process.properties.parameters.hasOwnProperty(prop)"><b>{{$hypens2camel(prop)}}:</b> {{process.properties.parameters[prop]}}</div>
                 </div>
                 <div v-for="prop in ['dsmopt_default_correlation','dsmopt_use_roi', 'dsmopt_roi_sizex', 'dsmopt_roi_sizey']" >
+                  <div v-if="process.properties.parameters.hasOwnProperty(prop)"><b>{{$t(prop)}}:</b> {{process.properties.parameters[prop]}}</div>
+                </div>
+                <!-- Display params for DSM-ASPY -->
+                <div v-for="prop in ['aspy_input_mode', 'aspy_run_stereo_pipeline', 'aspy_output_epsg', 'aspy_output_res_factor']" >
                   <div v-if="process.properties.parameters.hasOwnProperty(prop)"><b>{{$t(prop)}}:</b> {{process.properties.parameters[prop]}}</div>
                 </div>
              </div>
