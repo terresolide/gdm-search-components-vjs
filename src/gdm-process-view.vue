@@ -19,7 +19,8 @@
      "lists": "Interferogram list",
      "time_serie": "Time series",
      "tio_instructions":"Click on the map image to view the time series at that point.",
-     "units": "Units"
+     "units": "Units",
+     "phase": "Phase"
    },
    "fr":{
      "common": "Produits communs",
@@ -41,7 +42,8 @@
      "lists": "Liste d'interférogrammes",
      "time_serie": "Séries temporelles",
      "tio_instructions": "Cliquez sur l'image de la carte pour visualiser les séries temporelles en ce point.",
-     "units": "Unités"
+     "units": "Unités",
+     "phase": "Phase"
    }
 }
 </i18n>
@@ -103,6 +105,12 @@
 	             <span style="white-space:nowrap;">
 	               {{date2str(process.end)}}
 	             </span>
+	          </div>
+	           <div v-if="process.phase">
+	           <b>{{$t('phase')}}:</b>
+			        <span style="white-space:nowrap;">
+			          {{ process.phase }}
+			        </span>
 	          </div>
 	          <div v-if="process.status === 'TERMINATED' && process.datePurge && !process.keep"
 	          style="font-size:0.9em;color:darkred;cursor:pointer;" :title="$t('clear_data')">
