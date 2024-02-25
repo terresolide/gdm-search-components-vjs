@@ -131,12 +131,12 @@
    </div>  
    <div class="gdm-process-column-6">
      <div class="infos" >
-             <div v-if="process.properties.parameters && Object.keys(process.properties.parameters).length < 10"  >
+             <div v-if="process.properties.parameters && Object.keys(process.properties.parameters).length < 5"  >
                 <div v-for="(value, prop) in process.properties.parameters" >
-                  <div><b>{{$t(prop)}}:</b> {{value}}</div>
+                  <div><b>{{$t(prop)}} :</b> {{value}}</div>
                 </div>
              </div>
-             <div v-else>
+             <div>
                 <div v-for="prop in ['atmo', 'rlooks_int', 'rlooks_unw']" >
                   <div v-if="process.properties.parameters.hasOwnProperty(prop)"><b>{{$hypens2camel(prop)}}:</b> {{process.properties.parameters[prop]}}</div>
                 </div>
