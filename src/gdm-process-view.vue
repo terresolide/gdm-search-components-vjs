@@ -19,8 +19,7 @@
      "lists": "Interferogram list",
      "time_serie": "Time series",
      "tio_instructions":"Click on the map image to view the time series at that point.",
-     "units": "Units",
-     "phase": "Phase"
+     "units": "Units"
    },
    "fr":{
      "common": "Produits communs",
@@ -42,8 +41,7 @@
      "lists": "Liste d'interférogrammes",
      "time_serie": "Séries temporelles",
      "tio_instructions": "Cliquez sur l'image de la carte pour visualiser les séries temporelles en ce point.",
-     "units": "Unités",
-     "phase": "Phase"
+     "units": "Unités"
    }
 }
 </i18n>
@@ -106,12 +104,7 @@
 	               {{date2str(process.end)}}
 	             </span>
 	          </div>
-	           <div v-if="process.phase">
-	           <b>{{$t('phase')}}:</b>
-			        <span style="white-space:nowrap;">
-			          {{ process.phase }}
-			        </span>
-	          </div>
+	         
 	          <div v-if="process.status === 'TERMINATED' && process.datePurge && !process.keep"
 	          style="font-size:0.9em;color:darkred;cursor:pointer;" :title="$t('clear_data')">
 	           <i class="fa fa-exclamation-triangle"> 
@@ -125,7 +118,7 @@
 		   </div>
 		   <div class="header-2-2" style="position:relative;z-index:0;">
 		     <gdm-process-progress :status="process.status" :progress="process.progress" 
-		     :step-id="process.stepId" :log="log" :back="back" :steps="process.serviceSteps" ></gdm-process-progress>
+		     :step-id="process.stepId" :phase="process.phase" :log="log" :back="back" :steps="process.serviceSteps" ></gdm-process-progress>
 		  </div>
 		  <div class="header-2-3">
 		      <div><b>{{$t('owner')}}:</b> {{process.email}} <span v-if="process.team">({{process.team}})</span></div>
@@ -841,6 +834,7 @@ export default {
         // }
         this.$set(this.process, 'progress', detail.progress)
         this.$set(this.process, 'stepId', detail.stepId)
+        this.$set(this.process, 'phase', detail.phase)
         this.$set(this.process, 'end', detail.end)
         this.$set(this.process, 'processEnd', detail.processEnd)
         this.$set(this.process, 'processStart', detail.processStart)

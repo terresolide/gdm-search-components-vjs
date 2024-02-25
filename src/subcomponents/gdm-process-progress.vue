@@ -14,7 +14,26 @@
 </i18n>
 <template>
 <div class="gdm-progress" >
- <div v-if="steps.length > 0" class="gdm-steps" >
+  
+ <div v-if="phaseId">
+    <span  v-for="index in phaseId.nb" style="display:inline-block;width:50%;vertical-align:top;">
+     
+     <span class="gdm-process-progress">
+     <div>
+        <div :class="classByIndex(index)"  :style="{width: index < phaseId.id ? '99%' : progress + '%'}">
+        <div>
+            <span v-if="phaseId.id === index && progress >= 50" style="line-height:25px;">{{progress}} %</span>
+             <span v-if="phaseId.id > index" style="line-height:25px;">100 %</span></div>
+        
+        </div>
+       <div v-if="index === phaseId.id && progress < 50" style="line-height:25px;height:25px;display:inline-block;vertical-align:top;">{{progress}} %</div>
+        
+      </div>
+      </span>
+      <div style="text-align:center;color:#333;font-size:0.9em;">{{phasesNames[index - 1]}}</div>
+    </span>
+ </div>
+ <div v-else-if="steps.length > 0" class="gdm-steps" >
  <ul class="gdm-progress-step">
     <li v-for="(step, index) in steps" :class="stepClass(index)"
     :style="{width: 100/steps.length + '%'}" :title="step.stp_description">
@@ -53,6 +72,10 @@ export default {
       type: Array,
       default: () => []
     },
+    phase: {
+      type: String,
+      default: null
+    },
     progress: {
       type: Number,
       default: 0
@@ -76,7 +99,11 @@ export default {
   },
   data(){
     return {
-      step: true
+      step: true,
+      phasesNames: [
+        "KH9 images Preprocessing",
+        "Stereo Pipeline"
+      ]
     }
   },
   computed: {
@@ -95,6 +122,17 @@ export default {
         return -1
       }
     },
+    phaseId () {
+      if (!this.phase) {
+        return null
+      }
+      var tab = this.phase.split('/')
+      if (parseInt(tab[1]) === 1 ) {
+        return null
+      }
+      return {id: parseInt(tab[0]), nb: Array.from({length: parseInt(tab[1])}, (v, i) => i + 1)}
+    },
+    
     classes () {
       var classname = ''
         switch(this.status) {
@@ -139,6 +177,20 @@ export default {
       } else if (this.steps[index].stp_order === this.findStep.stp_order){
         return this.classes
       }     
+    },
+    classByIndex (index) {
+       if (this.status === 'TERMINATED') {
+        return 'gdm-progress-terminated gdm-completed'
+      }
+      if (index < this.phaseId.id && this.status === 'RUNNING') {
+          return 'gdm-progress-terminated gdm-completed'
+      } else if ( index < this.phaseId.id) {
+          return this.classes + ' gdm-completed'
+      }
+     
+      if (index  === this.phaseId.id) {
+        return this.classes
+       }
     }
   }
 }
@@ -180,11 +232,18 @@ div.gdm-steps:hover + div.gdm-tooltip {
 div.gdm-tooltip:hover {
  display:block;
 }
-.gdm-process-progress {
+.gdm-process-progress,
+.gdm-process-progress-50 {
  -webkit-box-sizing: content-box;
  box-sizing: content-box;
+ 
 }
-.gdm-process-progress > div {
+.gdm-process-progress-50 {
+   width:50%;
+   display:inline-block;
+  }
+.gdm-process-progress > div ,
+.gdm-process-progress-50 > div{
  background:#eef1f3;
  border:2px solid lightgrey;
  border-radius:10px;
