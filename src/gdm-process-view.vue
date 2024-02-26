@@ -688,6 +688,9 @@ export default {
       
     },
     display (response) {
+      if (this.process) {
+        return
+      }
       this.describe = response.serviceParametersUrl
       this.defaultParameters = response.feature.properties.parameters
       var parameters = response.feature.properties.parameters
