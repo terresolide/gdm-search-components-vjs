@@ -15,10 +15,10 @@
 <template>
 <div class="gdm-progress" >
   
- <div v-if="phaseId">
-    <span  v-for="index in phaseId.nb" style="display:inline-block;width:50%;vertical-align:top;">
+ <div v-if="phaseId" style="margin-left:5px;">
+    <span  v-for="index in phaseId.nb" style="display:inline-block;width:50%;max-width:250px;vertical-align:top;">
      
-     <span class="gdm-process-progress">
+     <span class="gdm-process-progress" >
      <div>
         <div :class="classByIndex(index)"  :style="{width: index < phaseId.id ? '99%' : progress + '%'}">
         <div>
@@ -238,12 +238,8 @@ div.gdm-tooltip:hover {
  box-sizing: content-box;
  
 }
-.gdm-process-progress-50 {
-   width:50%;
-   display:inline-block;
-  }
-.gdm-process-progress > div ,
-.gdm-process-progress-50 > div{
+
+.gdm-process-progress > div {
  background:#eef1f3;
  border:2px solid lightgrey;
  border-radius:10px;
