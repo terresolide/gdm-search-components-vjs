@@ -32,7 +32,7 @@
 </i18n>
 <template>
 <div class="gdm-process-result">
-     <div>
+     <div v-if="status !== 'PURGED'">
       <h3 :style="{color:color}" >{{$t('results')}}</h3>
       <div v-if="result['partial results']">
 	      <div v-for="link, name in result['partial results']"  class="partial-result">
@@ -59,8 +59,8 @@
       </div>
       
     </div>
-    <div v-if="serviceName === 'DSM-OPT'" class="gdm-comment" v-html="$t('product_license')"></div>
-    <div v-if="result.dir" style="display:block;">
+    <div v-if="status !== 'PURGED' && serviceName === 'DSM-OPT'" class="gdm-comment" v-html="$t('product_license')"></div>
+    <div v-if="status !== 'PURGED' && result.dir" style="display:block;">
       <a :href="result.dir" class="button" target="_blank" style="margin:10px 0 20px 0;">
          <i class="fa fa-folder"></i> {{$t('folder')}}
       </a>
@@ -68,7 +68,7 @@
         <i class="fa fa-file-text"></i> Synthèse</a>
      </div>
      
-    <div v-if="!result.dir && images && images.length > 0" :style="{width: series ? '35%' : '100%'}" style="margin-bottom:5px;">
+    <div v-if="canDisplay && !result.dir && images && images.length > 0" :style="{width: series ? '35%' : '100%'}" style="margin-bottom:5px;">
       <h3  :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h3>
       <div class="gdm-image-layer" v-if="image.type !== 'serie' && image.type !== 'list'" v-for="(image, index) in images" >
 		    <h4 v-if="image.first" :style="{color:color}" style="margin-bottom:0;">{{$t(image.first)}}</h4>
@@ -85,7 +85,7 @@
 		    </div>
 		  </div>
     </div>
-    <div v-if="result.dir && images && images.length > 0">
+    <div v-if="canDisplay && result.dir && images && images.length > 0">
        <h3 :style="{color:color}" style="margin:10px 0 0 0;">{{$t('preview')}}</h3>
  
       <div v-if="images && images.length > 0"  style="margin-bottom:5px;">
@@ -100,7 +100,7 @@
 	      </div>
 
     </div>
-    <div v-if="series" style="max-width:330px;min-width:300px;">
+    <div v-if="canDisplay && series" style="max-width:330px;min-width:300px;">
       <div>
       <gdm-serie-navigation :series="series" :serie-name="serieName" :serie-index="serieIndex" :color="color" :lang="lang" :main="true" 
       @dateChange="dateSerieChange"></gdm-serie-navigation>
@@ -155,6 +155,10 @@ export default {
       type: String,
       default: null
     },
+    status: {
+      type: String,
+      default: 'TERMINATED'
+    },
     synthesis: {
       type: String,
       default: null
@@ -194,6 +198,9 @@ export default {
     },
     hasFirst () {
       return this.images.some(img => img.first)
+    },
+    canDisplay () {
+      return this.result.local || this.status !== 'PURGED'
     }
   },
   destroyed: function() {
