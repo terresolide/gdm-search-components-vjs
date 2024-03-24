@@ -516,15 +516,26 @@ export default {
       return image
     },
     addResult (result) {
-      console.log(result)
+      if (this.process.status === 'PURGED' && !result.local) {
+        return
+      }
       if (result && result.thumbnails) {
         result.thumbnails.sort(function (a, b) {
           return a.title > b.title ? 1 : -1
         })
+        var url = ''
+        if (result.local) {
+          url = this.api.replace('api', '')
+        }
+        console.log(url)
         var imageLayers = result.thumbnails
         imageLayers.forEach(function (image) {
           image.checked = false,
           image.type = 'image'
+          image.png = url + image.png
+          if (image.legend) {
+            image.legend = url + image.legend
+          }
           if (result.bounds) {
             image.bounds = result.bounds
           }
