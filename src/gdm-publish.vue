@@ -4,7 +4,9 @@
     <div><label>Nom</label><input v-model="post.name" /></div>
     <div><label>Description</label> <textarea v-model="post.description"></textarea></div>
     <div><label>Mots-clés</label> <input type="text" v-model="search" />
-      <div style="border: 1px solid grey;padding:5px;"></div>
+      <div style="border: 1px solid lightgrey;padding:5px;">
+        
+      </div>
     </div>
  </div>
 </template>
@@ -14,7 +16,7 @@ export default {
   props: {
     thesaurus: {
       type: String,
-      default: 'https://catalogue-terresolide.ipgp.fr'
+      default: 'https://catalogue-terresolide.ipgp.fr/voc/rest/v1/'
     },
     processId: {
       type: Number,
@@ -25,8 +27,13 @@ export default {
       default: 'https://gdm.formater/api/process'
     }
   },
+  created () {
+    this.getThesaurus('discipline')
+  },
   data () {
     return {
+      search: null,
+      thesaurusList: ['discipline'],
       post: {
         service: 'machin',
         name: 'name',
@@ -35,7 +42,15 @@ export default {
         
       }
     }
+  },
+  methods: {
+    getThesaurus (name) {
+      this.$http.get(this.thesaurus + name + '/topConcepts?lang=fr',
+      {Headers: ['accept: application/ld+json']})
+      .then(resp => {console.log(resp.json)})
+    }
   }
+  
   
 }
 </script>
