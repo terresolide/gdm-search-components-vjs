@@ -1,19 +1,23 @@
 <template>
  <div>
-  
-    <div><h2>Titre principal</h2> 
-         <div><span class="lang-label">fr: </span>GDM-SAR-In <input v-model="post.title.fr" />
-           collection d'interférogrammes<span v-if="hasSerie"> et série temporelle</span> {{temporal.fr}}  </div>
-         <div><span class="lang-label">en: </span>GDM-SAR-In <input v-model="post.title.en" /> 
-           collection of interferograms<span v-if="hasSerie"> and time serie</span> {{ temporal.en }} </div>
+   <h1 v-if="type === 'insert'">Publication dans le catalogue FormaTerre pour le job {{ this.post.title.fr }}</h1>
+   <h1 v-else>Mise à jour des métadonnées pour le job {{ this.post.title.fr }}</h1>
+       
 
-       </div>
-    <div><h2>Objectif</h2>
+   <h2>Titre principal</h2> 
+   <div style="margin-left:10px;">
+       <div><span class="lang-label">fr: </span>GDM-SAR-In <input v-model="post.title.fr" />
+         collection d'interférogrammes<span v-if="hasSerie"> et série temporelle</span> {{temporal.fr}}  </div>
+       <div><span class="lang-label">en: </span>GDM-SAR-In <input v-model="post.title.en" /> 
+         collection of interferograms<span v-if="hasSerie"> and time serie</span> {{ temporal.en }} </div>
+   </div>
+
+   <h2>Objectif</h2>
+   <div style="margin-left:10px;">
       <div><span class="lang-label">fr: </span><textarea v-model="post.purpose.fr" style="vertical-align: top;"></textarea>      </div> 
       <div><span class="lang-label">en: </span><textarea v-model="post.purpose.en" style="vertical-align: top;"></textarea>      </div> 
     </div>
-   
-    <gdm-keywords :keywords="post.keywords"></gdm-keywords>
+    <gdm-keywords :has-serie="hasSerie" :keywords="post.keywords" @remove="removeKeyword"></gdm-keywords>
  </div>
 </template>
 <script>
@@ -44,6 +48,7 @@ export default {
     return {
       process: null,
       hasSerie: false,
+      type: 'insert',
       temporal: {
         fr: '',
         en: ''
@@ -79,6 +84,7 @@ export default {
           en: json.feature.properties.temporalExtent[0].substring(0,10) + ' to ' + json.feature.properties.temporalExtent[1].substring(0,10)
         }
         if (json.metadata) {
+          this.type = 'update'
           this.post.keywords = json.metadata.keywords
           if (json.metadata.title.fr) {
               this.post.title = json.metadata.title
@@ -115,6 +121,12 @@ export default {
           }
         }
        })
+    },
+    removeKeyword (obj) {
+      if (obj.item.uri) {
+        var index = this.post.keywords.thesaurus[obj.thesaurus].findIndex(k => k.uri === obj.item.uri)
+        this.post.keywords['thesaurus'][obj.thesaurus].splice(index, 1)
+      } 
     }
   }
   
@@ -127,5 +139,8 @@ export default {
   font-weight:700;
   display:inline-block;
   min-width:50px;
+}
+textarea {
+  min-width: 700px;
 }
 </style>
