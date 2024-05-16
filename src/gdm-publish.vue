@@ -28,10 +28,7 @@ export default {
     GdmKeywords
   },
   props: {
-    thesaurus: {
-      type: String,
-      default: 'https://catalogue-terresolide.ipgp.fr/voc/rest/v1/'
-    },
+    
     processId: {
       type: Number,
       default: null
