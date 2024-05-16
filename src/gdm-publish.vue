@@ -17,7 +17,8 @@
       <div><span class="lang-label">fr: </span><textarea v-model="post.purpose.fr" style="vertical-align: top;"></textarea>      </div> 
       <div><span class="lang-label">en: </span><textarea v-model="post.purpose.en" style="vertical-align: top;"></textarea>      </div> 
     </div>
-    <gdm-keywords :has-serie="hasSerie" :keywords="post.keywords" @remove="removeKeyword"></gdm-keywords>
+    <gdm-keywords :has-serie="hasSerie" :keywords="post.keywords" 
+    @remove="removeKeyword" @add="addKeyword"></gdm-keywords>
  </div>
 </template>
 <script>
@@ -59,6 +60,19 @@ export default {
     }
   },
   methods: {
+    addKeyword (obj) {
+        if (obj.item.uri) {
+          if (!this.post.keywords.thesaurus[obj.thesaurus]) {
+            this.post.keywords.thesaurus[obj.thesaurus] = []
+          } else {
+            var index = this.post.keywords.thesaurus[obj.thesaurus].findIndex(k => k.uri === obj.item.uri)
+            if (index >=0) {
+              return
+            }
+          }
+          this.post.keywords.thesaurus[obj.thesaurus].push(obj.item)
+        } 
+    },
     getProcess() {
       this.$http.get(this.api + '/' + this.processId, {credentials: true})
       .then(resp => {
