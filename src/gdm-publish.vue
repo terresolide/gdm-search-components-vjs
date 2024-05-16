@@ -140,7 +140,7 @@ export default {
           }
         }
         
-        ['instrument', 'network', 'foi', 'discipline'].forEach(function (vocab) {
+        ['discipline', 'variable', 'foi', 'platform', 'instrument', 'process', 'product', 'network'].forEach(function (vocab) {
           if (!keywords.thesaurus[vocab]) {
             keywords.thesaurus[vocab] = []
           }
