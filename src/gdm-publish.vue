@@ -17,7 +17,7 @@
       <div><span class="lang-label">fr: </span><textarea v-model="post.purpose.fr" style="vertical-align: top;"></textarea>      </div> 
       <div><span class="lang-label">en: </span><textarea v-model="post.purpose.en" style="vertical-align: top;"></textarea>      </div> 
     </div>
-    <gdm-keywords :has-serie="hasSerie" :keywords="post.keywords" 
+    <gdm-keywords :has-serie="hasSerie" :count="count" :keywords="post.keywords" 
     @remove="removeKeyword" @add="addKeyword"></gdm-keywords>
  </div>
 </template>
@@ -47,6 +47,7 @@ export default {
       process: null,
       hasSerie: false,
       type: 'insert',
+      count: 0,
       temporal: {
         fr: '',
         en: ''
@@ -61,17 +62,23 @@ export default {
   },
   methods: {
     addKeyword (obj) {
+       
         if (obj.item.uri) {
-          if (!this.post.keywords.thesaurus[obj.thesaurus]) {
-            this.post.keywords.thesaurus[obj.thesaurus] = []
+          var keywords = this.post.keywords
+          if (!keywords.thesaurus[obj.thesaurus]) {
+            keywords.thesaurus[obj.thesaurus] = [obj.item]
           } else {
-            var index = this.post.keywords.thesaurus[obj.thesaurus].findIndex(k => k.uri === obj.item.uri)
+            var index = keywords.thesaurus[obj.thesaurus].findIndex(k => k.uri === obj.item.uri)
             if (index >=0) {
               return
             }
+            keywords.thesaurus[obj.thesaurus].push(obj.item)
           }
-          this.post.keywords.thesaurus[obj.thesaurus].push(obj.item)
+          this.post.keywords = keywords
+          
         } 
+        // this.$set(this.post, 'keywords', keywords)
+        
     },
     getProcess() {
       this.$http.get(this.api + '/' + this.processId, {credentials: true})
@@ -96,7 +103,8 @@ export default {
         }
         if (json.metadata) {
           this.type = 'update'
-          this.post.keywords = json.metadata.keywords
+          var keywords = json.metadata.keywords
+          
           if (json.metadata.title.fr) {
               this.post.title = json.metadata.title
           } else {
@@ -114,7 +122,7 @@ export default {
           var rOrbit = json.feature.properties.parameters.relative_orbit
           var ron = rOrbit[0].toUpperCase() + rOrbit.slice(1).padStart(3, 0)
        
-          this.post.keywords = {
+          var keywords = {
             thesaurus: {
               polarisation: [
                  {
@@ -131,6 +139,13 @@ export default {
             }
           }
         }
+        
+        ['instrument', 'network', 'foi', 'discipline'].forEach(function (vocab) {
+          if (!keywords.thesaurus[vocab]) {
+            keywords.thesaurus[vocab] = []
+          }
+        })
+        this.post.keywords = keywords
        })
     },
     removeKeyword (obj) {
