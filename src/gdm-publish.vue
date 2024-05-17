@@ -17,7 +17,7 @@
       <div><span class="lang-label">fr: </span><textarea v-model="post.purpose.fr" style="vertical-align: top;"></textarea>      </div> 
       <div><span class="lang-label">en: </span><textarea v-model="post.purpose.en" style="vertical-align: top;"></textarea>      </div> 
     </div>
-    <gdm-keywords :has-serie="hasSerie" :count="count" :keywords="post.keywords" 
+    <gdm-keywords ref="keywords" :has-serie="hasSerie" :count="count" :keywords="post.keywords" @vocab="checkKeywords"
     @remove="removeKeyword" @add="addKeyword"></gdm-keywords>
  </div>
 </template>
@@ -55,7 +55,7 @@ export default {
       post: {
         title: {fr: '', en: ''},
         purpose: {fr: '', en: ''},
-        keywords: {}
+        keywords: {thesaurus: {}, free: {}}
         
       }
     }
@@ -79,6 +79,16 @@ export default {
         } 
         // this.$set(this.post, 'keywords', keywords)
         
+    },
+    checkKeywords(vocabularies) {
+      if (this.post.keywords) {
+        var self = this
+        vocabularies.forEach(function (voc) {
+          if (!self.post.keywords.thesaurus[voc.id]) {
+            self.post.keywords.thesaurus[voc.id] = []
+          }
+        })
+      }
     },
     getProcess() {
       this.$http.get(this.api + '/' + this.processId, {credentials: true})
@@ -127,26 +137,36 @@ export default {
               polarisation: [
                  {
                    fr: json.feature.properties.parameters.polarisation.toUpperCase(),
-                   en: json.feature.properties.parameters.polarisation.toUpperCase()
+                   en: json.feature.properties.parameters.polarisation.toUpperCase(),
+                   disabled: true
                  }
               ],
               ron: [
                  {
                    fr: ron,
-                   en: ron
+                   en: ron,
+                   disabled: true
                  }
               ]
             }
           }
         }
+        var vocabularies = this.$refs.keywords.vocabularies;
+        console.log(vocabularies);
         
-        ['discipline', 'variable', 'foi', 'platform', 'instrument', 'process', 'product', 'network'].forEach(function (vocab) {
-          if (!keywords.thesaurus[vocab]) {
-            keywords.thesaurus[vocab] = []
+        vocabularies.forEach(function (vocab) {
+          if (!keywords.thesaurus[vocab.id]) {
+            keywords.thesaurus[vocab.id] = []
           }
         })
+        keywords.thesaurus.polarisation[0].disabled = true
+        keywords.thesaurus.ron[0].disabled = true
+        keywords.thesaurus.platform[0].disabled = true
         this.post.keywords = keywords
        })
+    },
+    initKeywords () {
+      
     },
     removeKeyword (obj) {
       if (obj.item.uri) {
