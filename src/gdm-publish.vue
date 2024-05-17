@@ -1,5 +1,5 @@
 <template>
- <div>
+ <div class="gdm-publish">
    <h1 v-if="type === 'insert'">Publication dans le catalogue FormaTerre pour le job {{ this.post.title.fr }}</h1>
    <h1 v-else>Mise à jour des métadonnées pour le job {{ this.post.title.fr }}</h1>
        
@@ -169,6 +169,12 @@ export default {
 }
 </script>
 <style>
+.gdm-publish {
+  font-family: Arial, Helvetica, sans-serif;
+}
+h1, h2, h3 {
+  color: darkred;
+}
 .lang-label {
   color:#333;
   font-weight:700;
