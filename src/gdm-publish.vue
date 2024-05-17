@@ -2,20 +2,37 @@
  <div class="gdm-publish">
    <h1 v-if="type === 'insert'">Publication dans le catalogue FormaTerre pour le job {{ this.post.title.fr }}</h1>
    <h1 v-else>Mise à jour des métadonnées pour le job {{ this.post.title.fr }}</h1>
-       
+   <em>Une grande partie des métadonnées provient des informations sur le calcul et du backup_product.json (emprise géographique, dates, liens...) mais ces informations sont insuffisantes
+    pour   l'indexation de vos produits dans le catalogue FormaTerre et par suite celui de DataTerra<br><br>
+    Nous vous encourageons donc à compléter au mieux les informations ci-dessous.<br>
+   
+    <br>Vous pouvez dans un premier temps sauvegarder les métadonnées et lorsque vous êtes satisfait publier dans le catalogue FormaTerre.
+    <br>Un ensemble de fiches de métadonnées sera généré:
+       <ul>
+         <li>une fiche parent comprenant un ensemble de fiches enfants:
+            <ul>
+               <li>une fiche par interférogramme (pour toutes les versions de l'interférogramme: enroulé, déroulé, filtré...)</li>
+               <li>une fiche pour les données auxiliaires</li>
+               <li>et s'il existe une série temporelle, une fiche pour la série temporelle</li>
+            </ul>
+         </li>
+   
+       </ul>
+    Une fois publié, vous pourrez toujours modifier ces informations. 
+   </em>
 
    <h2>Titre principal</h2> 
    <div style="margin-left:10px;">
-       <div><span class="lang-label">fr: </span>GDM-SAR-In <input v-model="post.title.fr" />
+       <div style="margin-bottom:5px;"><span class="lang-label">FR: </span>GDM-SAR-In <input type="text" v-model="post.title.fr" />
          collection d'interférogrammes<span v-if="hasSerie"> et série temporelle</span> {{temporal.fr}}  </div>
-       <div><span class="lang-label">en: </span>GDM-SAR-In <input v-model="post.title.en" /> 
+       <div><span class="lang-label">EN: </span>GDM-SAR-In <input type="text" v-model="post.title.en" /> 
          collection of interferograms<span v-if="hasSerie"> and time serie</span> {{ temporal.en }} </div>
    </div>
 
    <h2>Objectif</h2>
    <div style="margin-left:10px;">
-      <div><span class="lang-label">fr: </span><textarea v-model="post.purpose.fr" style="vertical-align: top;"></textarea>      </div> 
-      <div><span class="lang-label">en: </span><textarea v-model="post.purpose.en" style="vertical-align: top;"></textarea>      </div> 
+      <div><span class="lang-label">FR: </span><textarea v-model="post.purpose.fr" style="vertical-align: top;"></textarea>      </div> 
+      <div><span class="lang-label">EN: </span><textarea v-model="post.purpose.en" style="vertical-align: top;"></textarea>      </div> 
     </div>
     <gdm-keywords ref="keywords" :has-serie="hasSerie" :count="count" :keywords="post.keywords" @vocab="checkKeywords"
     @remove="removeKeyword" @add="addKeyword"></gdm-keywords>
@@ -74,6 +91,9 @@ export default {
             keywords.thesaurus[obj.thesaurus].push(obj.item)
           }
           this.post.keywords = keywords
+        } else {
+          var kw = Object.assign({}, obj.item)
+          this.post.keywords.free[obj.thesaurus].push(kw)
         }
     },
     checkKeywords(vocabularies) {
@@ -151,9 +171,16 @@ export default {
             keywords.thesaurus[vocab.id] = []
           }
         })
+       
         keywords.thesaurus.polarisation[0].disabled = true
         keywords.thesaurus.ron[0].disabled = true
         keywords.thesaurus.platform[0].disabled = true
+        var types = this.$refs.keywords.types
+        for(var type in types) {
+           if (!keywords.free[type]) {
+             keywords.free[type] = []
+           }
+         }
         this.post.keywords = keywords
        })
     },
@@ -161,19 +188,22 @@ export default {
       if (obj.item.uri) {
         var index = this.post.keywords.thesaurus[obj.thesaurus].findIndex(k => k.uri === obj.item.uri)
         this.post.keywords['thesaurus'][obj.thesaurus].splice(index, 1)
+      } else {
+        this.post.keywords.free[obj.thesaurus].splice(obj.index,1)
       } 
     }
   }
-  
-  
 }
 </script>
 <style>
 .gdm-publish {
   font-family: Arial, Helvetica, sans-serif;
 }
-h1, h2, h3 {
+.gdm-publish h1, .gdm-publish h2, .gdm-publish h3 {
   color: darkred;
+}
+.gdm-publish h1 {
+  text-transform:uppercase;
 }
 .lang-label {
   color:#333;
@@ -181,7 +211,14 @@ h1, h2, h3 {
   display:inline-block;
   min-width:50px;
 }
-textarea {
+.gdm-publish input[type=text] {
+  outline-color: darkgrey;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size:1rem;
+  color: #333;
+}
+.gdm-publish textarea {
   min-width: 700px;
+  outline-color: darkgrey;
 }
 </style>
