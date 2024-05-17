@@ -62,7 +62,6 @@ export default {
   },
   methods: {
     addKeyword (obj) {
-       
         if (obj.item.uri) {
           var keywords = this.post.keywords
           if (!keywords.thesaurus[obj.thesaurus]) {
@@ -75,10 +74,7 @@ export default {
             keywords.thesaurus[obj.thesaurus].push(obj.item)
           }
           this.post.keywords = keywords
-          
-        } 
-        // this.$set(this.post, 'keywords', keywords)
-        
+        }
     },
     checkKeywords(vocabularies) {
       if (this.post.keywords) {
@@ -137,23 +133,19 @@ export default {
               polarisation: [
                  {
                    fr: json.feature.properties.parameters.polarisation.toUpperCase(),
-                   en: json.feature.properties.parameters.polarisation.toUpperCase(),
-                   disabled: true
+                   en: json.feature.properties.parameters.polarisation.toUpperCase()
                  }
               ],
               ron: [
                  {
                    fr: ron,
-                   en: ron,
-                   disabled: true
+                   en: ron
                  }
               ]
             }
           }
         }
         var vocabularies = this.$refs.keywords.vocabularies;
-        console.log(vocabularies);
-        
         vocabularies.forEach(function (vocab) {
           if (!keywords.thesaurus[vocab.id]) {
             keywords.thesaurus[vocab.id] = []
@@ -164,9 +156,6 @@ export default {
         keywords.thesaurus.platform[0].disabled = true
         this.post.keywords = keywords
        })
-    },
-    initKeywords () {
-      
     },
     removeKeyword (obj) {
       if (obj.item.uri) {
