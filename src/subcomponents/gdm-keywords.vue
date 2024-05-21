@@ -240,24 +240,18 @@ export default {
         var results = []
         if (resp.body.results) {
           results = resp.body.results
-          console.log(this.keywords)
-          // for(var vocab in this.keywords.thesaurus) {
-          // this.keywords.thesaurus[vocab].forEach(function(item) {
-          //   var index = results.findIndex(voc => voc.uri === item.uri && voc.vocab === vocab)
-          //   if (index >= 0) {
-          //     results.splice(index, 1)
-          //   }
-          //   
-          // })
-          //
-         results.forEach(function(item, index) {
-           if (self.keywords.thesaurus && self.keywords.thesaurus[item.vocab]) {
-             var find = self.keywords.thesaurus[item.vocab].findIndex(voc => voc.uri === item.uri)
-             if (find >= 0) {
-               results[index].choose = true
+          var indexes = results.reduce(function (accumulator, item, index) {
+             if (self.keywords.thesaurus[item.vocab]) {
+                var find = self.keywords.thesaurus[item.vocab].findIndex(voc => voc.uri === item.uri)
+                if (find >=0) {
+                  accumulator.push(index)
+                } 
              }
-           }
-         })
+             return accumulator
+          },[],)
+          for(var i=indexes.length - 1; i >=0; i--) {
+            results.splice(indexes[i], 1)
+          }
         }
         if (results.length === 0) {
           this.notFind = query
@@ -267,7 +261,6 @@ export default {
           this.notFind = ''
         }
         this.results = results
-        
       })
     }
   }
