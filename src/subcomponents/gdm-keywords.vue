@@ -1,4 +1,4 @@
-s<template>
+<template>
 <span>
   <h2>Mots-clés</h2>
  <span style="display:inline-block;width:112px;">Rechercher:  </span> 
@@ -240,15 +240,24 @@ export default {
         var results = []
         if (resp.body.results) {
           results = resp.body.results
-          
-          results.forEach(function(item, index) {
-            if (self.keywords.thesaurus && self.keywords.thesaurus[item.vocab]) {
-              var find = self.keywords.thesaurus[item.vocab].findIndex(voc => voc.uri === item.uri)
-              if (find >= 0) {
-                results[index].choose = true
-              }
-            }
-          })
+          console.log(this.keywords)
+          // for(var vocab in this.keywords.thesaurus) {
+          // this.keywords.thesaurus[vocab].forEach(function(item) {
+          //   var index = results.findIndex(voc => voc.uri === item.uri && voc.vocab === vocab)
+          //   if (index >= 0) {
+          //     results.splice(index, 1)
+          //   }
+          //   
+          // })
+          //
+         results.forEach(function(item, index) {
+           if (self.keywords.thesaurus && self.keywords.thesaurus[item.vocab]) {
+             var find = self.keywords.thesaurus[item.vocab].findIndex(voc => voc.uri === item.uri)
+             if (find >= 0) {
+               results[index].choose = true
+             }
+           }
+         })
         }
         if (results.length === 0) {
           this.notFind = query
