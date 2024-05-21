@@ -98,6 +98,7 @@ export default {
           var kw = Object.assign({}, obj.item)
           this.post.keywords.free[obj.thesaurus].push(kw)
         }
+        this.$refs.keywords.$forceUpdate()
     },
     checkKeywords(vocabularies) {
       if (this.post.keywords) {
@@ -199,7 +200,8 @@ export default {
         this.post.keywords['thesaurus'][obj.thesaurus].splice(index, 1)
       } else {
         this.post.keywords.free[obj.thesaurus].splice(obj.index,1)
-      } 
+      }
+      this.$refs.keywords.$forceUpdate()
     }
   }
 }
