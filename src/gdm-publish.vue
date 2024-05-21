@@ -20,7 +20,10 @@
        </ul>
     Une fois publié, vous pourrez toujours modifier ces informations. 
    </em>
-
+   <div>
+    <button @click="save">Sauvegarder</button>
+    <button>Publier</button>
+   </div>
    <h2>Titre principal</h2> 
    <div style="margin-left:10px;">
        <div style="margin-bottom:5px;"><span class="lang-label">FR: </span>GDM-SAR-In <input type="text" v-model="post.title.fr" />
@@ -123,6 +126,9 @@ export default {
             }
           }
         }
+        if (json.metadata) {
+          this.post = Object.assign(this.post,json.metadata)
+        }
         this.temporal = {
           fr: json.feature.properties.temporalExtent[0].substring(0,10) + ' à ' + json.feature.properties.temporalExtent[1].substring(0,10),
           en: json.feature.properties.temporalExtent[0].substring(0,10) + ' to ' + json.feature.properties.temporalExtent[1].substring(0,10)
@@ -183,6 +189,9 @@ export default {
          }
         this.post.keywords = keywords
        })
+    },
+    save () {
+      console.log(this.post)
     },
     removeKeyword (obj) {
       if (obj.item.uri) {
