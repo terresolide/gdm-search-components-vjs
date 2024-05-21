@@ -178,7 +178,6 @@ export default {
             keywords.thesaurus[vocab.id] = []
           }
         })
-       
         keywords.thesaurus.polarisation[0].disabled = true
         keywords.thesaurus.ron[0].disabled = true
         keywords.thesaurus.platform[0].disabled = true
@@ -191,8 +190,25 @@ export default {
         this.post.keywords = keywords
        })
     },
-    save () {
+    publish () {
+          console.log(this.post)
+          this.$http.post(this.api + '/' + this.processId + '/catalog',
+            this.post,
+            {
+              credentials: true,
+              headers: {'Content-Type': 'application/json'}
+            }
+          ).then(resp => {console.log()})
+        },
+    publish () {
       console.log(this.post)
+      this.$http.put(this.api + '/' + this.processId + '/catalog',
+        this.post,
+        {
+          credentials: true,
+          headers: {'Content-Type': 'application/json'}
+        }
+      ).then(resp => {console.log()})
     },
     removeKeyword (obj) {
       if (obj.item.uri) {
