@@ -20,6 +20,8 @@
        </ul>
     Une fois publié, vous pourrez toujours modifier ces informations. 
    </em>
+   <div style="color:darkred;margin:10px 0;border:1px solid darkred;padding:10px;display:inline-block;"><i class="fa fa-exclamation-triangle"></i> 
+    Attention, dans tous les cas, vous devez vous assurer que le répertoire des résultats n'est pas un répertoire effaçable!</div>
    <div>
     <button @click="save">Sauvegarder</button>
     <button>Publier</button>
@@ -190,16 +192,7 @@ export default {
         this.post.keywords = keywords
        })
     },
-    publish () {
-          console.log(this.post)
-          this.$http.post(this.api + '/' + this.processId + '/catalog',
-            this.post,
-            {
-              credentials: true,
-              headers: {'Content-Type': 'application/json'}
-            }
-          ).then(resp => {console.log()})
-        },
+    
     publish () {
       console.log(this.post)
       this.$http.put(this.api + '/' + this.processId + '/catalog',
@@ -218,6 +211,15 @@ export default {
         this.post.keywords.free[obj.thesaurus].splice(obj.index,1)
       }
       this.$refs.keywords.$forceUpdate()
+    },
+    save () {
+      this.$http.post(this.api + '/' + this.processId + '/catalog',
+        this.post,
+        {
+          credentials: true,
+          headers: {'Content-Type': 'application/json'}
+        }
+      ).then(resp => {console.log()})
     }
   }
 }
