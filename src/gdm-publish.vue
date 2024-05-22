@@ -2,45 +2,55 @@
  <div class="gdm-publish">
    <h1 v-if="type === 'insert'">Publication dans le catalogue FormaTerre pour le job {{ this.post.title.fr }}</h1>
    <h1 v-else>Mise à jour des métadonnées pour le job {{ this.post.title.fr }}</h1>
-   <em>Une grande partie des métadonnées provient des informations sur le calcul et du backup_product.json (emprise géographique, dates, liens...) mais ces informations sont insuffisantes
+   <em style="display:block;">Une grande partie des métadonnées provient des informations sur le calcul et du backup_product.json (emprise géographique, dates, liens...) mais ces informations sont insuffisantes
     pour   l'indexation de vos produits dans le catalogue FormaTerre et par suite celui de DataTerra<br><br>
     Nous vous encourageons donc à compléter au mieux les informations ci-dessous.<br>
-   
-    <br>Vous pouvez dans un premier temps sauvegarder les métadonnées et lorsque vous êtes satisfait publier dans le catalogue FormaTerre.
-    <br>Un ensemble de fiches de métadonnées sera généré:
-       <ul>
-         <li>une fiche parent comprenant un ensemble de fiches enfants:
-            <ul>
-               <li>une fiche par interférogramme (pour toutes les versions de l'interférogramme: enroulé, déroulé, filtré...)</li>
-               <li>une fiche pour les données auxiliaires</li>
-               <li>et s'il existe une série temporelle, une fiche pour la série temporelle</li>
-            </ul>
-         </li>
-   
-       </ul>
-    Une fois publié, vous pourrez toujours modifier ces informations. 
+    <div v-if="metaUrl">
+      Des fiches de métadonnées ont été publiées pour ce job: <a :href="metaUrl" target="_blank">Fiche de métadonnées racine enregistrée</a>
+    </div>
+    <div v-if="!metaUrl">
+      <br>Vous pouvez dans un premier temps sauvegarder les métadonnées et lorsque vous êtes satisfait publier dans le catalogue FormaTerre.
+      <br>Un ensemble de fiches de métadonnées sera généré:
+         <ul>
+           <li>une fiche parent comprenant un ensemble de fiches enfants:
+              <ul>
+                 <li>une fiche par interférogramme (pour toutes les versions de l'interférogramme: enroulé, déroulé, filtré...)</li>
+                 <li>une fiche pour les données auxiliaires</li>
+                 <li>et s'il existe une série temporelle, une fiche pour la série temporelle</li>
+              </ul>
+           </li>
+     
+         </ul>
+      Une fois publié, vous pourrez toujours modifier ces informations. 
+     </div>
    </em>
    <div style="color:darkred;margin:10px 0;border:1px solid darkred;padding:10px;display:inline-block;"><i class="fa fa-exclamation-triangle"></i> 
-    Attention, dans tous les cas, vous devez vous assurer que le répertoire des résultats n'est pas un répertoire effaçable!</div>
-   <div>
-    <button @click="save">Sauvegarder</button>
-    <button>Publier</button>
+    Attention, vous devez vous assurer que le répertoire des résultats n'est pas provisoire!
+  </div>
+  <div style="border:1px solid darkgrey;padding:10px; max-width:900px;box-shadow: 0 1px 5px rgba(0,0,0,.65);">
+     <div style="text-align:right;">
+      <button class="btn btn-publish" @click="save" title="Enregistrer les informations en interne">Sauvegarder</button>
+      <button class="btn btn-publish" @click="publish" title="Publier dans le catalogue FormaTerre">
+        <template v-if="metaUrl">Modifier dans le catalogue</template> 
+        <template v-else >Publier dans le catalogue</template>
+      </button>
+     </div>
+     <h2>Titre principal</h2> 
+     <div style="margin-left:10px;">
+         <div style="margin-bottom:5px;"><span class="lang-label">FR: </span>GDM-SAR-In <input type="text" v-model="post.title.fr" />
+           collection d'interférogrammes<span v-if="hasSerie"> et série temporelle</span> {{temporal.fr}}  </div>
+         <div><span class="lang-label">EN: </span>GDM-SAR-In <input type="text" v-model="post.title.en" /> 
+           collection of interferograms<span v-if="hasSerie"> and time serie</span> {{ temporal.en }} </div>
+     </div>
+  
+     <h2>Objectif</h2>
+     <div style="margin-left:10px;">
+        <div><span class="lang-label">FR: </span><textarea v-model="post.purpose.fr" style="vertical-align: top;"></textarea>      </div> 
+        <div><span class="lang-label">EN: </span><textarea v-model="post.purpose.en" style="vertical-align: top;"></textarea>      </div> 
+      </div>
+      <gdm-keywords ref="keywords" :has-serie="hasSerie" :count="count" :keywords="post.keywords" @vocab="checkKeywords"
+      @remove="removeKeyword" @add="addKeyword"></gdm-keywords>
    </div>
-   <h2>Titre principal</h2> 
-   <div style="margin-left:10px;">
-       <div style="margin-bottom:5px;"><span class="lang-label">FR: </span>GDM-SAR-In <input type="text" v-model="post.title.fr" />
-         collection d'interférogrammes<span v-if="hasSerie"> et série temporelle</span> {{temporal.fr}}  </div>
-       <div><span class="lang-label">EN: </span>GDM-SAR-In <input type="text" v-model="post.title.en" /> 
-         collection of interferograms<span v-if="hasSerie"> and time serie</span> {{ temporal.en }} </div>
-   </div>
-
-   <h2>Objectif</h2>
-   <div style="margin-left:10px;">
-      <div><span class="lang-label">FR: </span><textarea v-model="post.purpose.fr" style="vertical-align: top;"></textarea>      </div> 
-      <div><span class="lang-label">EN: </span><textarea v-model="post.purpose.en" style="vertical-align: top;"></textarea>      </div> 
-    </div>
-    <gdm-keywords ref="keywords" :has-serie="hasSerie" :count="count" :keywords="post.keywords" @vocab="checkKeywords"
-    @remove="removeKeyword" @add="addKeyword"></gdm-keywords>
  </div>
 </template>
 <script>
@@ -67,6 +77,7 @@ export default {
   data () {
     return {
       process: null,
+      metaUrl: null,
       hasSerie: false,
       type: 'insert',
       count: 0,
@@ -112,6 +123,12 @@ export default {
         })
       }
     },
+    getMetadata () {
+      this.$http.get(this.api + '/' + this.processId + '/catalog', {credentials: true})
+      .then(resp => {
+              this.metaUrl = resp.body.url
+      })
+    },
     getProcess() {
       this.$http.get(this.api + '/' + this.processId, {credentials: true})
       .then(resp => {
@@ -129,6 +146,7 @@ export default {
             }
           }
         }
+        this.getMetadata()
         if (json.metadata) {
           this.post = Object.assign(this.post,json.metadata)
         }
@@ -170,6 +188,13 @@ export default {
                    fr: ron,
                    en: ron
                  }
+              ],
+              platform: [
+               {
+                  fr: 'SENTINEL-1',
+                  en: 'SENTINEL-1',
+                  uri: 'https://service.poleterresolide.fr/voc/platform/P010100'
+               }
               ]
             }
           }
@@ -194,14 +219,16 @@ export default {
     },
     
     publish () {
-      console.log(this.post)
       this.$http.put(this.api + '/' + this.processId + '/catalog',
         this.post,
         {
           credentials: true,
           headers: {'Content-Type': 'application/json'}
         }
-      ).then(resp => {console.log()})
+      ).then(
+        resp => {console.log()},
+        resp => {console.log('pb publish')}
+      )
     },
     removeKeyword (obj) {
       if (obj.item.uri) {
@@ -219,12 +246,49 @@ export default {
           credentials: true,
           headers: {'Content-Type': 'application/json'}
         }
-      ).then(resp => {console.log()})
+      ).then(
+        resp => {console.log()},
+        resp => {console.log('pb')}
+      )
     }
   }
 }
 </script>
 <style>
+
+.btn {
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  border: 1px solid transparent;
+  border-top-color: transparent;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: .25rem;
+  transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+.btn-publish {
+  color: #fff;
+  background-color: #8b0000;
+  border-color: #8b0000;
+}
+.btn-publish:hover {
+  background-color: #7d0e0e;
+  border-color: #9c0000;
+}
+.btn-publish:focus {
+  box-shadow: 0 0 0 .2rem rgba(139,0,0,.5);
+}
 .gdm-publish {
   font-family: Arial, Helvetica, sans-serif;
 }

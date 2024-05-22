@@ -1,5 +1,5 @@
 <template>
-<span>
+<div>
   <h2>Mots-clés</h2>
  <span style="display:inline-block;width:112px;">Rechercher:  </span> 
  <span class="search" style="">
@@ -36,9 +36,7 @@
    </div>
    </div>
    </div>
-    
- 
-  <div style="float:left;min-width:450px;width:50%;" @click="show=false">
+  <div style="display:inline-block;min-width:300px;width:calc(50% - 20px);" @click="show=false">
     <h3>Mots-clés de thésaurus</h3>
        <div v-for="list, thesaurus in keywords.thesaurus" v-show="list.length > 0">
           <label>{{ toTitle(thesaurus) }}</label>
@@ -60,7 +58,7 @@
           </div>
        </div>
   </div>
-  <div style="float:left;max-width:450px;width:50%;">
+  <div style="display:inline-block;min-width:300px;width:calc(50% - 20px);vertical-align:top;">
     <h3>Mots-clés libres</h3>
     
     <div v-for="list, type in keywords.free" v-show="list.length > 0">
@@ -71,8 +69,8 @@
                @click="remove(type, item, index)"></span></div>
              </div> 
           </div>
-  </div>
-</span>
+        </div>
+</div>
 </template>
 <script>
 export default {
