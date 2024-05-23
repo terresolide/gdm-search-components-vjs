@@ -1,5 +1,6 @@
 <template>
  <div class="gdm-publish">
+  <div v-if="running" class="gdm-processing fa fa-spinner fa-spin fa-3x fa-fw running" ></div>
    <h1 v-if="type === 'insert'">Publication dans le catalogue FormaTerre pour le job {{ this.post.title.fr }}</h1>
    <h1 v-else>Mise à jour des métadonnées pour le job {{ this.post.title.fr }}</h1>
    <em style="display:block;">Une grande partie des métadonnées provient des informations sur le calcul et du backup_product.json (emprise géographique, dates, liens...) mais ces informations sont insuffisantes
@@ -36,10 +37,11 @@
     </div>
 
   </div>
+  <div v-if="running">En cours</div>
   <div style="border:1px solid darkgrey;padding:10px; max-width:900px;box-shadow: 0 1px 5px rgba(0,0,0,.65);">
      <div style="text-align:right;">
-      <button class="btn btn-publish" @click="save" :disabled="errorProcess" title="Enregistrer les informations en interne">Sauvegarder</button>
-      <button class="btn btn-publish" @click="publish" :disabled="errorGn || errorProcess" title="Publier dans le catalogue FormaTerre">
+      <button class="btn btn-publish" @click="save" :disabled="errorProcess || running" title="Enregistrer les informations en interne">Sauvegarder</button>
+      <button class="btn btn-publish" @click="publish" :disabled="errorGn || errorProcess || running" title="Publier dans le catalogue FormaTerre">
         <template v-if="metaUrl">Modifier dans le catalogue</template> 
         <template v-else >Publier dans le catalogue</template>
       </button>
@@ -77,7 +79,7 @@ export default {
     },
     api: {
       type: String,
-      default: 'https://gdm.formater/api/process'
+      default: 'https://gdm.formater/api'
     }
   },
   created () {
@@ -92,6 +94,8 @@ export default {
       metaUrl: null,
       hasSerie: false,
       type: 'insert',
+      running: null,
+      taskId: null,
       count: 0,
       temporal: {
         fr: '',
@@ -136,7 +140,7 @@ export default {
       }
     },
     getMetadata () {
-      this.$http.get(this.api + '/' + this.processId + '/catalog', {credentials: true})
+      this.$http.get(this.api + '/process/' + this.processId + '/catalog', {credentials: true})
       .then(resp => {
               this.metaUrl = resp.body.url
       }, resp => {
@@ -238,7 +242,7 @@ export default {
        this.post.keywords = keywords
     },
     getProcess() {
-      this.$http.get(this.api + '/' + this.processId, {credentials: true})
+      this.$http.get(this.api + '/process/' + this.processId, {credentials: true})
       .then(
         resp => { this.treatmentProcess(resp)},
         resp => { if (resp.body.error) {
@@ -248,16 +252,40 @@ export default {
           }
       })
     },
-    
+    getTask () {
+      if (!this.taskId) {
+        return
+      }
+      this.$http.get(this.api + '/tasks/' + this.taskId, {credentials: true})
+      .then(resp => {
+        if (resp.body.task && ['COMPLETED', 'FAILED'].indexOf(resp.body.task.tks_status) >= 0) {
+          if (this.running) {
+            clearInterval(this.running)
+            this.running = null
+          }
+          this.taskId = null
+        }
+      })
+    },
     publish () {
-      this.$http.put(this.api + '/' + this.processId + '/catalog',
+      if (this.running) {
+        return
+      }
+      this.$http.put(this.api + '/process/' + this.processId + '/catalog',
         this.post,
         {
           credentials: true,
           headers: {'Content-Type': 'application/json'}
         }
       ).then(
-        resp => {},
+        resp => {
+          
+          this.taskId = resp.body.task
+          var self = this
+          this.running = setInterval(function (){
+            self.getTask()
+          }, 10000)
+        },
         resp => {console.log('pb publish')}
       )
     },
@@ -271,7 +299,7 @@ export default {
       this.$refs.keywords.$forceUpdate()
     },
     save () {
-      this.$http.post(this.api + '/' + this.processId + '/catalog',
+      this.$http.post(this.api + '/process/' + this.processId + '/catalog',
         this.post,
         {
           credentials: true,
@@ -286,6 +314,14 @@ export default {
 }
 </script>
 <style>
+.gdm-processing {
+    position:fixed;
+    top: 48%;
+    left:50%;
+    color:white;
+    text-shadow:1px 1px 3px #333, -1px -1px 3px #333;
+    z-index:2001;
+  }
 
 .btn {
   display: inline-block;
