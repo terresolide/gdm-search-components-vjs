@@ -242,9 +242,9 @@ export default {
       .then(
         resp => { this.treatmentProcess(resp)},
         resp => { if (resp.body.error) {
-            this.errorProcess = 'Le serveur a répondu: ' + resp.body.error
+            this.errorProcess = 'Le serveur a répondu lors de l\'accès au job: ' + resp.body.error
           } else {
-            this.errorProcess = 'e serveur a répondu: UNKNOWN ERROR' 
+            this.errorProcess = 'Le serveur a répondu lors de l\'accès au job: UNKNOWN ERROR' 
           }
       })
     },
