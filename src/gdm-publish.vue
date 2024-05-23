@@ -27,10 +27,13 @@
    <div style="color:darkred;margin:10px 0;border:1px solid darkred;padding:10px;display:inline-block;"><i class="fa fa-exclamation-triangle"></i> 
     Attention, vous devez vous assurer que le répertoire des résultats n'est pas provisoire!
   </div>
+  <div style="color:darkred;margin:10px 0;border:1px solid darkred;padding:10px;display:inline-block;"><i class="fa fa-exclamation-triangle"></i> 
+      {{error}}
+    </div>
   <div style="border:1px solid darkgrey;padding:10px; max-width:900px;box-shadow: 0 1px 5px rgba(0,0,0,.65);">
      <div style="text-align:right;">
       <button class="btn btn-publish" @click="save" title="Enregistrer les informations en interne">Sauvegarder</button>
-      <button class="btn btn-publish" @click="publish" title="Publier dans le catalogue FormaTerre">
+      <button class="btn btn-publish" @click="publish" :disabled="error" ßtitle="Publier dans le catalogue FormaTerre">
         <template v-if="metaUrl">Modifier dans le catalogue</template> 
         <template v-else >Publier dans le catalogue</template>
       </button>
@@ -76,6 +79,7 @@ export default {
   },
   data () {
     return {
+      error: null,
       process: null,
       metaUrl: null,
       hasSerie: false,
@@ -127,6 +131,8 @@ export default {
       this.$http.get(this.api + '/' + this.processId + '/catalog', {credentials: true})
       .then(resp => {
               this.metaUrl = resp.body.url
+      }, resp => {
+        this.error = resp.body.error
       })
     },
     getProcess() {
@@ -281,6 +287,10 @@ export default {
   color: #fff;
   background-color: #8b0000;
   border-color: #8b0000;
+}
+.btn-publish:disabled {
+  opacity:0.6;
+  pointer-events: none;
 }
 .btn-publish:hover {
   background-color: #7d0e0e;
