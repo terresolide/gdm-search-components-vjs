@@ -24,16 +24,22 @@
       Une fois publié, vous pourrez toujours modifier ces informations. 
      </div>
    </em>
-   <div style="color:darkred;margin:10px 0;border:1px solid darkred;padding:10px;display:inline-block;"><i class="fa fa-exclamation-triangle"></i> 
-    Attention, vous devez vous assurer que le répertoire des résultats n'est pas provisoire!
-  </div>
-  <div style="color:darkred;margin:10px 0;border:1px solid darkred;padding:10px;display:inline-block;"><i class="fa fa-exclamation-triangle"></i> 
-      {{error}}
+   <div style="color:darkred;margin:10px 0;border:1px solid darkred;padding:10px;display:block;max-width:900px;">
+    <i class="fa fa-exclamation-triangle" style="vertical-align:top;width:30px;"></i> 
+    <div style="display:inline-block;width:calc(100% - 50px);">
+      <div v-if="errorGn" style="margin-bottom:5px;">L'application a renvoyé le message d'erreur suivant: {{ errorGn }}. 
+        <br>Vous ne pourrez pas publier  dans le catalogue FormaTerre pour le moment, mais vous pouvez toujours enregistrer les informations auprès de GDM et finaliser plus tard.</div>
+      <div v-if="errorProcess" style="margin-bottom:5px;">{{ errorProcess }}</div>
+      <div v-if="!errorProcess">Vous devez vous assurer que le répertoire des résultats est <b>pérenne</b>! 
+        <div v-if="resultDir && !errorProcess">Le répertoire enregistré en DB est: <br><a :href="resultDir" target="_blank">{{ resultDir }}</a> </div>
+      </div>
     </div>
+
+  </div>
   <div style="border:1px solid darkgrey;padding:10px; max-width:900px;box-shadow: 0 1px 5px rgba(0,0,0,.65);">
      <div style="text-align:right;">
-      <button class="btn btn-publish" @click="save" title="Enregistrer les informations en interne">Sauvegarder</button>
-      <button class="btn btn-publish" @click="publish" :disabled="error" ßtitle="Publier dans le catalogue FormaTerre">
+      <button class="btn btn-publish" @click="save" :disabled="errorProcess" title="Enregistrer les informations en interne">Sauvegarder</button>
+      <button class="btn btn-publish" @click="publish" :disabled="errorGn || errorProcess" title="Publier dans le catalogue FormaTerre">
         <template v-if="metaUrl">Modifier dans le catalogue</template> 
         <template v-else >Publier dans le catalogue</template>
       </button>
@@ -48,8 +54,8 @@
   
      <h2>Objectif</h2>
      <div style="margin-left:10px;">
-        <div><span class="lang-label">FR: </span><textarea v-model="post.purpose.fr" style="vertical-align: top;"></textarea>      </div> 
-        <div><span class="lang-label">EN: </span><textarea v-model="post.purpose.en" style="vertical-align: top;"></textarea>      </div> 
+        <div><span class="lang-label">FR: </span><textarea v-model="post.purpose.fr" style="vertical-align: top;"></textarea></div> 
+        <div><span class="lang-label">EN: </span><textarea v-model="post.purpose.en" style="vertical-align: top;"></textarea></div> 
       </div>
       <gdm-keywords ref="keywords" :has-serie="hasSerie" :count="count" :keywords="post.keywords" @vocab="checkKeywords"
       @remove="removeKeyword" @add="addKeyword"></gdm-keywords>
@@ -79,7 +85,9 @@ export default {
   },
   data () {
     return {
-      error: null,
+      errorGn: null,
+      errorProcess: null,
+      resultDir: null,
       process: null,
       metaUrl: null,
       hasSerie: false,
@@ -132,96 +140,113 @@ export default {
       .then(resp => {
               this.metaUrl = resp.body.url
       }, resp => {
-        this.error = resp.body.error
+        this.errorGn = resp.body.error
       })
+    },
+    treatmentProcess(resp) {
+      var json = resp.body
+       console.log(resp)
+       if (!json.result) {
+         this.errorProcess = 'Aucun résultat à publier pour ce job'
+         return
+       }
+       this.resultDir = json.result.dir
+       if (json.result['series']) {
+         this.hasSerie = true
+       } else {
+         // vieux format de résultat!!
+         for(var key in json.result) {
+           if (key.indexOf('iw') >= 0) {
+             if (json.result[key].Time_Serie) {
+               this.hasSerie = true
+             }
+           }
+         }
+       }
+       this.getMetadata()
+       if (json.metadata) {
+         this.post = Object.assign(this.post,json.metadata)
+       }
+       this.temporal = {
+         fr: json.feature.properties.temporalExtent[0].substring(0,10) + ' à ' + json.feature.properties.temporalExtent[1].substring(0,10),
+         en: json.feature.properties.temporalExtent[0].substring(0,10) + ' to ' + json.feature.properties.temporalExtent[1].substring(0,10)
+       }
+       if (json.metadata) {
+         this.type = 'update'
+         var keywords = json.metadata.keywords
+         
+         if (json.metadata.title.fr) {
+             this.post.title = json.metadata.title
+         } else {
+           this.post.title = {
+             fr: json.metadata.title,
+             en: json.metadata.title
+           }
+         }
+         this.post.goal = json.metadata.goal
+       } else {
+         this.post.title = {
+           fr: json.feature.properties.processusName,
+           en: json.feature.properties.processusName
+         }
+         var rOrbit = json.feature.properties.parameters.relative_orbit
+         var ron = rOrbit[0].toUpperCase() + rOrbit.slice(1).padStart(3, 0)
+      
+         var keywords = {
+           thesaurus: {
+             polarisation: [
+                {
+                  fr: json.feature.properties.parameters.polarisation.toUpperCase(),
+                  en: json.feature.properties.parameters.polarisation.toUpperCase()
+                }
+             ],
+             ron: [
+                {
+                  fr: ron,
+                  en: ron
+                }
+             ],
+             platform: [
+              {
+                 fr: 'SENTINEL-1',
+                 en: 'SENTINEL-1',
+                 uri: 'https://service.poleterresolide.fr/voc/platform/P010100'
+              }
+             ]
+           },
+           free: {}
+         }
+       }
+       var vocabularies = this.$refs.keywords.vocabularies;
+       vocabularies.forEach(function (vocab) {
+         if (!keywords.thesaurus[vocab.id]) {
+           keywords.thesaurus[vocab.id] = []
+         }
+       })
+       keywords.thesaurus.polarisation[0].disabled = true
+       keywords.thesaurus.ron[0].disabled = true
+       keywords.thesaurus.platform[0].disabled = true
+       var types = this.$refs.keywords.types
+       if (!keywords.free) {
+         keywords.free = {}
+       }
+       for(var type in types) {
+          if (!keywords.free[type]) {
+            keywords.free[type] = []
+          }
+        }
+       this.post.keywords = keywords
     },
     getProcess() {
       this.$http.get(this.api + '/' + this.processId, {credentials: true})
-      .then(resp => {
-        var json = resp.body
-        console.log(resp)
-        if (json.result['series']) {
-          this.hasSerie = true
-        } else {
-          // vieux format de résultat!!
-          for(var key in json.result) {
-            if (key.indexOf('iw') >= 0) {
-              if (json.result[key].Time_Serie) {
-                this.hasSerie = true
-              }
-            }
-          }
-        }
-        this.getMetadata()
-        if (json.metadata) {
-          this.post = Object.assign(this.post,json.metadata)
-        }
-        this.temporal = {
-          fr: json.feature.properties.temporalExtent[0].substring(0,10) + ' à ' + json.feature.properties.temporalExtent[1].substring(0,10),
-          en: json.feature.properties.temporalExtent[0].substring(0,10) + ' to ' + json.feature.properties.temporalExtent[1].substring(0,10)
-        }
-        if (json.metadata) {
-          this.type = 'update'
-          var keywords = json.metadata.keywords
-          
-          if (json.metadata.title.fr) {
-              this.post.title = json.metadata.title
+      .then(
+        resp => { this.treatmentProcess(resp)},
+        resp => { if (resp.body.error) {
+            this.errorProcess = 'Le serveur a répondu: ' + resp.body.error
           } else {
-            this.post.title = {
-              fr: json.metadata.title,
-              en: json.metadata.title
-            }
+            this.errorProcess = 'e serveur a répondu: UNKNOWN ERROR' 
           }
-          this.post.goal = json.metadata.goal
-        } else {
-          this.post.title = {
-            fr: json.feature.properties.processusName,
-            en: json.feature.properties.processusName
-          }
-          var rOrbit = json.feature.properties.parameters.relative_orbit
-          var ron = rOrbit[0].toUpperCase() + rOrbit.slice(1).padStart(3, 0)
-       
-          var keywords = {
-            thesaurus: {
-              polarisation: [
-                 {
-                   fr: json.feature.properties.parameters.polarisation.toUpperCase(),
-                   en: json.feature.properties.parameters.polarisation.toUpperCase()
-                 }
-              ],
-              ron: [
-                 {
-                   fr: ron,
-                   en: ron
-                 }
-              ],
-              platform: [
-               {
-                  fr: 'SENTINEL-1',
-                  en: 'SENTINEL-1',
-                  uri: 'https://service.poleterresolide.fr/voc/platform/P010100'
-               }
-              ]
-            }
-          }
-        }
-        var vocabularies = this.$refs.keywords.vocabularies;
-        vocabularies.forEach(function (vocab) {
-          if (!keywords.thesaurus[vocab.id]) {
-            keywords.thesaurus[vocab.id] = []
-          }
-        })
-        keywords.thesaurus.polarisation[0].disabled = true
-        keywords.thesaurus.ron[0].disabled = true
-        keywords.thesaurus.platform[0].disabled = true
-        var types = this.$refs.keywords.types
-        for(var type in types) {
-           if (!keywords.free[type]) {
-             keywords.free[type] = []
-           }
-         }
-        this.post.keywords = keywords
-       })
+      })
     },
     
     publish () {
@@ -232,7 +257,7 @@ export default {
           headers: {'Content-Type': 'application/json'}
         }
       ).then(
-        resp => {console.log()},
+        resp => {},
         resp => {console.log('pb publish')}
       )
     },
