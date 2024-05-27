@@ -48,6 +48,10 @@
      <formater-search-box :color="color" header-icon-class="fa fa-calendar" open-icon-class="fa fa-caret-right" :title="$t('temporal_extent')" :deployed="false" type="empty" >
          <formater-temporal-search name="temp" lang="fr" :color="color" :format="format" :default-from="parameters.tempStart" :default-to="parameters.tempEnd" daymin="2014-04-03" @change="dateChange"></formater-temporal-search>
      </formater-search-box>
+     <formater-search-box  :color="color" v-if="back" header-icon-class="fa fa-database" open-icon-class="fa fa-caret-right" title="Catalogue" :deployed="false" type="empty" >
+         <div><div style="display:inline-block;width:calc(100% - 50px);text-align:left;">Possèdent des métadonnées pour le catalogue FormaTerre:      </div>
+          <input type="checkbox" v-model="catalog"  @change="catalogChange"/>      </div>
+       </formater-search-box>
       <formater-search-box  :color="color" v-if="groups.length > 0 && back" header-icon-class="fa fa-object-group" open-icon-class="fa fa-caret-right" :title="$t('service_group')" :deployed="false" type="empty" >
       <formater-select  :color="color" :options="groups" :defaut="parameters.group" @input="groupChange" width="228px"></formater-select>
     </formater-search-box>
@@ -166,6 +170,7 @@ export default {
   },
   created () {
     this.archived = this.parameters.archived
+    this.catalog = this.parameters.catalog
     this.$i18n.locale = this.lang
     if (this.lang === 'fr') {
       this.format = 'DD/MM/YYYY'
@@ -187,6 +192,7 @@ export default {
         daymax: 'now'
       },
       archived: false,
+      catalog:false,
       format: 'DD/MM/YYYY',
       textSearch: null,
       dateFormat: 'DD/MM/YYYY',
@@ -238,6 +244,9 @@ export default {
     },
     archivedChange () {
       this.$emit('archivedChange', this.archived)
+    },
+    catalogChange() {
+      this.$emit('catalogChange', this.catalog)
     },
     textChange(event) {
       if (event.which == 13 || event.keyCode == 13) {

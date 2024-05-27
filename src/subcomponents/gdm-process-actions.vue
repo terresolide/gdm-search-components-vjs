@@ -20,6 +20,7 @@
      "get_result": "Get result",
      "recorded_request": "Your request has been saved.\nIt will be processed as quickly as possible by our service.",
      "run": "end of debug",
+     "save": "Save",
      "share": "Share",
      "publish": "Publish"
    },
@@ -43,6 +44,7 @@
      "get_result": "Obtenir les résultats",
      "recorded_request": "Votre demande a été enregistrée.\nElle sera traitée le plus rapidement possible par nos services.",
      "run": "Fin du debug" ,
+     "save": "Enregistrer",
      "share": "Partager",
      "publish": "Publier"
    }
@@ -73,7 +75,20 @@
           </div>
         </form>
       </div>
- 
+      <div v-if="showCatalog && back" class="publish-box">
+           <div style="float:right;"><span class="gdm-close fa fa-close" @click="showCatalog=false"></span></div>
+              <div style="margin:10px 0;"> Vous souhaitez publier ce job dans un catalogue. Il existe deux catalogues:
+                <ul>
+                  <li>le catalogue FormaTerre</li>
+                  <li>le catalogue ISDeform (moissonné par FormaTerre)</li>
+                </ul>
+              </div>
+              <div style="margin:10px 0;text-align:right;">
+                     <input type="button" class="button" @click="showCatalog=false" value="Annuler" />
+                     <a href="" class="button">FormaTerre</a>
+                     <input type="button" class="button" disabled value="ISDeform" />
+             </div>
+      </div>
       <div v-if="showPublish && !back" class="publish-box">
         <div style="float:right;"><span class="gdm-close fa fa-close" @click="showPublish=false"></span></div>
         <div v-html="$t('continue_publish')" style="margin:10px 0;"></div>
@@ -113,8 +128,13 @@
          <span v-if="process.serviceName.indexOf('SAR-I') >= 0 && process.status === 'TERMINATED'">
 	         <a class="button" v-if="!back && userId === process.userId && !process.isExample" 
 	         @click="showPublish = true" :class="{disabled: process.keep}">{{$t('publish')}}</a>
+          
            <a class="button" v-if="back && !process.isExample && !process.keep" @click="changeKeep">Ne pas purger</a>
            <a class="button" v-else-if="back && !process.isExample && process.keep" @click="changeKeep">À purger</a>
+           
+           <!-- catalogue -->
+           <a class="button" v-if="back && !process.metadata" @click="showCatalog=true" title="Publier dans un catalogue">Catalogue</a>
+           <a class="button" v-if="back && process.metadata" href="" title="Modifier les métadonnées pour le catalogue FormaTerre">Catalogue FormaTerre</a>
            <!--  button purge -->
           <a class="button" v-if="!process.isExample && !process.keep" @click="purge"  :class="{disabled: !canEdit}">
            <i class="fa fa-trash"></i> {{$t('purge')}}</a>
@@ -211,6 +231,7 @@ export default {
       isExample: false,
       resultUrl: null,
       showPublish: false,
+      showCatalog: false,
       invalidUrl: false,
       purpose: '',
       getCount: 0,
@@ -622,11 +643,14 @@ export default {
   -webkit-animation: spin 1.5s linear infinite;
   animation: spin 1.5s linear infinite;
 }
-/*
-a.button{
+
+a.button,
+input[type="button"].button {
    display: inline-block;
    margin: 0px 7px 3px 0;
    padding: 3px 12px;
+   font-family: Arial, Helvetica, sans-serif;
+   font-size: 14px;
    height: auto;
    line-height: 1.43;
    white-space: normal;
@@ -645,16 +669,19 @@ a.button{
    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
    opacity: 0.8
   }
- a.button:hover{
+ a.button:hover,
+ input[type="button"].button:hover{
    background: #f0f0e6;
    text-decoration: none;
    opacity: 1
  }
 
  a.button:disabled,
- a.button.disabled {
+ a.button.disabled,
+ input[type="button"].button:disabled,
+ input[type="button"].button.disabled{
     color: #999;
     pointer-events: none;
-  }*/
+  }
 
 </style>

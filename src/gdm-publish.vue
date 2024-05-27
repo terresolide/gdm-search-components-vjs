@@ -77,6 +77,10 @@ export default {
       type: Number,
       default: null
     },
+    geonetwork: {
+      type: String,
+      default: null
+    },
     api: {
       type: String,
       default: 'https://gdm.formater/api'

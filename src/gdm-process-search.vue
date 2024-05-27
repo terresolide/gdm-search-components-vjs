@@ -39,7 +39,8 @@
     :color="color" :user="parameters.user" :service="parameters.service" :height="height" :back="back"
     :parameters="parameters" :teams="teams"
      @remove="removeSelected" @dateChange="dateChange" @statusChange="statusChange" @groupChange="groupChange"
-     @teamChange="teamChange" @textChange="textChange" @archivedChange="archivedChange" @reset="reset"></gdm-form-process> 
+     @teamChange="teamChange" @textChange="textChange" @archivedChange="archivedChange" 
+     @catalogChange="catalogChange" @reset="reset"></gdm-form-process> 
    </div>
    <div class="column-right" >
    <div id="fmtLargeMap" style="width:calc(100%);"></div>
@@ -368,6 +369,9 @@ export default {
        if (this.parameters.archived) {
          location += '&archived=1'
        }
+       if (this.parameters.catalog) {
+          location += '&catalog=1'
+       }
        if (this.parameters.team && this.parameters.team !== '0') {
          location += '&team=' + this.parameters.team
        }
@@ -432,6 +436,10 @@ export default {
        var archived = url.searchParams.get('archived')
        if (archived) {
          this.parameters.archived = archived
+       }
+       var catalog= url.searchParams.get('catalog')
+       if (catalog) {
+         this.parameters.catalog = catalog
        }
        var order = url.searchParams.get('order')
        if (order) {
@@ -539,6 +547,14 @@ export default {
         this.parameters.archived = value
       } else {
         delete this.parameters.archived
+      }
+      this.changeQuery()
+    },
+    catalogChange (value) {
+      if (value) {
+        this.parameters.catalog = value
+      } else {
+        delete this.parameters.catalog
       }
       this.changeQuery()
     },
