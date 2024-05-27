@@ -65,11 +65,13 @@
       <div v-if="showPublish && back" class="publish-box">
         <div style="float:right;"><span class="gdm-close fa fa-close" @click="showPublish=false"></span></div>
         <h3 :style="{color:color}">Entrez l'url du nouveau répertoire</h3>
-        <input v-model="resultUrl" type="url"  style="min-width:430px;" @keypress="validUrl"/>
-        <div style="margin:10px 0;text-align:right;">
-          <input type="button" class="button" @click="showPublish=false" value="Annuler" />
-         <input type="button" class="button" @click="publish" :disabled="invalidUrl" :value="process.isExample ? $t('save') : $t('publish')" />
-        </div>
+        <form name="publish">
+          <input v-model="resultUrl" type="url"  style="min-width:430px;"/>
+          <div style="margin:10px 0;text-align:right;">
+            <input type="button" class="button" @click="showPublish=false" value="Annuler" />
+           <input type="button" class="button" @click="publish"  :value="process.isExample ? $t('save') : $t('publish')" />
+          </div>
+        </form>
       </div>
  
       <div v-if="showPublish && !back" class="publish-box">
@@ -433,6 +435,11 @@ export default {
     },
     publish () {
       this.submitting = true
+      var form = this.$el.querySelector('form[name="publish"]')
+      if (!form.reportValidity()) {
+        this.submitting = false
+        return false
+      }
       this.$http.post(
           this.api + '/process/' + this.process.id + '/publish',
           {url: this.resultUrl},
