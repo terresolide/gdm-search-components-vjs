@@ -3,14 +3,15 @@
    "en":{
      "abort": "Abort",
      "before_get_result": "You will download the backup_product.json file from the results directory.\nIt may not exist yet!\nDo you want to continue?",
+     "cancel": "Cancel",
      "confirm_abort": "This action is final.\nAre you sure you want to continue?",
-     "continue_publish": "You request a publication of your results.\nIf this request is accepted, your results will appear from the interface under the \"public results\" tab.\nDo you want to continue?",
+     "continue_publish": "You will request a publication of your results.<br>If this request is accepted, your results will appear from the interface under the \"public results\" tab.<br>Please justify your request in a few lines:",
      "refresh": "Refresh",
      "edit": "Edit",
      "launch": "Launch",
      "relaunch": "Relaunch",
-     "stop": "Kill",
-     "cancel": "Stop",
+     "kill": "Kill",
+     "stop": "Stop",
      "purge": "To trash",
      "evaluate": "Evaluate",
      "error_occured": "An error has occured",
@@ -25,14 +26,15 @@
    "fr":{
      "abort": "Abandonner",
      "before_get_result": "Vous allez télécharger le fichier backup_product.json du répertoire des résultats.\nIl est possible qu'il n'existe pas encore!\nVoulez-vous continuer?",
+     "cancel": "Annuler",
      "confirm_abort": "Cette action est définitive.\nVoulez-vous continuer?",
-     "continue_publish": "Vous demandez une publication de vos résultats.\nSi cette demande est acceptée, vos résultats apparaîtront depuis l'interface sous l'onglet \"résultats publics\".\nVoulez-vous continuer?",
+     "continue_publish": "Vous allez demander une publication de vos résultats.<br>Si cette demande est acceptée, vos résultats apparaîtront depuis l'interface sous l'onglet \"résultats publics\".<br>Veuillez justifier votre demande en quelques lignes:",
      "refresh": "Actualiser",
      "edit": "Editer",
      "launch": "Lancer",
      "relaunch": "Relancer",
-     "stop": "Détruire",
-     "cancel": "Stopper",
+     "kill": "Détruire",
+     "stop": "Stopper",
      "purge": "Vider",
      "evaluate": "Evaluer",
      "error_occured": "Une erreur s'est produite",
@@ -48,6 +50,7 @@
 </i18n>
 <template>
 <span class="gdm-process-actions" v-if="process && (userId || back)" >
+  
       <div v-show="showShare" class="gdm-share" >
 	      <h3 :style="{color:color}">{{$t('share')}}</h3>
 	      Avec les membres de l'équipe
@@ -59,12 +62,24 @@
 	         <a class="button small"  @click="share">{{$t('share')}}</a>
 	      </div>
       </div>
-      <div v-if="showPublish" class="publish-box">
+      <div v-if="showPublish && back" class="publish-box">
         <div style="float:right;"><span class="gdm-close fa fa-close" @click="showPublish=false"></span></div>
         <h3 :style="{color:color}">Entrez l'url du nouveau répertoire</h3>
-        <input v-model="resultUrl" type="url"  style="min-width:380px;" @keyup="validUrl"/>
+        <input v-model="resultUrl" type="url"  style="min-width:430px;" @keypress="validUrl"/>
+        <div style="margin:10px 0;text-align:right;">
+          <input type="button" class="button" @click="showPublish=false" value="Annuler" />
          <input type="button" class="button" @click="publish" :disabled="invalidUrl" :value="process.isExample ? $t('save') : $t('publish')" />
-         
+        </div>
+      </div>
+ 
+      <div v-if="showPublish && !back" class="publish-box">
+        <div style="float:right;"><span class="gdm-close fa fa-close" @click="showPublish=false"></span></div>
+        <div v-html="$t('continue_publish')" style="margin:10px 0;"></div>
+        <textarea v-model="purpose" style="width:calc(100% - 10px);height:80px;"></textarea>
+        <div style="text-align:right;margin:10px 0;">
+           <input type="button" class="button" @click="showPublish = false" :value="$t('cancel')" />
+           <input type="button" :disabled="purpose.length < 10" class="button" @click="requestPublish" :value="$t('publish')" />
+        </div>
       </div>
       <span  v-if="submitting" class="gdm-searching"><i class="fa fa-circle-o-notch animated"></i></span>
       <a class="button" v-if="userId===process.userId && teams.length > 0 && !process.team" @click="showShare=true"  >{{$t('share')}}</a>
@@ -86,15 +101,16 @@
   
       <!--  PURGED NOTHING TO DO => CREATE NEW PROCESS WITH THIS-->
       <span v-else-if="process.status === 'PURGED' || process.status === 'ABORTED' || process.status === 'TERMINATED'">
+    
          <a class="button" @click="duplicate"  :class="{disabled: !canEdit}">{{$t('duplicate')}}</a>
          <a class="button" v-if="back && process.status ==='TERMINATED' && !process.isExample" @click="showPublish=true"  :class="{disabled: !canEdit}">{{$t('publish')}}</a>
           <a class="button" v-if="back && process.isExample && process.status ==='TERMINATED'" @click="showPublish=true">Modifier url résultat</a>
           <a class="button" v-if="back && process.isExample && process.status ==='TERMINATED'" @click="unpublish">Dépublier</a>
          
          <!--  for SAR TERMINATED process -->
-         <span v-if="process.group === 'SAR' && process.status === 'TERMINATED'">
+         <span v-if="process.serviceName.indexOf('SAR-I') >= 0 && process.status === 'TERMINATED'">
 	         <a class="button" v-if="!back && userId === process.userId && !process.isExample" 
-	         @click="requestPublish" :class="{disabled: process.keep}">{{$t('publish')}}</a>
+	         @click="showPublish = true" :class="{disabled: process.keep}">{{$t('publish')}}</a>
            <a class="button" v-if="back && !process.isExample && !process.keep" @click="changeKeep">Ne pas purger</a>
            <a class="button" v-else-if="back && !process.isExample && process.keep" @click="changeKeep">À purger</a>
            <!--  button purge -->
@@ -193,7 +209,8 @@ export default {
       isExample: false,
       resultUrl: null,
       showPublish: false,
-      invalidUrl: true,
+      invalidUrl: false,
+      purpose: '',
       getCount: 0,
       searchResult: false,
     }
@@ -447,12 +464,10 @@ export default {
       })
     },
     requestPublish () {
-      if (!window.confirm(this.$i18n.t('continue_publish'))) {
-        return
-      }
+     
       this.submitting = true
-      this.$http.get(
-          this.api.replace('api', 'requests') + '/publish/' + this.process.id,
+      this.$http.post(
+          this.api.replace('api', 'requests') + '/publish/' + this.process.id, {purpose: this.purpose},
           {headers: { 'accept-language': this.lang}, credentials: true, emulateJSON: true})
       .then(function (resp) {
          console.log(resp)

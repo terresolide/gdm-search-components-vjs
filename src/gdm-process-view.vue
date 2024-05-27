@@ -153,6 +153,7 @@
 		  <!--  </div>
 		   <div class="header-4">--> 
 		   <div class="process-actions">
+ 
 		     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" :color="color"
 		     :process="process" :user-id="userId" :is-private="isPrivate" :can-edit="hasAccessService && !pleiadeRemoved" :lang="lang" :teams="teams" @processChange="statusChange" 
 		     @statusChange="statusChange" @teamChange="teamChange" @duplicate="duplicate"
