@@ -85,7 +85,7 @@
               </div>
               <div style="margin:10px 0;text-align:right;">
                      <input type="button" class="button" @click="showCatalog=false" value="Annuler" />
-                     <a href="" class="button">FormaTerre</a>
+                     <a :href="metadataUrl" class="button">FormaTerre</a>
                      <input type="button" class="button" disabled value="ISDeform" />
              </div>
       </div>
@@ -134,7 +134,7 @@
            
            <!-- catalogue -->
            <a class="button" v-if="back && !process.metadata" @click="showCatalog=true" title="Publier dans un catalogue">Catalogue</a>
-           <a class="button" v-if="back && process.metadata" href="" title="Modifier les métadonnées pour le catalogue FormaTerre">Catalogue FormaTerre</a>
+           <a class="button" v-if="back && process.metadata" :href="metadataUrl" title="Modifier les métadonnées pour le catalogue FormaTerre">Catalogue FormaTerre</a>
            <!--  button purge -->
           <a class="button" v-if="!process.isExample && !process.keep" @click="purge"  :class="{disabled: !canEdit}">
            <i class="fa fa-trash"></i> {{$t('purge')}}</a>
@@ -277,6 +277,9 @@ export default {
     },
     disabled () {
       return  (!this.serviceOpen || this.submitting)
+    },
+    metadataUrl () {
+      return  this.api.replace('api' ,'process') + '/' + this.process.id + '/metadata'
     }
   },
   destroyed () {
