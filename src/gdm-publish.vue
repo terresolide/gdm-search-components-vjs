@@ -1,8 +1,8 @@
 <template>
  <div class="gdm-publish">
   <div v-if="running" class="gdm-processing fa fa-spinner fa-spin fa-3x fa-fw running" ></div>
-   <h1 v-if="type === 'insert'">Publication dans le catalogue FormaTerre pour le job {{ this.post.title.fr }}</h1>
-   <h1 v-else>Mise à jour des métadonnées pour le job {{ this.post.title.fr }}</h1>
+   <h1 v-if="type === 'insert'">Catalogue FormaTerre - publication du job N°{{processId}} &laquo;{{this.post.title.fr }}&raquo;</h1>
+   <h1 v-else>Catalogue FormaTerre - M.a.j des métadonnées du job N°{{ processId }} - {{ this.post.title.fr }}</h1>
    <em style="display:block;">Une grande partie des métadonnées provient des informations sur le calcul et du backup_product.json (emprise géographique, dates, liens...) mais ces informations sont insuffisantes
     pour   l'indexation de vos produits dans le catalogue FormaTerre et par suite celui de DataTerra<br><br>
     Nous vous encourageons donc à compléter au mieux les informations ci-dessous.<br>
@@ -87,6 +87,9 @@ export default {
     }
   },
   created () {
+    if (!this.geonetwork) {
+      this.errorGn = 'PAS DE GEONETWORK CONFIGURÉ'
+    }
     this.getProcess()
   },
   data () {

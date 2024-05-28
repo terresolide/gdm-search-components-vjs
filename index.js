@@ -11,4 +11,4 @@ import GdmRestrictTo from './src/gdm-restrict-to.vue'
 import GdmStat from './src/gdm-stat.vue'
 import GdmServiceStatus from './src/subcomponents/gdm-service-status.vue'
 
-xport {GdmProcessSearch, GdmManageStep, GdmPaging, GdmProcessSar, GdmProcessView, GdmPublish, GdmRestrictTo, GdmStat}d
+export {GdmProcessSearch, GdmManageStep, GdmPaging, GdmProcessSar, GdmProcessView, GdmPublish, GdmRestrictTo, GdmStat}d

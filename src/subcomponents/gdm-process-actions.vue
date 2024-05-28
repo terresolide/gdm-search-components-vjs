@@ -279,7 +279,7 @@ export default {
       return  (!this.serviceOpen || this.submitting)
     },
     metadataUrl () {
-      return  this.api.replace('api' ,'process') + '/' + this.process.id + '/metadata'
+      return  this.api.replace('api' ,'process') + '/metadata/' + this. process.id 
     }
   },
   destroyed () {
