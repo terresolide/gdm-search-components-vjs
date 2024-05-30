@@ -116,8 +116,8 @@
              <div v-for="type in ['provider', 'position']" >
                 <div v-if="process.properties[type]" >
                   <div v-for="(value, prop) in process.properties[type]" 
-                  v-if="prop !== 'bbox' && prop !== 'providerName' && value">
-                    <div><b>{{$t(prop)}}:</b> {{value}}</div>
+                  v-if="prop !== 'bbox' && prop !== 'providerName'  && value">
+                    <div><b>{{$t(prop)}}:</b> {{decodeURIComponent(value)}}</div>
                   </div>
                </div>
              </div>

@@ -78,7 +78,7 @@
       <div v-if="showCatalog && back" class="publish-box">
            <div style="float:right;"><span class="gdm-close fa fa-close" @click="showCatalog=false"></span></div>
               <div style="margin:10px 0;"> Vous souhaitez publier ce job dans un catalogue. Il existe deux catalogues:
-                <ul>
+                <ul style="margin-left:20px;">
                   <li>le catalogue FormaTerre</li>
                   <li>le catalogue ISDeform (moissonné par FormaTerre)</li>
                 </ul>
