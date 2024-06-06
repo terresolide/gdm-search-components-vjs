@@ -106,7 +106,7 @@
 	          </div>
 	         
 	          <div v-if="process.status === 'TERMINATED' && process.datePurge && !process.keep"
-	          style="font-size:0.9em;color:darkred;cursor:pointer;" :title="$t('clear_data')">
+	          style="color:darkred;cursor:pointer;" :title="$t('clear_data')">
 	           <i class="fa fa-exclamation-triangle"> 
 	           </i>
 	           <b>Purge: </b>

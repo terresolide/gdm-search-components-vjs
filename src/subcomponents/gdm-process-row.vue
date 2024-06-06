@@ -100,7 +100,7 @@
 	            <i class="fa fa-exclamation-triangle"></i>
 	            <b>Purge: </b>{{printDate(process.properties.datePurge)}}
 	         </span>
-	         <div class="gdm-tooltip">{{$t('clear_data')}}</div>
+	         <div class="gdm-tooltip" style="font-size:0.9em;word-break: normal;">{{$t('clear_data')}}</div>
          </div>
     
    </div>
@@ -394,9 +394,8 @@ div.toSelect.selected:hover  {
  background: #f9eae6;
 }
 .gdm-process-row span.date-purge {
-  font-size:0.9em;
-  color:#333;
-  font-style:italic;
+ 
+  color:darkred;
   cursor:pointer;
 }
 .gdm-process-row div.gdm-tooltip {
