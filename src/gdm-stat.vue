@@ -213,25 +213,25 @@
            <div v-for="(type, index) in userTypes" v-if="groupBy === 'type'">
              <span class="fa fa-circle" :style="{color: colors[index]}"></span>
              <b>{{type.t_name_fr}}</b>:
-             <span v-if="status === 'success' && jobs.duration && jobs.countDuration[type.t_id]">{{secondToStr(jobs.duration[type.t_id]/jobs.countDuration[type.t_id])}}</span>
+             <span v-if="jobs.duration[type.t_id] && jobs.countDuration[type.t_id]">{{secondToStr(jobs.duration[type.t_id]/jobs.countDuration[type.t_id])}}</span>
              <span v-else>---</span>
            </div>
             <div v-for="(pole, index) in poles" v-if="groupBy === 'pole'">
              <span class="fa fa-circle" :style="{color: pole.po_color}"></span>
              <b>{{poleName(pole.po_id)}}</b>:
-             <span v-if="status === 'success' && jobs.duration && jobs.countDuration[pole.po_id]">{{secondToStr(jobs.duration[pole.po_id]/jobs.countDuration[pole.po_id])}}</span>
+             <span v-if="jobs.duration[pole.po_id] && jobs.countDuration[pole.po_id]">{{secondToStr(jobs.duration[pole.po_id]/jobs.countDuration[pole.po_id])}}</span>
              <span v-else>---</span>
            </div>
            <div v-for="service in selectedServices" v-if="groupBy === 'service'  && (selectedService() === '' || selectedService() === service.id)">
              <span class="fa fa-circle" :style="{color: service.color}"></span>
              <b>{{service.name}}</b>:
-             <span v-if="status === 'success' && jobs.duration && jobs.countDuration[service.name]">{{secondToStr(jobs.duration[service.name]/jobs.countDuration[service.name])}}</span>
+             <span v-if="jobs.duration[service.name] && jobs.countDuration[service.name]">{{secondToStr(jobs.duration[service.name]/jobs.countDuration[service.name])}}</span>
              <span v-else>---</span>
            </div>
            <hr v-if="selectedService() === '' || groupBy !== 'service'" style="width:60%;margin-left:5px;color:gray;">
             <div v-if="selectedService() === '' || groupBy !== 'service'" >
               <b>Tout {{groupBy}}</b>:
-              <span v-if="status === 'success' && jobs.avg.duration">{{secondToStr(jobs.avg.duration)}}</span>
+              <span v-if="jobs.avg.duration">{{secondToStr(jobs.avg.duration)}}</span>
               <span v-else>---</span>
             </div>
        </div>
@@ -1308,7 +1308,6 @@ export default {
 	        }
 	      })
       }
-      // this.jobsAverage(e)
       this.average(this.jobs, e.groupBy, e)
       this.drawJobs(e)
     },
