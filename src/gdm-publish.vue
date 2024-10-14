@@ -59,7 +59,8 @@
         <div><span class="lang-label">FR: </span><textarea v-model="post.purpose.fr" style="vertical-align: top;"></textarea></div> 
         <div><span class="lang-label">EN: </span><textarea v-model="post.purpose.en" style="vertical-align: top;"></textarea></div> 
       </div>
-      <gdm-keywords ref="keywords" :has-serie="hasSerie" :count="count" :keywords="post.keywords" @vocab="checkKeywords"
+      <gdm-keywords ref="keywords" :has-serie="hasSerie" :removed="removed.split(',')"
+      :count="count" :keywords="post.keywords" @vocab="checkKeywords"
       @remove="removeKeyword" @add="addKeyword"></gdm-keywords>
    </div>
  </div>
@@ -80,6 +81,10 @@ export default {
     geonetwork: {
       type: String,
       default: null
+    },
+    removed: {
+      type: String,
+      default: 'product,platform,process'
     },
     api: {
       type: String,
@@ -224,12 +229,14 @@ export default {
                  uri: 'https://service.poleterresolide.fr/voc/platform/P010100'
               }
              ]
+                 
            },
            free: {}
          }
        }
        var vocabularies = this.$refs.keywords.vocabularies;
        vocabularies.forEach(function (vocab) {
+         console.log(vocab)
          if (!keywords.thesaurus[vocab.id]) {
            keywords.thesaurus[vocab.id] = []
          }
@@ -238,8 +245,16 @@ export default {
        keywords.thesaurus.ron[0].disabled = true
        keywords.thesaurus.platform[0].disabled = true
        var types = this.$refs.keywords.types
+      
        if (!keywords.free) {
          keywords.free = {}
+       } else {
+          var keys = Object.keys(types)
+          for(var key in keywords.free) {
+            if (keys.indexOf(key) < 0) {
+              keywords.free.theme.concat(keywords.free[key])
+            }
+          }
        }
        for(var type in types) {
           if (!keywords.free[type]) {

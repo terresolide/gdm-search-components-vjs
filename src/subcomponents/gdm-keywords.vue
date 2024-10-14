@@ -84,6 +84,10 @@ export default {
       type: String,
       default: 'https://catalogue-terresolide.ipgp.fr/voc/rest/v1/'
     },
+    removed: {
+      type: Array,
+      default: () => []
+    },
     hasSerie: {
       type: Boolean,
       default: false
@@ -186,6 +190,7 @@ export default {
       this.$http.get(this.voc + 'vocabularies?lang=fr', {headers: {'Accept': 'application/json'}})
       .then(resp => {
         if (resp.body.vocabularies) {
+          // filtre les vocabulaires supprime process et product
           this.vocabularies = resp.body.vocabularies
           this.$emit('vocab', this.vocabularies)
         }
