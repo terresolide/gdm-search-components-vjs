@@ -21,10 +21,11 @@
       <label>Statut</label>
       <select v-model="status" @change="search()">
         <option value="" >---</option>
-        <option value="ended">Terminé</option>
-        <option value="success">Terminé avec succès</option>
-        <option value="failed">En échec</option>
-        <option value="aborted">Abandonné</option>
+        <option value="RUNNING">EN COURS...</option>
+        <option value="ended">TERMINÉ</option>
+        <option value="SUCCESS">Terminé avec succès</option>
+        <option value="FAILED">Terminé en échec</option>
+        <option value="ABORTED">Terminé par abandon</option>
       </select>
       </span>
      <span v-if="mode === 'job' || mode === 'product' || mode === 'ciest2'">
@@ -43,10 +44,12 @@
          </option>
       </select>
      </span>
-     <span v-if="mode === 'job'">
+     <span v-if="mode === 'job' || mode === 'ciest2'">
       <label>Regrouper par</label>
       <select v-model="groupBy" @change="search()">
+         
          <option value="service">Service</option>
+         <option value="status">Statut</option>
          <option value="type">Type d'organisme</option>
          <option value="pole">Pôle de données</option>
       </select>

@@ -170,6 +170,12 @@
              <span v-if="jobs.count && jobs.count[pole.po_id]">{{jobs.count[pole.po_id].toLocaleString()}}</span>
              <span v-else>0</span>
            </div>
+           <div v-for="(status, index) in status" v-if="groupBy === 'status'">
+             <span class="fa fa-circle" :style="{color: status.color}"></span>
+             <b>{{status.name}}</b>:
+             <span v-if="jobs.count && jobs.count[status.id]">{{jobs.count[status.id].toLocaleString()}}</span>
+             <span v-else>0</span>
+           </div>
            <div v-for="service in selectedServices" v-if="groupBy === 'service' && (selectedService() === '' || selectedService() === service.id)">
              <span class="fa fa-circle" :style="{color: service.color}"></span>
              <b>{{service.name}}</b>:
@@ -193,6 +199,12 @@
              <span class="fa fa-circle" :style="{color: pole.po_color}"></span>
              <b>{{poleName(pole.po_id)}}</b>:
              <span v-if="jobs.cost && jobs.cost[pole.po_id]">{{Math.round(jobs.cost[pole.po_id]/jobs.countCost[pole.po_id]).toLocaleString()}} CPU secondes</span>
+             <span v-else>---</span>
+           </div>
+           <div v-for="(status, index) in status" v-if="groupBy === 'status'">
+             <span class="fa fa-circle" :style="{color: status.color}"></span>
+             <b>{{status.name}}</b>:
+             <span v-if="jobs.cost && jobs.cost[status.id]">{{Math.round(jobs.cost[status.id]/jobs.countCost[status.id]).toLocaleString()}} CPU secondes</span>
              <span v-else>---</span>
            </div>
            <div v-for="service in selectedServices" v-if="groupBy === 'service' && (selectedService() === '' || selectedService() === service.id)">
@@ -220,6 +232,12 @@
              <span class="fa fa-circle" :style="{color: pole.po_color}"></span>
              <b>{{poleName(pole.po_id)}}</b>:
              <span v-if="jobs.duration[pole.po_id] && jobs.countDuration[pole.po_id]">{{secondToStr(jobs.duration[pole.po_id]/jobs.countDuration[pole.po_id])}}</span>
+             <span v-else>---</span>
+           </div>
+           <div v-for="(status, index) in status" v-if="groupBy === 'status'">
+             <span class="fa fa-circle" :style="{color: status.color}"></span>
+             <b>{{status.name}}</b>:
+             <span v-if="jobs.duration[status.id] && jobs.countDuration[status.id]">{{secondToStr(jobs.duration[status.id]/jobs.countDuration[status.id])}}</span>
              <span v-else>---</span>
            </div>
            <div v-for="service in selectedServices" v-if="groupBy === 'service'  && (selectedService() === '' || selectedService() === service.id)">
@@ -438,6 +456,23 @@ export default {
       status: '',
       totalUsers: 0,
       disabledUsers: 0,
+      status: [{
+            id: 'RUNNING',
+            name: 'En cours',
+            color: 'grey'
+          }, {
+            id: 'SUCCESS',
+            name: "Terminé avec succès",
+            color: 'green',
+          }, {
+            id: 'ABORTED',
+            name: 'Abandonné',
+            color: 'orange'
+          }, {
+            id: 'FAILED',
+            name: "En échec",
+            color: 'red'
+      }],
      // avg: {},
    //   avgProduct: {},
 //       selectedService: '',
@@ -716,6 +751,11 @@ export default {
           case 'type':
             name = this.nameByKey(index, e.groupBy)
             break;
+          case 'status':
+            var pl = this.status.find(st => st.id === index)
+            colors.push(pl.color)
+            name = pl.name
+            break
           case 'service':
             var find = this.services.find(s => s.name === index)
             name = index
@@ -854,6 +894,14 @@ export default {
             cost += content.cost[pole.po_id]
             countCost += content.countCost[pole.po_id]
           })
+        case 'status':
+          this.status.forEach(function (st) {
+            count += content.count[st.id]
+            countDuration += content.countDuration[st.id]
+            duration += content.duration[st.id]
+            cost += content.cost[st.id]
+            countCost += content.countCost[st.id]
+          })
           break;
         default:
 	        this.selectedServices.forEach(function (sv) {
@@ -953,7 +1001,7 @@ export default {
       }
     },
     searchConnection (e) {
-      var url = this.appUrl + '/statistics/searchSession?'
+      var url = this.appUrl + '/api/statistics/sessions?'
       var params = [];
       if (e.startDate) {
         params.push('start=' + e.startDate)
@@ -968,7 +1016,7 @@ export default {
       })
     },
     searchJob (e) {
-      var url = this.appUrl + '/statistics/searchJobs?'
+      var url = this.appUrl + '/api/statistics/process?'
       var params = [];
       if (e.startDate) {
         params.push('start=' + e.startDate)
@@ -988,8 +1036,8 @@ export default {
       if (e.service) {
         params.push('service=' + e.service)
       }
-      if (e.groupBy !== 'service') {
-        params.push(e.groupBy + '=1')
+      if (e.groupBy ) {
+        params.push('groupBy=' + e.groupBy )
       }
       url += params.join('&')
       this.$http.get(url, {credentials: true})
@@ -998,7 +1046,7 @@ export default {
       })
     },
     searchProduct (e) {
-      var url = this.appUrl + '/statistics/countProducts?'
+      var url = this.appUrl + '/api/statistics/products?'
       var params = [];
           if (e.startDate) {
         params.push('start=' + e.startDate)
@@ -1016,13 +1064,13 @@ export default {
       })
     },
     searchService () {
-      this.$http.get(this.appUrl + '/statistics/serviceUsers', {credentials: true})
+      this.$http.get(this.appUrl + '/api/statistics/users', {credentials: true})
       .then(function (response) {
         this.treatmentServices(response.body)
       })
     },
     searchCiest2 (e) {
-      var url = this.appUrl + '/statistics/ciest?'
+      var url = this.appUrl + '/api/statistics/ciest?'
       var params = [];
           if (e.startDate) {
         params.push('start=' + e.startDate)
@@ -1033,8 +1081,8 @@ export default {
       if (this.status !== '') {
         params.push('status=' + e.status)
       }
-      if (e.service) {
-        params.push('service=' + e.service)
+      if (e.groupBy ) {
+        params.push('groupBy=' + e.groupBy )
       }
       url += params.join('&')
       this.$http.get(url, {credentials: true})
@@ -1286,6 +1334,17 @@ export default {
 	            _this.jobs.data.years[tp.t_id] = results.years 
 	        })
 	        break;
+      case 'status':
+          
+          this.status.forEach(function (st) {
+            var tab = data.process.filter(tp => st.id === tp.status)
+            var results = _this.extractSeriesFrom(tab, st.id, _this.jobs, first, e)
+            first = false
+            _this.jobs.data.days[st.id] = results.days
+            _this.jobs.data.months[st.id] = results.months
+            _this.jobs.data.years[st.id] = results.years 
+          })
+          break;
       case 'pole':
           this.poles.forEach(function (tp) {
             var tab = data.process.filter(ps => ps.pole === tp.po_id)
@@ -1297,6 +1356,7 @@ export default {
           })
           break;
       case 'service':
+        console.log(this.selectedServices)
 	      this.selectedServices.forEach(function (service) {
 	        if (_this.selectedService() === '' || _this.selectedService() === service.id) {
 		        var tab = data.process.filter(p => p.service === parseInt(service.id))
@@ -1355,7 +1415,7 @@ export default {
       var tot = 0
       var rest = 0
       var disabled = 0
-      data.userByType.forEach(function(obj) {
+      data.types.forEach(function(obj) {
         if(obj.type) {
           tot += obj.tot
         } else {
@@ -1368,7 +1428,7 @@ export default {
       var value = 0
       var values = []
       this.userTypes.forEach(function (type, id, array ) {
-        var find = data.userByType.find(obj => obj.type === type.t_id)
+        var find = data.types.find(obj => obj.type === type.t_id)
         if (find) {
           value = Math.round(100 * find.tot / tot)
           rest = rest - tot
@@ -1389,7 +1449,7 @@ export default {
       
       tot = 0
       rest = 0
-      data.userByPole.forEach(function(obj) {
+      data.poles.forEach(function(obj) {
         if(obj.pole) {
           tot += obj.tot
         }
@@ -1399,7 +1459,7 @@ export default {
       values = []
       colors = []
       this.poles.forEach(function (pole, id, array ) {
-        var find = data.userByPole.find(obj => obj.pole === pole.po_id)
+        var find = data.poles.find(obj => obj.pole === pole.po_id)
         if (find) {
           value = Math.round(100 * find.tot / tot)
           rest = rest - tot
@@ -1455,14 +1515,14 @@ export default {
       this.userTypes.forEach(function (tp) {
         aux[tp.t_id] = []
       })
-
-      data.serviceUsers.forEach(function (obj) {
+      console.log(aux)
+      data.serviceTypes.forEach(function (obj) {
         if (obj.service !== currentService) {
           categories.push(obj.service)
           currentService = obj.service
           // search count for this service
           for (var type in aux) {
-            var find = data.serviceUsers.find(el => el.type === type && el.service === currentService)
+            var find = data.serviceTypes.find(el => el.type === type && el.service === currentService)
             if (find) {
               aux[type].push(find.tot)
             } else {
