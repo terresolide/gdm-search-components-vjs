@@ -154,111 +154,16 @@
    </div>
     <div v-show="mode === 'job'" class="job-content" >
     <h1>{{selectedName()}}</h1>
-    <div class="job-header" >
-
-       <div>
-          <h2>Total jobs</h2>
-           <div v-for="(type, index) in userTypes" v-if="groupBy === 'type'">
-             <span class="fa fa-circle" :style="{color: colors[index]}"></span>
-             <b>{{type.t_name_fr}}</b>:
-             <span v-if="jobs.count && jobs.count[type.t_id]">{{jobs.count[type.t_id].toLocaleString()}}</span>
-             <span v-else>0</span>
-           </div>
-           <div v-for="(pole, index) in poles" v-if="groupBy === 'pole'">
-             <span class="fa fa-circle" :style="{color: pole.po_color}"></span>
-             <b>{{poleName(pole.po_id)}}</b>:
-             <span v-if="jobs.count && jobs.count[pole.po_id]">{{jobs.count[pole.po_id].toLocaleString()}}</span>
-             <span v-else>0</span>
-           </div>
-           <div v-for="(status, index) in status" v-if="groupBy === 'status'">
-             <span class="fa fa-circle" :style="{color: status.color}"></span>
-             <b>{{status.name}}</b>:
-             <span v-if="jobs.count && jobs.count[status.id]">{{jobs.count[status.id].toLocaleString()}}</span>
-             <span v-else>0</span>
-           </div>
-           <div v-for="service in selectedServices" v-if="groupBy === 'service' && (selectedService() === '' || selectedService() === service.id)">
-             <span class="fa fa-circle" :style="{color: service.color}"></span>
-             <b>{{service.name}}</b>:
-             <span v-if="jobs.count && jobs.count[service.name]">{{jobs.count[service.name].toLocaleString()}}</span>
-             <span v-else>0</span>
-           </div>
-           <hr v-if="selectedService() === '' || groupBy !== 'service'" style="width:60%;margin-left:5px;color:gray;">
-           <div v-if="selectedService() === '' || groupBy !== 'service'">
-              <b>Total</b>: {{jobs.avg.count}}
-           </div>
-       </div>
-       <div>
-           <h2>Coût moyen</h2>
-           <div v-for="(type, index) in userTypes" v-if="groupBy === 'type'">
-             <span class="fa fa-circle" :style="{color: colors[index]}"></span>
-             <b>{{type.t_name_fr}}</b>:
-             <span v-if="jobs.cost && jobs.cost[type.t_id]">{{Math.round(jobs.cost[type.t_id]/jobs.countCost[type.t_id]).toLocaleString()}} CPU secondes</span>
-             <span v-else>---</span>
-           </div>
-            <div v-for="(pole, index) in poles" v-if="groupBy === 'pole'">
-             <span class="fa fa-circle" :style="{color: pole.po_color}"></span>
-             <b>{{poleName(pole.po_id)}}</b>:
-             <span v-if="jobs.cost && jobs.cost[pole.po_id]">{{Math.round(jobs.cost[pole.po_id]/jobs.countCost[pole.po_id]).toLocaleString()}} CPU secondes</span>
-             <span v-else>---</span>
-           </div>
-           <div v-for="(status, index) in status" v-if="groupBy === 'status'">
-             <span class="fa fa-circle" :style="{color: status.color}"></span>
-             <b>{{status.name}}</b>:
-             <span v-if="jobs.cost && jobs.cost[status.id]">{{Math.round(jobs.cost[status.id]/jobs.countCost[status.id]).toLocaleString()}} CPU secondes</span>
-             <span v-else>---</span>
-           </div>
-           <div v-for="service in selectedServices" v-if="groupBy === 'service' && (selectedService() === '' || selectedService() === service.id)">
-             <span class="fa fa-circle" :style="{color: service.color}"></span>
-             <b>{{service.name}}</b>:
-             <span v-if="jobs.cost && jobs.cost[service.name]">{{Math.round(jobs.cost[service.name]/jobs.countCost[service.name]).toLocaleString()}} CPU secondes</span>
-             <span v-else>---</span>
-           </div>
-           <hr v-if="selectedService() === '' || groupBy !== 'service'" style="width:60%;margin-left:5px;color:gray;">
-           <div v-if="selectedService() === '' || groupBy !== 'service'">
-              <b>Tout {{groupBy}}</b>:
-              <span v-if="jobs.avg && jobs.avg.cost">{{Math.round(jobs.avg.cost).toLocaleString()}} CPU Secondes</span>
-              <span v-else>---</span>
-           </div>
-       </div>
-       <div >
-           <h2>Durée moyenne</h2>
-           <div v-for="(type, index) in userTypes" v-if="groupBy === 'type'">
-             <span class="fa fa-circle" :style="{color: colors[index]}"></span>
-             <b>{{type.t_name_fr}}</b>:
-             <span v-if="jobs.duration[type.t_id] && jobs.countDuration[type.t_id]">{{secondToStr(jobs.duration[type.t_id]/jobs.countDuration[type.t_id])}}</span>
-             <span v-else>---</span>
-           </div>
-            <div v-for="(pole, index) in poles" v-if="groupBy === 'pole'">
-             <span class="fa fa-circle" :style="{color: pole.po_color}"></span>
-             <b>{{poleName(pole.po_id)}}</b>:
-             <span v-if="jobs.duration[pole.po_id] && jobs.countDuration[pole.po_id]">{{secondToStr(jobs.duration[pole.po_id]/jobs.countDuration[pole.po_id])}}</span>
-             <span v-else>---</span>
-           </div>
-           <div v-for="(status, index) in status" v-if="groupBy === 'status'">
-             <span class="fa fa-circle" :style="{color: status.color}"></span>
-             <b>{{status.name}}</b>:
-             <span v-if="jobs.duration[status.id] && jobs.countDuration[status.id]">{{secondToStr(jobs.duration[status.id]/jobs.countDuration[status.id])}}</span>
-             <span v-else>---</span>
-           </div>
-           <div v-for="service in selectedServices" v-if="groupBy === 'service'  && (selectedService() === '' || selectedService() === service.id)">
-             <span class="fa fa-circle" :style="{color: service.color}"></span>
-             <b>{{service.name}}</b>:
-             <span v-if="jobs.duration[service.name] && jobs.countDuration[service.name]">{{secondToStr(jobs.duration[service.name]/jobs.countDuration[service.name])}}</span>
-             <span v-else>---</span>
-           </div>
-           <hr v-if="selectedService() === '' || groupBy !== 'service'" style="width:60%;margin-left:5px;color:gray;">
-            <div v-if="selectedService() === '' || groupBy !== 'service'" >
-              <b>Tout {{groupBy}}</b>:
-              <span v-if="jobs.avg.duration">{{secondToStr(jobs.avg.duration)}}</span>
-              <span v-else>---</span>
-            </div>
-       </div>
-     </div>
+    <stat-process-summary :colors="colors" :selected-name="selectedName()" :selected-service="selectedService()"
+       :group-by="groupBy" :selected-services="selectedServices" :user-types="userTypes" :poles="poles"
+       :status="status" :jobs="jobs"></stat-process-summary>
+    
      <div id="jobs" style="margin-top:30px;"></div>
    </div>
    <div v-if="mode === 'product'">
     <h1>{{selectedName()}}</h1>
     <div class="job-header" >
+     
        <div>
           <h2>Nombre de jobs</h2>
           
@@ -308,52 +213,10 @@
    </div>
    <div v-show="mode === 'ciest2'" class="job-content" >
     <h1>{{selectedName()}}</h1>
-    <div class="job-header" >
+       <stat-process-summary :colors="colors" :selected-name="selectedName()" :selected-service="selectedService()"
+       :group-by="groupBy" :selected-services="selectedServices" :user-types="userTypes" :poles="poles"
+       :status="status" :jobs="ciest2"></stat-process-summary>
 
-       <div>
-          <h2>Total jobs</h2>
-           <div v-for="service in selectedServices" v-if="(selectedService() === '' || selectedService() === service.id)">
-             <span class="fa fa-circle" :style="{color: service.color}"></span>
-             <b>{{service.name}}</b>:
-             <span v-if="ciest2.count && ciest2.count[service.name]">{{ciest2.count[service.name].toLocaleString()}}</span>
-             <span v-else>0</span>
-           </div>
-           <hr v-if="selectedService() === ''" style="width:60%;margin-left:5px;color:gray;">
-           <div v-if="selectedService() === ''">
-              <b>Total</b>: {{ciest2.avg.count}}
-           </div>
-       </div>
-       <div>
-           <h2>Coût moyen</h2>
-           <div v-for="service in selectedServices" v-if="(selectedService() === '' || selectedService() === service.id)">
-             <span class="fa fa-circle" :style="{color: service.color}"></span>
-             <b>{{service.name}}</b>:
-             <span v-if="ciest2.cost && ciest2.cost[service.name]">{{Math.round(ciest2.cost[service.name]/ciest2.countCost[service.name]).toLocaleString()}} CPU secondes</span>
-             <span v-else>---</span>
-           </div>
-           <hr v-if="selectedService() === ''" style="width:60%;margin-left:5px;color:gray;">
-           <div v-if="selectedService() === ''">
-              <b >Tout service</b>:
-              <span v-if="ciest2.avg && ciest2.avg.cost">{{Math.round(ciest2.avg.cost).toLocaleString()}} CPU Secondes</span>
-              <span v-else>---</span>
-           </div>
-       </div>
-       <div >
-           <h2>Durée moyenne</h2>
-           <div v-for="service in selectedServices" v-if="(selectedService() === '' || selectedService() === service.id)">
-             <span class="fa fa-circle" :style="{color: service.color}"></span>
-             <b>{{service.name}}</b>:
-             <span v-if="status === 'success' && ciest2.duration && ciest2.countDuration[service.name]">{{secondToStr(ciest2.duration[service.name]/ciest2.countDuration[service.name])}}</span>
-             <span v-else>---</span>
-           </div>
-           <hr v-if="selectedService() === ''" style="width:60%;margin-left:5px;color:gray;">
-            <div v-if="selectedService() === ''" >
-              <b>Tout service</b>:
-              <span v-if="status === 'success' && ciest2.avg.duration">{{secondToStr(ciest2.avg.duration)}}</span>
-              <span v-else>---</span>
-            </div>
-       </div>
-     </div>
      <div id="ciest2" style="margin-top:30px;"></div>
       <div style="margin-top:30px;">
       <h1>Images téléchargées</h1>
@@ -373,7 +236,7 @@ import ExportData from 'highcharts/modules/export-data'
 
 import Accessibility from 'highcharts/modules/accessibility'
 import GdmStatForm from './subcomponents/gdm-stat-form.vue'
-
+import StatProcessSummary from './subcomponents/stat-process-summary.vue'
 if (typeof Highcharts === 'object') {
   HighchartsExporting(Highcharts)
   Accessibility(Highcharts)
@@ -384,7 +247,8 @@ import moment from 'moment'
 export default {
   name: 'GdmStat',
   components: {
-    GdmStatForm
+    GdmStatForm,
+    StatProcessSummary
   },
   props: {
     appUrl: {
@@ -796,20 +660,34 @@ export default {
       }
       this.drawHistogram('products', 'Nombre de produits', categories, series, options)
     },
-    drawCiest2 () {
-      var categories = this[this.by + 's']
-      var data = this.ciest2.data[this.by + 's']
+    drawCiest2 (e) {
+      var categories = this[e.by + 's']
+      var data = this.ciest2.data[e.by + 's']
       var series = []
       var colors = []
       var name = ''
       for (var index in data) {
-         var find = this.services.find(s => s.name === index)
-         name = index
-         colors.push(find.color)
-         series.push({
-           name: name,
-           data: data[index]
-         })
+        switch (e.groupBy) {
+          case 'pole':
+            var pl = this.poles.find(pl => pl.po_id === index)
+            colors.push(pl.po_color)
+          case 'type':
+            name = this.nameByKey(index, e.groupBy)
+            break;
+          case 'status':
+            var pl = this.status.find(st => st.id === index)
+            colors.push(pl.color)
+            name = pl.name
+            break
+          case 'service':
+            var find = this.services.find(s => s.name === index)
+            name = index
+            colors.push(find.color)
+        }
+        series.push({
+          name: name,
+          data: data[index]
+        })
       }
       var options = {}
       if (colors.length > 0) {
@@ -817,9 +695,9 @@ export default {
       }
       this.drawHistogram('ciest2', 'Activité CIEST2', categories, series, options)
     },
-    drawDownload () {
-      var categories = this[this.by + 's']
-      var data = this.download.data[this.by + 's']
+    drawDownload (e) {
+      var categories = this[e.by + 's']
+      var data = this.download.data[e.by + 's']
       var series = []
       var colors = []
       var name = ''
@@ -894,6 +772,7 @@ export default {
             cost += content.cost[pole.po_id]
             countCost += content.countCost[pole.po_id]
           })
+          break
         case 'status':
           this.status.forEach(function (st) {
             count += content.count[st.id]
@@ -929,8 +808,8 @@ export default {
 // //       var countCost = 0
 // //       if (this.userType) {
 // //         this.userTypes.forEach(function (type) {
-// //           count += _this.jobs.count[type.t_id]
-// //           countDuration += _this.jobs.countDuration[type.t_id]
+// //           count += treatmentJob.count[type.t_id]
+// //           countDuration += treatmentJob.countDuration[type.t_id]
 // //           duration += _this.duration[type.t_id]
 // //           cost += _this.jobs.cost[type.t_id]
 // //           countCost += _this.jobs.countCost[type.t_id]
@@ -1034,7 +913,7 @@ export default {
 //         params.push('service=' + services.join(','))
 //       }
       if (e.service) {
-        params.push('service=' + e.service)
+        params.push('serviceIds=' + e.service)
       }
       if (e.groupBy ) {
         params.push('groupBy=' + e.groupBy )
@@ -1042,7 +921,9 @@ export default {
       url += params.join('&')
       this.$http.get(url, {credentials: true})
       .then(function (response) {
-        this.treatmentJobs(response.body, e)
+        this.jobs = this.treatmentJobs(response.body, e)
+        this.average(this.jobs, e.groupBy, e)
+        this.drawJobs(e)
       })
     },
     searchProduct (e) {
@@ -1087,7 +968,12 @@ export default {
       url += params.join('&')
       this.$http.get(url, {credentials: true})
       .then(function (response) {
-        this.treatmentCiest2(response.body, e)
+        this.ciest2=this.treatmentJobs(response.body, e)
+        this.download.data = this.extractSeriesFrom(response.body.download, null, this.download, false, e)
+      
+        this.average(this.ciest2, e.groupBy, e)
+        this.drawCiest2(e)
+        this.drawDownload(e)
       })
     },
     extractSeriesFrom (data, cat, content, first, temp) {
@@ -1308,7 +1194,7 @@ export default {
       this.drawNewUsers(e)
 
     },
-    treatmentJobs (data, e) {
+    treatmentJobs ( data, e) {
       this.groupBy = e.groupBy
       var _this = this
 //       if (this.services.length === 0) {
@@ -1321,38 +1207,39 @@ export default {
 //           }
 //         })
 //       }
-      this.jobs.data = {days: {}, months: {}, years: {}}
+      var jobs = this.defaultData()
+      // jobs.data = {days: {}, months: {}, years: {}}
       var first = true
       switch (e.groupBy) {
       case 'type':
 	        this.userTypes.forEach(function (tp) {
 	            var tab = data.process.filter(ps => ps.type === tp.t_id)
-	            var results = _this.extractSeriesFrom(tab, tp.t_id, _this.jobs, first, e)
+	            var results = _this.extractSeriesFrom(tab, tp.t_id, jobs, first, e)
 	            first = false
-	            _this.jobs.data.days[tp.t_id] = results.days
-	            _this.jobs.data.months[tp.t_id] = results.months
-	            _this.jobs.data.years[tp.t_id] = results.years 
+	            jobs.data.days[tp.t_id] = results.days
+	            jobs.data.months[tp.t_id] = results.months
+	            jobs.data.years[tp.t_id] = results.years 
 	        })
 	        break;
       case 'status':
           
           this.status.forEach(function (st) {
             var tab = data.process.filter(tp => st.id === tp.status)
-            var results = _this.extractSeriesFrom(tab, st.id, _this.jobs, first, e)
+            var results = _this.extractSeriesFrom(tab, st.id, jobs, first, e)
             first = false
-            _this.jobs.data.days[st.id] = results.days
-            _this.jobs.data.months[st.id] = results.months
-            _this.jobs.data.years[st.id] = results.years 
+            jobs.data.days[st.id] = results.days
+            jobs.data.months[st.id] = results.months
+            jobs.data.years[st.id] = results.years 
           })
           break;
       case 'pole':
           this.poles.forEach(function (tp) {
             var tab = data.process.filter(ps => ps.pole === tp.po_id)
-            var results = _this.extractSeriesFrom(tab, tp.po_id, _this.jobs, first, e)
+            var results = _this.extractSeriesFrom(tab, tp.po_id, jobs, first, e)
             first = false
-            _this.jobs.data.days[tp.po_id] = results.days
-            _this.jobs.data.months[tp.po_id] = results.months
-            _this.jobs.data.years[tp.po_id] = results.years 
+            jobs.data.days[tp.po_id] = results.days
+            jobs.data.months[tp.po_id] = results.months
+            jobs.data.years[tp.po_id] = results.years 
           })
           break;
       case 'service':
@@ -1360,37 +1247,15 @@ export default {
 	      this.selectedServices.forEach(function (service) {
 	        if (_this.selectedService() === '' || _this.selectedService() === service.id) {
 		        var tab = data.process.filter(p => p.service === parseInt(service.id))
-		        var results = _this.extractSeriesFrom(tab, service.name, _this.jobs, first, e)
+		        var results = _this.extractSeriesFrom(tab, service.name, jobs, first, e)
 		        first = false
-		        _this.jobs.data.days[service.name] = results.days
-		        _this.jobs.data.months[service.name] = results.months
-		        _this.jobs.data.years[service.name] = results.years 
+		        jobs.data.days[service.name] = results.days
+		        jobs.data.months[service.name] = results.months
+		        jobs.data.years[service.name] = results.years 
 	        }
 	      })
       }
-      this.average(this.jobs, e.groupBy, e)
-      this.drawJobs(e)
-    },
-    treatmentCiest2 (data, e) {
-      var _this = this
-      
-      this.ciest2.data = {days: {}, months: {}, years: {}}
-      var first = true
-
-      this.selectedServices.forEach(function (service) {
-        if (_this.selectedService() === '' || _this.selectedService() === service.id) {
-          var tab = data.process.filter(p => p.service === parseInt(service.id))
-          var results = _this.extractSeriesFrom(tab, service.name, _this.ciest2, first, e)
-          first = false
-          _this.ciest2.data.days[service.name] = results.days
-          _this.ciest2.data.months[service.name] = results.months
-          _this.ciest2.data.years[service.name] = results.years 
-        }
-      })
-      this.download.data = this.extractSeriesFrom(data.download, null, this.download, false, e)
-      this.average(this.ciest2, 'service', e)
-      this.drawCiest2(e)
-      this.drawDownload(e)
+      return jobs
     },
     treatmentProducts (data, e) {
       this.products.data = {days: {}, months: {}, years: {}}
