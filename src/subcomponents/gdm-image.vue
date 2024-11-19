@@ -98,9 +98,9 @@
 	  <img :src="image.quicklook" >
 	</div>
 	<div class="gdm-image-1">
-	<img v-if="image.quicklook && mode !== 'view' && type === 'PEPS'" :src="image.quicklook" @click="displayImage($event)" 
+	<img v-if="image.quicklook && mode !== 'view' && type === 'PEPS'" :src="quicklook" @click="displayImage($event)"  @error="errorloaded"
 	:title="displayedImageId === image.productIdentifier ? $t('click_to_reduce') : $t('click_to_enlarge')" style="cursor:pointer;" :class="{selected: displayedImageId === image.productIdentifier}"/>
-  <img v-else-if="image.quicklook" :src="image.quicklook"  />
+  <img v-else-if="image.quicklook" :src="quicklook"  @error="errorloaded" />
   
 	<img v-else src="../assets/images/no_image.png" width="85" style="margin: 3px 5px;padding:3px;border: 1px solid grey;"/>
   
@@ -113,13 +113,13 @@
 	  <label v-else >{{$t('no_image')}}</label>
 	</div>
 	<div class="gdm-image-2 gdm-fields">
-	   <div><label>Date : </label><span :style="{color: 'black'}">{{printDate(image.startDate)}}</span></div>
+	   <div><label>Date : </label><span :style="{color: 'black'}">{{printDate(image.startDate || image['temporal:startDate'])}}</span></div>
 	   <div v-if="image.productIdentifier">
 	     <div v-if="type === 'PEPS'">    
-	       <div><label>{{$t('product_type')}} : </label>{{image.productType}}</div>
+	       <div><label>{{$t('product_type')}} : </label>{{image.productType || image['spaceborne:productType']}}</div>
            
-         <div><label>{{$t('platform')}} : </label>{{image.platform}}</div>
-         <div><label>{{$t('relative_orbit')}} : </label> {{image.relativeOrbitNumber}}</div>
+         <div><label>{{$t('platform')}} : </label>{{image.platform || image['spaceborne:satellitePlatform']}}</div>
+         <div><label>{{$t('relative_orbit')}} : </label> {{image.relativeOrbitNumber || image['spaceborne:orbitID']}}</div>
        </div>
        <div v-else-if="type === 'PLEIADES'">
           <div><label>Instrument: </label>{{image.instrument}}</div>
@@ -146,11 +146,12 @@
 	<div v-if="image.productIdentifier" class="gdm-image-3 gdm-fields">
 	   <div v-if="type === 'PEPS'">
        <div><label>{{$t('cloud_cover')}} : </label>
-         <span v-if="image.cloudCover !== null" :style="{color: 'black'}">{{image.cloudCover}}</span>
+         <span v-if="image.cloudCover && image.cloudCover !== null" :style="{color: 'black'}">{{image.cloudCover}}</span>
+         <span v-else-if="image['spaceborne:cloudCover']" :style="{color: 'black'}">{{Math.round(image['spaceborne:cloudCover'])}}</span>
          <span v-else>---</span>
        </div>
        <div><label>{{$t('snow_cover')}} : </label>{{image.snowCover !== null ? image.snowCover : '--'}}</div>
-       <div><label>{{$t('processing_level')}} : </label>{{image.processingLevel}}</div>
+       <div><label>{{$t('processing_level')}} : </label>{{image.processingLevel || image['spaceborne:productLevel']}}</div>
     </div>
     <div v-else-if="type === 'PLEIADES' && angles" >
 	    <div> <label>{{$t('incidence')}}:</label>
@@ -247,6 +248,7 @@
 </template>
 <script>
 import moment from 'moment'
+var no_image = require('../assets/images/no_image.png')
 export default {
   name: 'GdmImage',
   props: {
@@ -345,14 +347,21 @@ export default {
   },
   data () {
     return {
-      full: false
+      full: false,
+      quicklook: '../assets/images/no_image.png'
     }
   },
   created () {
     moment.locale(this.lang)
     this.$i18n.locale = this.lang
+    if (this.image.quicklook) {
+      this.quicklook = this.image.quicklook
+    }
   },
   methods: {
+    errorloaded (e) {
+      this.quicklook = no_image
+    },
     displayImage (event) {
 //       var layer = this.layer
 //       layer.id = this.image.productIdentifier
