@@ -106,15 +106,15 @@
   
 	</div>
 	<div class="gdm-image-title">
-	  <label v-if="image.productIdentifier">
-	     {{image.productIdentifier}}
+	  <label v-if="image.productIdentifier || image.identifier">
+	     {{image.productIdentifier || image.identifier}}
 	     <span v-if="image.duplicate" style="color:darkred;">({{$t('duplicate')}})</span>
 	  </label>
 	  <label v-else >{{$t('no_image')}}</label>
 	</div>
 	<div class="gdm-image-2 gdm-fields">
 	   <div><label>Date : </label><span :style="{color: 'black'}">{{printDate(image.startDate || image['temporal:startDate'])}}</span></div>
-	   <div v-if="image.productIdentifier">
+	   <div v-if="image.productIdentifier || image.identifier">
 	     <div v-if="type === 'PEPS'">    
 	       <div><label>{{$t('product_type')}} : </label>{{image.productType || image['spaceborne:productType']}}</div>
            
@@ -143,7 +143,7 @@
     </div>
     </div>
 	</div>
-	<div v-if="image.productIdentifier" class="gdm-image-3 gdm-fields">
+	<div v-if="image.productIdentifier || image.identifier" class="gdm-image-3 gdm-fields">
 	   <div v-if="type === 'PEPS'">
        <div><label>{{$t('cloud_cover')}} : </label>
          <span v-if="image.cloudCover && image.cloudCover !== null" :style="{color: 'black'}">{{image.cloudCover}}</span>
@@ -177,7 +177,7 @@
      
     </div>
   </div>
-	<div v-if="image.productIdentifier && mode === 'S2ST-STACK'" class="gdm-image-4 gdm-fields" >
+	<div v-if="(image.productIdentifier || image.identifier) && mode === 'S2ST-STACK'" class="gdm-image-4 gdm-fields" >
 	  <div v-if="!searching && order > 0" >
 	     <span :style="{color: temporal.start ? '#555': 'black'}">{{$t('select_first_date')}}</span>
 	     <span class="fa" :class="{'fa-square-o': !startChecked, 'fa-check-square-o': startChecked}" @click="selectFirstDate($event)"></span>
