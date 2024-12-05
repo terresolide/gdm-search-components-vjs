@@ -106,7 +106,7 @@
          :disabled="disabled || !hasCredit">{{$t('launch')}}</a>
       </span>
        <span v-else-if="process.status === 'FAILED'">
-        <a class="button" @click="duplicate" :class="{disabled: !canEdit}">{{$t('duplicate')}}</a>
+        <a class="button" @click="duplicate" :class="{disabled: !canDuplicate}">{{$t('duplicate')}}</a>
       </span>
       <span v-else-if="process.status === 'INVALID'">
         <a class="button" v-if="!back && url  && canEdit"  :href="url + 'process/' + process.id + '/edit'" :class="{disabled: !canEdit}">{{$t('edit')}}</a>
@@ -119,7 +119,7 @@
       <!--  PURGED NOTHING TO DO => CREATE NEW PROCESS WITH THIS-->
       <span v-else-if="process.status === 'PURGED' || process.status === 'ABORTED' || process.status === 'TERMINATED'">
     
-         <a class="button" @click="duplicate"  :class="{disabled: !canEdit}">{{$t('duplicate')}}</a>
+         <a class="button" @click="duplicate"  :class="{disabled: !canDuplicate}">{{$t('duplicate')}}</a>
          <a class="button" v-if="back && process.status ==='TERMINATED' && !process.isExample" @click="showPublish=true"  :class="{disabled: !canEdit}">{{$t('publish')}}</a>
           <a class="button" v-if="back && process.isExample && process.status ==='TERMINATED'" @click="showPublish=true">Modifier url résultat</a>
           <a class="button" v-if="back && process.isExample && process.status ==='TERMINATED'" @click="unpublish">Dépublier</a>
@@ -149,7 +149,7 @@
         <a class="button"  @click="dismiss" :class="{disabled: disabled}" :disabled="disabled">
            <span>{{$t('abort')}}</span>
         </a>
-         <a class="button" @click="duplicate"  :class="{disabled: !canEdit}">{{$t('duplicate')}}</a>
+         <a class="button" @click="duplicate"  :class="{disabled: !canDuplicate}">{{$t('duplicate')}}</a>
         
         <a class="button" v-if="back" @click="switchDebug" :title="$t('debug')">
         <i class="fa fa-arrow-right"></i>
@@ -217,6 +217,10 @@ export default {
       default: null
     },
     canEdit: {
+      type: Boolean,
+      default: true
+    },
+    canDuplicate: {
       type: Boolean,
       default: true
     }

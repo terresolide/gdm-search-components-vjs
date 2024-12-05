@@ -19,7 +19,8 @@
      "lists": "Interferogram list",
      "time_serie": "Time series",
      "tio_instructions":"Click on the map image to view the time series at that point.",
-     "units": "Units"
+     "units": "Units",
+     "data": "Data"
    },
    "fr":{
      "common": "Produits communs",
@@ -41,7 +42,8 @@
      "lists": "Liste d'interférogrammes",
      "time_serie": "Séries temporelles",
      "tio_instructions": "Cliquez sur l'image de la carte pour visualiser les séries temporelles en ce point.",
-     "units": "Unités"
+     "units": "Unités",
+     "data": "Données"
    }
 }
 </i18n>
@@ -155,7 +157,7 @@
 		   <div class="process-actions">
  
 		     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" :color="color"
-		     :process="process" :user-id="userId" :is-private="isPrivate" :can-edit="hasAccessService && !pleiadeRemoved" :lang="lang" :teams="teams" @processChange="statusChange" 
+		     :process="process" :user-id="userId" :is-private="isPrivate" :can-duplicate="hasAccessService && !dataRemoved"  :can-edit="hasAccessService" lang="lang" :teams="teams" @processChange="statusChange" 
 		     @statusChange="statusChange" @teamChange="teamChange" @duplicate="duplicate"
 		     @keptProcess="keepProcess">
 		     </gdm-process-actions>
@@ -198,12 +200,16 @@
 			        (<em style="color:#333;">{{date2str(process.lidar.properties.date, 'll')}}</em>)
 			     </div>
 			  </span>
-			  <h2 :style="{color:color}">{{images.length}} images</h2>
+			  <h2 v-if="!process.magtel" :style="{color:color}">{{images.length}} images</h2>
+        <h2 v-else :style="{color:color}">{{ $t('data') }}</h2>
 			  <div v-if="images.length > 0">
 				  <div  v-for="image in images" class="gdm-images-child" >
 		        <gdm-image :image="image" :type="type" :searching="false" :checked="false" :stereo-list="stereo" mode="view" :lang="lang"></gdm-image>
 		      </div>
 			  </div>
+        <div v-else-if="process.magtel"class="gdm-images-child"> 
+          <div>{{ process.magtel.filename }}</div>
+        </div>
 			  <div v-else style="text-align:center;padding: 30px;">NO IMAGES SELECTED - TYPE REQUEST</div>
 			  </div>
 			  
@@ -367,7 +373,7 @@ export default {
       errorCode: null,
       // INPUT IMAGES
       images: [],
-      pleiadeRemoved: false,
+      dataRemoved: false,
       statusList: null,
       headerHeight: null,
       // RESULT
@@ -737,6 +743,9 @@ export default {
       this.feature = response.feature
       this.feature.properties.id = this.id
       this.process = response
+      if (this.process.magtel && this.process.magtel.removed) {
+        this.dataRemoved = true
+      }
       
       this.addResult(this.process.result)
       if (this.$el && this.$el.querySelector && this.$el.querySelector('.gdm-process-header')) {
@@ -765,7 +774,7 @@ export default {
         if (this.type === 'PLEIADES') {
           // specific case pleiades
           if (list[index].removed || !list[index].owner) {
-            this.pleiadeRemoved = true
+            this.dataRemoved = true
             list[index].feature.properties.removed = true
           } else {
             list[index].feature.properties.removed = false
