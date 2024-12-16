@@ -590,13 +590,13 @@ list-style-type: none;
    grid-column: 2/4;
   grid-row: 1;
 }
-.gdm-removed {
+/* .gdm-removed {
   background: linear-gradient(-45deg, white 25%,
   #EEE 25%, #EEE 50%, 
   white 50%, white 75%, 
   #EEE 75%);
 background-size: 10px 10px;
-}
+} */
  div.gdm-image-remove {
     width:30px;
     height:30px;

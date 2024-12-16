@@ -157,7 +157,7 @@
 		   <div class="process-actions">
  
 		     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" :color="color"
-		     :process="process" :user-id="userId" :is-private="isPrivate" :can-duplicate="hasAccessService && !dataRemoved"  :can-edit="hasAccessService" lang="lang" :teams="teams" @processChange="statusChange" 
+		     :process="process" :user-id="userId" :is-private="isPrivate" :can-duplicate="hasAccessService && !dataRemoved"  :can-edit="hasAccessService" :lang="lang" :teams="teams" @processChange="statusChange" 
 		     @statusChange="statusChange" @teamChange="teamChange" @duplicate="duplicate"
 		     @keptProcess="keepProcess">
 		     </gdm-process-actions>
@@ -207,8 +207,8 @@
 		        <gdm-image :image="image" :type="type" :searching="false" :checked="false" :stereo-list="stereo" mode="view" :lang="lang"></gdm-image>
 		      </div>
 			  </div>
-        <div v-else-if="process.magtel"class="gdm-images-child"> 
-          <div>{{ process.magtel.filename }}</div>
+        <div v-else-if="process.magtel"class="gdm-images-child" :class="{'gdm-removed': process.magtel.removed}"> 
+          <div ><i class="fa fa-file-archive-o"></i> {{ process.magtel.filename }}</div>
         </div>
 			  <div v-else style="text-align:center;padding: 30px;">NO IMAGES SELECTED - TYPE REQUEST</div>
 			  </div>
@@ -887,6 +887,13 @@ export default {
 }
 </script>
 <style>
+.gdm-removed {
+  background: linear-gradient(-45deg, white 25%,
+  #EEE 25%, #EEE 50%, 
+  white 50%, white 75%, 
+  #EEE 75%);
+background-size: 10px 10px;
+}
 .gdm-process-view {
   font-family: Roboto, sans-serif;
 }
