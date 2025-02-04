@@ -95,12 +95,12 @@
 <template>
 <div class="gdm-image" :class="{'gdm-no-image': !image.productIdentifier, 'gdm-image-view': mode === 'view', 'gdm-pleiade': type === 'PLEIADES', 'gdm-removed': image.removed, 'gdm-duplicate': image.duplicate}" @mouseover="mouseover">
 	<div v-if="displayedImageId === image.productIdentifier" class="gdm-full"  @click="displayImage($event)" :title="$t('click_to_reduce')">
-	  <img :src="image.quicklook" >
+	  <img :src="quicklook" >
 	</div>
 	<div class="gdm-image-1">
-	<img v-if="image.quicklook && mode !== 'view' && type === 'PEPS'" :src="quicklook" @click="displayImage($event)"  @error="errorloaded"
+	<img v-if="quicklook && mode !== 'view' && type === 'PEPS' && !loadedError" :src="quicklook" @click="displayImage($event)"  @error="errorloaded"
 	:title="displayedImageId === image.productIdentifier ? $t('click_to_reduce') : $t('click_to_enlarge')" style="cursor:pointer;" :class="{selected: displayedImageId === image.productIdentifier}"/>
-  <img v-else-if="image.quicklook" :src="quicklook"  @error="errorloaded" />
+  <img v-else-if="quicklook && !loadedError" :src="quicklook"  @error="errorloaded" />
   
 	<img v-else src="../assets/images/no_image.png" width="85" style="margin: 3px 5px;padding:3px;border: 1px solid grey;"/>
   
@@ -343,24 +343,31 @@ export default {
       } else {
         return null
       }
+    },
+    quicklook () {
+      this.loadedError = false
+      if (this.image.quicklook) {
+        return this.image.quicklook
+      }
+      this.loadedError = true
+      return null
     }
   },
   data () {
     return {
       full: false,
-      quicklook: '../assets/images/no_image.png'
+      loadedError: false
     }
   },
   created () {
     moment.locale(this.lang)
     this.$i18n.locale = this.lang
-    if (this.image.quicklook) {
-      this.quicklook = this.image.quicklook
-    }
+    this.loadedError = false
+    
   },
   methods: {
     errorloaded (e) {
-      this.quicklook = no_image
+      this.loadedError = true
     },
     displayImage (event) {
 //       var layer = this.layer
