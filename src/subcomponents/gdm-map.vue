@@ -2,8 +2,8 @@
 <span class="gdm-map">
   <div v-if="tio && tio.searching" style="position:fixed;top:50%;left:50%;z-index:3002;color:#333;" class="fa fa-spinner fa-spin fa-2x fa-fw"></div>
    
- <tio-graph v-if="tio.img" v-show="tio.showGraph" :dates="tio.img.dates" :ns-values="tio.ptValues.ns" :ew-values="tio.ptValues.ew" 
-   :keys="tio.img.keys" :maximum="tio.img.max" :lang="lang" @close="tio.showGraph=false"></tio-graph>
+ <tio-graph v-if="tio.img" v-show="tio.showGraph" :img="tio.img" :ns-values="tio.ptValues.ns" :ew-values="tio.ptValues.ew" 
+   :lang="lang" @close="tio.showGraph=false"></tio-graph>
 
 	 <div id="fmtMap" class="mtdt-small"></div>
 	 <!--  <div class="gdm-mouseposition" >{{mouseposition}}</div> -->
