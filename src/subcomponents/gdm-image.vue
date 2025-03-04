@@ -116,10 +116,10 @@
 	   <div><label>Date : </label><span :style="{color: 'black'}">{{printDate(image.startDate || image['temporal:startDate'])}}</span></div>
 	   <div v-if="image.productIdentifier || image.identifier">
 	     <div v-if="type === 'PEPS'">    
-	       <div><label>{{$t('product_type')}} : </label>{{image.productType || image['spaceborne:productType']}}</div>
+	       <div><label>{{$t('product_type')}} : </label>{{image.productType || image['spaceborne:productType'] || image['product:type']}}</div>
            
          <div><label>{{$t('platform')}} : </label>{{image.platform || image['spaceborne:satellitePlatform']}}</div>
-         <div><label>{{$t('relative_orbit')}} : </label> {{image.relativeOrbitNumber || image['spaceborne:orbitID']}}</div>
+         <div><label>{{$t('relative_orbit')}} : </label> {{image.relativeOrbitNumber || image['spaceborne:orbitID'] || image['sat:relative_orbit']}}</div>
        </div>
        <div v-else-if="type === 'PLEIADES'">
           <div><label>Instrument: </label>{{image.instrument}}</div>
@@ -148,10 +148,16 @@
        <div><label>{{$t('cloud_cover')}} : </label>
          <span v-if="image.cloudCover && image.cloudCover !== null" :style="{color: 'black'}">{{image.cloudCover}}</span>
          <span v-else-if="image['spaceborne:cloudCover']" :style="{color: 'black'}">{{Math.round(image['spaceborne:cloudCover'])}}</span>
+         <span v-else-if="image['eo:cloud_cover']" :style="{color: 'black'}">{{Math.round(image['eo:cloud_cover'])}}</span>
+         
          <span v-else>---</span>
        </div>
-       <div><label>{{$t('snow_cover')}} : </label>{{image.snowCover !== null ? image.snowCover : '--'}}</div>
-       <div><label>{{$t('processing_level')}} : </label>{{image.processingLevel || image['spaceborne:productLevel']}}</div>
+       <div><label>{{$t('snow_cover')}} : </label>
+        <span v-if="image.snowCover">{{image.snowCover}}</span>
+        <span v-else-if="image['eo:snow_cover']">{{image['eo:snow_cover']}}</span>
+        <span v-else>---</span>
+       </div>
+       <div><label>{{$t('processing_level')}} : </label>{{image.processingLevel || image['spaceborne:productLevel'] || image['processing:level']}}</div>
     </div>
     <div v-else-if="type === 'PLEIADES' && angles" >
 	    <div> <label>{{$t('incidence')}}:</label>
