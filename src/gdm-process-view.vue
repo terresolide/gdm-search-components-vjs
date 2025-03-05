@@ -726,7 +726,6 @@ export default {
       if (response.images && response.images[0] && response.images[0].feature ) {
         // add feature.properties['temporal:startDate'] if not exist
         response.images.forEach(function(f, index) {
-          console.log(f)
           if (f.feature.properties.startDate) {
             response.images[index].feature.properties['temporal:startDate'] = f.feature.properties.startDate
           }

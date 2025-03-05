@@ -310,15 +310,8 @@ export default {
               _this.show = false
             }
           }
-        
-//           if (listener.hasOwnProperty('or')) {
-//             console.log('or1')
-//             e.detail.value = e.detail.value || _this.values[_this.name]
-//             console.log(e.detail.value)
-//           }
-//           if (listener.hasOwnProperty('not')) {
-//             e.detail.value = !e.detail.value
-//           }
+       
+         
           if (listener.emit) {
             if (listener.emitValue) {
               var steps = listener.emitValue
@@ -337,7 +330,7 @@ export default {
               })
             }
             console.log('valeur emise = ', e.detail.value)
-            var event = new CustomEvent(listener.emit, {detail: {value: e.detail.value}})
+            var event = new CustomEvent(listener.emit, {detail:e.detail})
             document.dispatchEvent(event)
           }
           if (listener.hasOwnProperty('disabled')) {
@@ -366,9 +359,10 @@ export default {
                 _this.used = true
                 _this.deployed = true
               } else {
-                console.log('cas unw close')
-                _this.used = false
-                _this.deployed = false
+                if (typeof e.detail.value !== 'undefined') {
+                  _this.used = false
+                  _this.deployed = false
+                }
               }
             }
           }
@@ -531,7 +525,7 @@ export default {
                   parameter.show = false
                 }
               }
-              if (listener.hasOwnProperty('or')) {
+              if (listener.hasOwnProperty('or') && !e.detail.init) {
                 e.detail.value = e.detail.value || _this.values[_this.name]
               }
               if (listener.hasOwnProperty('map') && listener.map[e.detail.value] && !e.detail.init) {
