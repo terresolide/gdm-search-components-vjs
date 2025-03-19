@@ -2,7 +2,7 @@
 <span class="gdm-map">
   <div v-if="tio && tio.searching" style="position:fixed;top:50%;left:50%;z-index:3002;color:#333;" class="fa fa-spinner fa-spin fa-2x fa-fw"></div>
    
- <tio-graph v-if="tio.img" v-show="tio.showGraph" :img="tio.img" :ns-values="tio.ptValues.ns" :ew-values="tio.ptValues.ew" 
+ <tio-graph v-if="tio.img" v-show="tio.showGraph" :latlng="latlng" :img="tio.img" :ns-values="tio.ptValues.ns" :ew-values="tio.ptValues.ew" 
    :lang="lang" @close="tio.showGraph=false"></tio-graph>
 
 	 <div id="fmtMap" class="mtdt-small"></div>
@@ -100,6 +100,7 @@ export default {
       fullscreenLayer: null,
       imageLayers: [],
       countImages: 0,
+      latlng: {lat:  null, lng: null},
       tio: {
         ptValues: {
           ns: [],
@@ -391,6 +392,10 @@ export default {
           _this.tio.showGraph = false
         })
         layer.on('TIO:DATA', function (resp) {
+          console.log(resp)
+          if (resp.latlng) {
+           _this.latlng = resp.latlng
+          }
           _this.$set(_this.tio.ptValues, resp.dimension, resp.values)
           _this.tio.showGraph = true
         })
