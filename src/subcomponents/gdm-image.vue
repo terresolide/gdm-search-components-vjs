@@ -113,7 +113,7 @@
 	  <label v-else >{{$t('no_image')}}</label>
 	</div>
 	<div class="gdm-image-2 gdm-fields">
-	   <div><label>Date : </label><span :style="{color: 'black'}">{{printDate(image.startDate || image['temporal:startDate'])}}</span></div>
+	   <div><label>Date : </label><span :style="{color: 'black'}">{{printDate(image.startDate || image['temporal:startDate'] || image['start_datetime'])}}</span></div>
 	   <div v-if="image.productIdentifier || image.identifier">
 	     <div v-if="type === 'PEPS'">    
 	       <div><label>{{$t('product_type')}} : </label>{{image.productType || image['spaceborne:productType'] || image['product:type']}}</div>
@@ -323,21 +323,21 @@ export default {
       }
     },
     startChecked () {
-      if (this.temporal.start === this.image.startDate) {
+      if (this.temporal.start === this.image.startDate || this.temporal.start === this.image.start_datetime) {
         return true
       } else {
         return false
       }
     },
     endChecked () {
-      if (this.temporal.end === this.image.startDate) {
+      if (this.temporal.end === this.image.startDate || this.temporal.start === this.image.start_datetime) {
         return true
       } else {
         return false
       }
     },
     splitChecked () {
-      if (this.split === this.image.startDate) {
+      if (this.split === this.image.startDate || this.temporal.start === this.image.start_datetime) {
         return true
       } else {
         return false
