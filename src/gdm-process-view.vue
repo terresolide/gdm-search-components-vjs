@@ -307,6 +307,16 @@ export default {
       }
       return this.process.status === 'TERMINATED' && this.process.result
     },
+    shareKey () {
+        if (this.$route) {
+         var query = this.$route.query
+         return query.key
+       } else {
+	       var querystring = window.location.search
+         const params = new URLSearchParams(querystring);
+	       return params.get('key')
+       }
+    },
     log () {
       if (!this.process || !this.process.log) {
         return null
@@ -821,6 +831,9 @@ export default {
     },
     load () {
       var url = this.api + '/process/' + this.id
+      if (this.shareKey) {
+        url += '?key=' + this.shareKey
+      }
       this.$http.get(url, {credentials: true})
       .then(
           response => this.display(response.body),
