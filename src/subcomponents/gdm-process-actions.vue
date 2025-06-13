@@ -7,6 +7,7 @@
      "confirm_abort": "This action is final.\nAre you sure you want to continue?",
      "continue_publish": "You will request a publication of your results.<br>If this request is accepted, your results will appear from the interface under the \"public results\" tab.<br>Please justify your request in a few lines:",
      "copy": "Copy",
+     "copied_to_clipboard": "The access link has been copied to clipboard",
      "refresh": "Refresh",
      "edit": "Edit",
      "launch": "Launch",
@@ -34,6 +35,7 @@
      "confirm_abort": "Cette action est définitive.\nVoulez-vous continuer?",
      "continue_publish": "Vous allez demander une publication de vos résultats.<br>Si cette demande est acceptée, vos résultats apparaîtront depuis l'interface sous l'onglet \"résultats publics\".<br>Veuillez justifier votre demande en quelques lignes:",
      "copy": "Copier",
+     "copied_to_clipboard": "Le lien d'accès a été copiée dans le presse-papier",
      "refresh": "Actualiser",
      "edit": "Editer",
      "launch": "Lancer",
@@ -67,7 +69,7 @@
             <h4>{{$t('with_access_link')}}</h4>
             
             <a :href="url + 'process/' + process.id + '?key=' + process.shareKey">{{url + 'process/' + process.id + '?key=' + process.shareKey}}</a>
-            <div style="text-align:right;margin:10px 20px;">
+            <div style="text-align:right;margin:10px 20px;position:relative;">
             <a class="button small"  @click="copyShare"><i class="fa fa-clipboard"></i> {{$t('copy')}}
                <div class="copy-tooltip" v-show="shareTooltip">{{$t('copied_to_clipboard')}}</div>
             </a>
@@ -727,5 +729,19 @@ input[type="button"].button {
     color: #999;
     pointer-events: none;
   }
-
+.copy-tooltip {
+  position: absolute;
+  background-color: #fafafa;
+  border: 1px solid #a3a3a3;
+  font-size: smaller;
+  padding: 4px;
+  width: 160px;
+  text-align: left;
+  right:0px;
+  bottom: 40px;
+  color:black;
+  z-index:100;
+  -webkit-box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
+}
 </style>
