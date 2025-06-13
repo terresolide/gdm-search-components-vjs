@@ -6,6 +6,7 @@
      "cancel": "Cancel",
      "confirm_abort": "This action is final.\nAre you sure you want to continue?",
      "continue_publish": "You will request a publication of your results.<br>If this request is accepted, your results will appear from the interface under the \"public results\" tab.<br>Please justify your request in a few lines:",
+     "copy": "Copy",
      "refresh": "Refresh",
      "edit": "Edit",
      "launch": "Launch",
@@ -22,7 +23,9 @@
      "run": "end of debug",
      "save": "Save",
      "share": "Share",
-     "publish": "Publish"
+     "publish": "Publish",
+     "with_access_link": "With the access link",
+     "with_team": "With a team"
    },
    "fr":{
      "abort": "Abandonner",
@@ -30,6 +33,7 @@
      "cancel": "Annuler",
      "confirm_abort": "Cette action est définitive.\nVoulez-vous continuer?",
      "continue_publish": "Vous allez demander une publication de vos résultats.<br>Si cette demande est acceptée, vos résultats apparaîtront depuis l'interface sous l'onglet \"résultats publics\".<br>Veuillez justifier votre demande en quelques lignes:",
+     "copy": "Copier",
      "refresh": "Actualiser",
      "edit": "Editer",
      "launch": "Lancer",
@@ -46,7 +50,9 @@
      "run": "Fin du debug" ,
      "save": "Enregistrer",
      "share": "Partager",
-     "publish": "Publier"
+     "publish": "Publier",
+     "with_access_link": "Avec le lien d'accès",
+     "with_team": "Avec les membres d'une équipe"
    }
 }
 </i18n>
@@ -54,15 +60,29 @@
 <span class="gdm-process-actions" v-if="process && (userId || back)" >
   
       <div v-show="showShare" class="gdm-share" >
+        <div style="float:right;"><span class="gdm-close fa fa-close" @click="showShare=false"></span></div>
 	      <h3 :style="{color:color}">{{$t('share')}}</h3>
-	      Avec les membres de l'équipe
-	      <select v-model="shared">
-	         <option v-for="team in teams" :value="team">{{team}}</option>
-	      </select>
-	      <div style="text-align:right;margin:10px 20px;">
-	         <a class="button small" @click="showShare=false">Annuler</a>
-	         <a class="button small"  @click="share">{{$t('share')}}</a>
-	      </div>
+        <div style="margin-left:10px;">
+          <template v-if="process.shareKey">
+            <h4>{{$t('with_access_link')}}</h4>
+            
+            <a :href="url + 'process/' + process.id + '?key=' + process.shareKey">{{url + 'process/' + process.id + '?key=' + process.shareKey}}</a>
+            <div style="text-align:right;margin:10px 20px;">
+            <a class="button small"  @click="copyShare">{{$t('copy')}}</a>
+            </div>
+          <hr v-if="teams.length > 0 && !process.team" />
+          </template>
+        
+          <template v-if="teams.length > 0 && !process.team">
+          <h4>{{$t('with_team')}}</h4>
+          <select v-model="shared">
+            <option v-for="team in teams" :value="team">{{team}}</option>
+          </select>
+          <div style="text-align:right;margin:10px 20px;">
+            <a class="button small"  @click="share">{{$t('share')}}</a>
+          </div>
+          </template>
+        </div>
       </div>
       <div v-if="showPublish && back" class="publish-box">
         <div style="float:right;"><span class="gdm-close fa fa-close" @click="showPublish=false"></span></div>
@@ -99,7 +119,7 @@
         </div>
       </div>
       <span  v-if="submitting" class="gdm-searching"><i class="fa fa-circle-o-notch animated"></i></span>
-      <a class="button" v-if="userId===process.userId && teams.length > 0 && !process.team" @click="showShare=true"  >{{$t('share')}}</a>
+      <a class="button" v-if="userId===process.userId && ((teams.length > 0 && !process.team) || process.shareKey)" @click="showShare=true"  >{{$t('share')}}</a>
       <span v-if="process.status === 'EVALUATED'">
          <a class="button" v-if="!back && url && canEdit" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
          <a class="button" @click="launch" :class="{disabled: disabled || !hasCredit || !canEdit}"
@@ -304,6 +324,10 @@ export default {
     this.launchTimer()
   },
   methods:{
+
+    copyShare () {
+
+    },
     launchTimer () {
       if (!this.timer && ['ACCEPTED', 'PRE-RUN', 'RUNNING'].indexOf(this.status) >=0) {
         var func = this.getStatus

@@ -312,10 +312,13 @@ export default {
          var query = this.$route.query
          return query.key
        } else {
-	       var querystring = window.location.search
-         const params = new URLSearchParams(querystring);
-	       return params.get('key')
+	       var result = window.location.href.match(/^.+\?([^\/]+)$/)
+         if (result.length > 1) {
+            const params = new URLSearchParams(result[1]);
+	          return params.get('key')
+         }
        }
+       return null
     },
     log () {
       if (!this.process || !this.process.log) {
