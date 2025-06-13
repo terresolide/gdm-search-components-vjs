@@ -68,7 +68,9 @@
             
             <a :href="url + 'process/' + process.id + '?key=' + process.shareKey">{{url + 'process/' + process.id + '?key=' + process.shareKey}}</a>
             <div style="text-align:right;margin:10px 20px;">
-            <a class="button small"  @click="copyShare">{{$t('copy')}}</a>
+            <a class="button small"  @click="copyShare"><i class="fa fa-clipboard"></i> {{$t('copy')}}
+               <div class="copy-tooltip" v-show="shareTooltip">{{$t('copied_to_clipboard')}}</div>
+            </a>
             </div>
           <hr v-if="teams.length > 0 && !process.team" />
           </template>
@@ -260,6 +262,7 @@ export default {
       purpose: '',
       getCount: 0,
       searchResult: false,
+      shareTooltip: false
     }
   },
   computed: {
@@ -326,7 +329,17 @@ export default {
   methods:{
 
     copyShare () {
-
+       var link = this.url + 'process/' + this.process.id + '?key=' + this.process.shareKey
+       var self = this
+       navigator.clipboard.writeText(link).then(function() {
+         /* clipboard successfully set */
+           self.shareTooltip = true
+           setTimeout(function () {
+            self.shareTooltip = false
+         }, 2000)
+       }, function() {
+         alert('unauthorized clipboard')
+       });
     },
     launchTimer () {
       if (!this.timer && ['ACCEPTED', 'PRE-RUN', 'RUNNING'].indexOf(this.status) >=0) {

@@ -313,7 +313,7 @@ export default {
          return query.key
        } else {
 	       var result = window.location.href.match(/^.+\?([^\/]+)$/)
-         if (result.length > 1) {
+         if (result && result.length > 1) {
             const params = new URLSearchParams(result[1]);
 	          return params.get('key')
          }
