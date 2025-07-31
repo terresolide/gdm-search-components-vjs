@@ -200,16 +200,20 @@
 			        (<em style="color:#333;">{{date2str(process.lidar.properties.date, 'll')}}</em>)
 			     </div>
 			  </span>
-			  <h2 v-if="!process.magtel" :style="{color:color}">{{images.length}} images</h2>
-        <h2 v-else :style="{color:color}">{{ $t('data') }}</h2>
+			  <h2 v-if="!process.magtel && !process.gin" :style="{color:color}">{{images.length}} images</h2>
+              
+              <h2 v-else :style="{color:color}">{{ $t('data') }}</h2>
 			  <div v-if="images.length > 0">
 				  <div  v-for="image in images" class="gdm-images-child" >
-		        <gdm-image :image="image" :type="type" :searching="false" :checked="false" :stereo-list="stereo" mode="view" :lang="lang"></gdm-image>
-		      </div>
+		              <gdm-image :image="image" :type="type" :searching="false" :checked="false" :stereo-list="stereo" mode="view" :lang="lang"></gdm-image>
+		          </div>
 			  </div>
-        <div v-else-if="process.magtel"class="gdm-images-child" :class="{'gdm-removed': process.magtel.removed}"> 
-          <div ><i class="fa fa-file-archive-o"></i> {{ process.magtel.filename }}</div>
-        </div>
+              <div v-else-if="process.magtel"class="gdm-images-child" :class="{'gdm-removed': process.magtel.removed}"> 
+                  <div ><i class="fa fa-file-archive-o"></i> {{ process.magtel.filename }}</div>
+              </div>
+              <div v-else-if="process.gin"class="gdm-images-child" :class="{'gdm-removed': process.gin.removed}"> 
+                  <div ><i class="fa fa-file-archive-o"></i> {{ process.gin.filename }}</div>
+              </div>
 			  <div v-else style="text-align:center;padding: 30px;">NO IMAGES SELECTED - TYPE REQUEST</div>
 			  </div>
 			  
