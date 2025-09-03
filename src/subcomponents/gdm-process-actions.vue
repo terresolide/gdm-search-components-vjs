@@ -142,7 +142,6 @@
   
       <!--  PURGED NOTHING TO DO => CREATE NEW PROCESS WITH THIS-->
       <span v-else-if="process.status === 'PURGED' || process.status === 'ABORTED' || process.status === 'TERMINATED'">
-    
          <a class="button" @click="duplicate"  :class="{disabled: !canDuplicate}">{{$t('duplicate')}}</a>
          <a class="button" v-if="back && process.status ==='TERMINATED' && !process.isExample" @click="showPublish=true"  :class="{disabled: !canEdit}">{{$t('publish')}}</a>
           <a class="button" v-if="back && process.isExample && process.status ==='TERMINATED'" @click="showPublish=true">Modifier url résultat</a>

@@ -155,7 +155,6 @@
 		  <!--  </div>
 		   <div class="header-4">--> 
 		   <div class="process-actions">
- 
 		     <gdm-process-actions v-if="process" :api="api" :url="url" :id="id" :back="back" :color="color"
 		     :process="process" :user-id="userId" :is-private="isPrivate" :can-duplicate="hasAccessService && !dataRemoved"  :can-edit="hasAccessService" :lang="lang" :teams="teams" @processChange="statusChange" 
 		     @statusChange="statusChange" @teamChange="teamChange" @duplicate="duplicate"
@@ -208,10 +207,10 @@
 		              <gdm-image :image="image" :type="type" :searching="false" :checked="false" :stereo-list="stereo" mode="view" :lang="lang"></gdm-image>
 		          </div>
 			  </div>
-              <div v-else-if="process.magtel"class="gdm-images-child" :class="{'gdm-removed': process.magtel.removed}"> 
+              <div v-else-if="process.magtel"class="gdm-images-child" :class="{'gdm-removed': process.magtel.removed && !process.magtel.path}"> 
                   <div ><i class="fa fa-file-archive-o"></i> {{ process.magtel.filename }}</div>
               </div>
-              <div v-else-if="process.gin"class="gdm-images-child" :class="{'gdm-removed': process.gin.removed}"> 
+              <div v-else-if="process.gin" class="gdm-images-child" :class="{'gdm-removed': process.gin.removed}"> 
                   <div ><i class="fa fa-file-archive-o"></i> {{ process.gin.filename }}</div>
               </div>
 			  <div v-else style="text-align:center;padding: 30px;">NO IMAGES SELECTED - TYPE REQUEST</div>
@@ -759,7 +758,10 @@ export default {
       this.feature = response.feature
       this.feature.properties.id = this.id
       this.process = response
-      if (this.process.magtel && this.process.magtel.removed) {
+      if (this.process.magtel && this.process.magtel.removed && !this.process.magtel.path) {
+        this.dataRemoved = true
+      }
+      if (this.process.gin && this.process.gin.removed) {
         this.dataRemoved = true
       }
       
