@@ -122,7 +122,24 @@
            <input type="button" :disabled="purpose.length < 10" class="button" @click="requestPublish" :value="$t('publish')" />
         </div>
       </div>
+      <div v-if="showChangeOwner" class="publish-box" style="padding:10px;">
+        <div style="float:right;"><span class="gdm-close fa fa-close" @click="showChangeOwner=false"></span></div>
+        <div>Rechercher l'adresse mail du nouveau propriétaire. </div>
+        <input v-model="searchUser" style="width:400px;" list="users" @mousedown="$event.stopPropagation()" @input="usersUpdated($event)"/>
+        <datalist id="users">
+           <template v-for="usr in users">
+            <option :data-value="usr.u_id" >{{usr.denomination }}</option> 
+           </template>
+          </datalist>
+        <div style="text-align:right;margin:10px 0;">
+           <input type="button" class="button" @click="showChangeOwner = false" :value="$t('cancel')" />
+           <input type="button" :disabled="!searchUser" class="button" @click="changeOwner" :value="$t('save')" />
+        </div>
+      </div>
       <span  v-if="submitting" class="gdm-searching"><i class="fa fa-circle-o-notch animated"></i></span>
+    
+      <!-- change owner -->
+      <a class="button" v-if="back" @click="showChangeOwner = !showChangeOwner">Changer propriétaire</a>
       <a class="button" v-if="userId===process.userId && ((teams.length > 0 && !process.team) || process.shareKey)" @click="showShare=true"  >{{$t('share')}}</a>
       <span v-if="process.status === 'EVALUATED'">
          <a class="button" v-if="!back && url && canEdit" :href="url + 'process/' + process.id + '/edit'">{{$t('edit')}}</a>
@@ -175,6 +192,7 @@
          <a class="button" @click="duplicate"  :class="{disabled: !canDuplicate}">{{$t('duplicate')}}</a>
         
         <a class="button" v-if="back" @click="switchDebug" :title="$t('debug')">
+    
         <i class="fa fa-arrow-right"></i>
         DEBUG
         </a>
@@ -259,11 +277,15 @@ export default {
       resultUrl: null,
       showPublish: false,
       showCatalog: false,
+      showChangeOwner: false,
       invalidUrl: false,
       purpose: '',
       getCount: 0,
       searchResult: false,
-      shareTooltip: false
+      shareTooltip: false,
+      users: [],
+      searchUser: null,
+      owner: null
     }
   },
   computed: {
@@ -351,6 +373,33 @@ export default {
         clearInterval(this.timer)
         this.timer = null
       }
+    },
+    changeOwner () {
+      console.log(this.searchUser)
+      var find = this.users.find(u => u.denomination === this.searchUser)
+      if (!find) {
+         alert('Une erreur s\'est produite')
+        this.searchUser = null
+        return
+      }
+      fetch(this.api + '/process/' + this.process.id + '/owner',
+        {
+          headers: { "Content-Type": "application/x-www-form-urlencoded"},
+          method: 'POST',
+          credentials: 'include',
+          body: 'userId=' + find.u_id
+        }
+      ).then(resp => resp.json())
+      .then(json => {
+        this.showChangeOwner = false
+        this.searchUser = null
+        if (json.success) {
+         
+          this.$emit('processChange', json.process)
+        } else {
+          alert('Une erreur s\'est produite')
+        }
+      })
     },
     clickGetStatus() {
       this.submitting = true
@@ -499,6 +548,18 @@ export default {
       })
       
     },
+    getUsers () {
+      fetch(this.api + '/users?status=ENABLED&q=' + this.searchUser, {credentials: 'include'})
+      .then(resp => resp.json())
+      .then(json => {
+        var users = []
+        json.users.forEach(function(usr) {
+          usr.denomination = usr.u_email + ' (' + usr.u_firstname + ' ' + usr.u_lastname + ')'
+          users.push(usr)
+        })
+        this.users = users
+      })
+    },
     publish () {
       this.submitting = true
       var form = this.$el.querySelector('form[name="publish"]')
@@ -557,6 +618,31 @@ export default {
         this.submitting = false
         alert(this.$i18n.t('error_occured'))
       })
+    },
+    usersUpdated (event) {
+        this.owner = {
+          id: null,
+          username: null
+        }
+        
+        if (this.users.length <= 1) {
+            this.users = []
+        }
+        if (event.inputType && event.inputType.indexOf('delete') >=0)
+        {
+            return
+        }
+        if (this.searchUser.length === 3) {
+            this.getUsers()
+            return
+        }
+        if (this.searchUser.length < 5) {
+            return
+        }
+          // valid organism
+        // data.showOrganismMessage = false
+        
+        
     },
     unpublish () {
       if (!window.confirm('Cette action remettra le job à son ancien utilisateur,\nil sera sans doute purgé dans la nuit.\nVoulez-vous continuer?')) {

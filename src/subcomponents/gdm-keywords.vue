@@ -84,6 +84,10 @@ export default {
       type: String,
       default: 'https://catalogue-terresolide.ipgp.fr/voc/rest/v1/'
     },
+    geonetwork: {
+      type: String,
+      default: 'https://catalogue-terresolide.ipgp.fr/geonetwork/'
+    },
     removed: {
       type: Array,
       default: () => []
@@ -187,6 +191,14 @@ export default {
       })
     },
     getVocabularies () {
+      // this.$http.get(this.geonetwork + 'srv/fre/thesaurus?_content_type=json', {headers: {'Accept': 'application/json'}})
+      // .then(resp => {
+      //   if (resp.body.vocabularies) {
+      //     // filtre les vocabulaires supprime process et product
+      //     this.vocabularies = resp.body.vocabularies
+      //     this.$emit('vocab', this.vocabularies)
+      //   }
+      // })
       this.$http.get(this.voc + 'vocabularies?lang=fr', {headers: {'Accept': 'application/json'}})
       .then(resp => {
         if (resp.body.vocabularies) {
