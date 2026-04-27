@@ -552,11 +552,12 @@ export default {
       fetch(this.api + '/users?status=ENABLED&q=' + this.searchUser, {credentials: 'include'})
       .then(resp => resp.json())
       .then(json => {
-        var users = []
+        var users = ['---']
         json.users.forEach(function(usr) {
           usr.denomination = usr.u_email + ' (' + usr.u_firstname + ' ' + usr.u_lastname + ')'
           users.push(usr)
         })
+        console.log(users)
         this.users = users
       })
     },
