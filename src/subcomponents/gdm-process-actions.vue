@@ -573,7 +573,9 @@ export default {
           {url: this.resultUrl},
           {credentials: true, emulateJSON: true})
       .then(function (resp) {
-        location.reload()
+        this.showPublish = false
+        this.process.keep = 1
+        // location.reload()
       }, function (e) {
         this.submitting = false
         alert(this.$i18n.t('error_occured') + ': DISCONNECTED ?')
@@ -609,6 +611,7 @@ export default {
          if(resp.body && resp.body.success) {
            alert(this.$i18n.t('recorded_request'))
            this.$emit('keptProcess', true)
+           this.showPublish = false
          } else {
            if (resp.body.error) {
              alert(this.$i18n.t('error_occured') + ': ' +  resp.body.error)
