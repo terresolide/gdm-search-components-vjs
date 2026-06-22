@@ -59,18 +59,22 @@
         <div><span class="lang-label">FR: </span><textarea v-model="post.purpose.fr" style="vertical-align: top;"></textarea></div> 
         <div><span class="lang-label">EN: </span><textarea v-model="post.purpose.en" style="vertical-align: top;"></textarea></div> 
       </div>
-      <gdm-keywords ref="keywords" :has-serie="hasSerie" :removed="removed.split(',')"
-      :count="count" :keywords="post.keywords" @vocab="checkKeywords"
-      @remove="removeKeyword" @add="addKeyword"></gdm-keywords>
+      <h2>Mots-clés</h2>
+      {{ post.keywords }}
+      <formaterre-keywords ref="keywords" v-model="post.keywords" :recommanded="recommanded" :excluded="excluded">Complétez les informations par des mots-clés de thésaurus:<ul>
+        <li>Discipline</li>
+        <li>Objet d'intérêt</li>
+      </ul></formaterre-keywords>
    </div>
  </div>
 </template>
 <script>
-import GdmKeywords from './subcomponents/gdm-keywords.vue'
+// import GdmKeywords from './subcomponents/gdm-keywords.vue'
+import FormaterreKeywords from 'formaterre-keywords-vjs/src/FormaterreKeywords.vue'
 export default {
   name: 'GdmPublish',
   components: {
-    GdmKeywords
+    FormaterreKeywords
   },
   props: {
     
@@ -81,10 +85,6 @@ export default {
     geonetwork: {
       type: String,
       default: null
-    },
-    removed: {
-      type: String,
-      default: 'product,platform,process'
     },
     api: {
       type: String,
@@ -113,44 +113,26 @@ export default {
         fr: '',
         en: ''
       },
+      recommanded: ['external.discipline.formater-discipline', 'external.theme.formater-foi-gn'],
+      excluded: ['external.dataCentre.formater-distributor'],
+      fixed: [],
       post: {
         title: {fr: '', en: ''},
         purpose: {fr: '', en: ''},
-        keywords: {thesaurus: {}, free: {}}
+        keywords: {thesaurus: {'external.platform.formater-platform-gn': [{
+                value: 'SENTINEL-1',
+                values: {
+                  fr: 'SENTINEL-1',
+                  en: 'SENTINEL-1',
+                },
+                 uri: 'https://service.poleterresolide.fr/voc/platform/P010100'
+              }]}, free: {}}
         
       }
     }
   },
   methods: {
-    addKeyword (obj) {
-        if (obj.item.uri) {
-          var keywords = this.post.keywords
-          if (!keywords.thesaurus[obj.thesaurus]) {
-            keywords.thesaurus[obj.thesaurus] = [obj.item]
-          } else {
-            var index = keywords.thesaurus[obj.thesaurus].findIndex(k => k.uri === obj.item.uri)
-            if (index >=0) {
-              return
-            }
-            keywords.thesaurus[obj.thesaurus].push(obj.item)
-          }
-          this.post.keywords = keywords
-        } else {
-          var kw = Object.assign({}, obj.item)
-          this.post.keywords.free[obj.thesaurus].push(kw)
-        }
-        this.$refs.keywords.$forceUpdate()
-    },
-    checkKeywords(vocabularies) {
-      if (this.post.keywords) {
-        var self = this
-        vocabularies.forEach(function (voc) {
-          if (!self.post.keywords.thesaurus[voc.id]) {
-            self.post.keywords.thesaurus[voc.id] = []
-          }
-        })
-      }
-    },
+    
     getMetadata () {
       this.$http.get(this.api + '/process/' + this.processId + '/catalog', {credentials: true})
       .then(resp => {
@@ -188,9 +170,38 @@ export default {
          en: json.feature.properties.temporalExtent[0].substring(0,10) + ' to ' + json.feature.properties.temporalExtent[1].substring(0,10)
        }
        if (json.metadata) {
+         console.log('update')
          this.type = 'update'
          var keywords = json.metadata.keywords
-         
+         console.log(keywords)
+         if (keywords.thesaurus.ron) {
+          console.log(keywords.thesaurus.ron)
+          keywords.thesaurus['local.theme.ron'] = [{
+            vocab: 'local.themes.ron',
+            uri: keywords.thesaurus.ron[0].uri,
+            value: keywords.thesaurus.ron[0].fr,
+            values: {
+              fr: keywords.thesaurus.ron[0].fr,
+              en: keywords.thesaurus.ron[0].en
+            }
+          }]
+          console.log(keywords.thesaurus['local.theme.ron'])
+          delete keywords.thesaurus.ron
+         }
+         if (keywords.thesaurus.discipline) {
+            keywords.thesaurus['external.discipline.formater-discipline'] = []
+            keywords.thesaurus.discipline.forEach(function (item) {
+              var kw = {
+                uri: item.uri,
+                value: item.fr,
+                values: {fr: item.fr, en: item.en},
+                vocab: 'external.discipline.formater-discipline'
+              }
+              keywords.thesaurus['external.discipline.formater-discipline'].push(kw)
+            })
+            delete keywords.discipline
+         }
+         this.post.keywords = keywords
          if (json.metadata.title.fr) {
              this.post.title = json.metadata.title
          } else {
@@ -210,22 +221,32 @@ export default {
       
          var keywords = {
            thesaurus: {
-             polarisation: [
+             'local.theme.polarisation': [
                 {
-                  fr: json.feature.properties.parameters.polarisation.toUpperCase(),
-                  en: json.feature.properties.parameters.polarisation.toUpperCase()
+                  value: json.feature.properties.parameters.polarisation.toUpperCase(),
+                  values: {
+                    fr: json.feature.properties.parameters.polarisation.toUpperCase(),
+                    en: json.feature.properties.parameters.polarisation.toUpperCase()
+                  }
                 }
              ],
-             ron: [
+             'local.theme.ron': [
                 {
-                  fr: ron,
-                  en: ron
+                  vocab: 'local.theme.ron',
+                  value: ron,
+                  values: { 
+                    fr: ron,
+                    en: ron
+                  }
                 }
              ],
-             platform: [
+             'external.platform.formater-platform-gn': [
               {
-                 fr: 'SENTINEL-1',
-                 en: 'SENTINEL-1',
+                value: 'SENTINEL-1',
+                values: {
+                  fr: 'SENTINEL-1',
+                  en: 'SENTINEL-1',
+                },
                  uri: 'https://service.poleterresolide.fr/voc/platform/P010100'
               }
              ]
@@ -234,17 +255,17 @@ export default {
            free: {}
          }
        }
-       var vocabularies = this.$refs.keywords.vocabularies;
-       vocabularies.forEach(function (vocab) {
-         console.log(vocab)
-         if (!keywords.thesaurus[vocab.id]) {
-           keywords.thesaurus[vocab.id] = []
-         }
-       })
-       keywords.thesaurus.polarisation[0].disabled = true
-       keywords.thesaurus.ron[0].disabled = true
-       keywords.thesaurus.platform[0].disabled = true
-       var types = this.$refs.keywords.types
+      //  var vocabularies = this.$refs.keywords.vocabularies;
+      //  vocabularies.forEach(function (vocab) {
+      //    console.log(vocab)
+      //    if (!keywords.thesaurus[vocab.id]) {
+      //      keywords.thesaurus[vocab.id] = []
+      //    }
+      //  })
+      //  keywords.thesaurus.polarisation[0].disabled = true
+      //  keywords.thesaurus.ron[0].disabled = true
+      //  keywords.thesaurus.platform[0].disabled = true
+      //  var types = this.$refs.keywords.types
       
        if (!keywords.free) {
          keywords.free = {}
@@ -310,15 +331,6 @@ export default {
         },
         resp => {console.log('pb publish')}
       )
-    },
-    removeKeyword (obj) {
-      if (obj.item.uri) {
-        var index = this.post.keywords.thesaurus[obj.thesaurus].findIndex(k => k.uri === obj.item.uri)
-        this.post.keywords['thesaurus'][obj.thesaurus].splice(index, 1)
-      } else {
-        this.post.keywords.free[obj.thesaurus].splice(obj.index,1)
-      }
-      this.$refs.keywords.$forceUpdate()
     },
     save () {
       this.$http.post(this.api + '/process/' + this.processId + '/catalog',

@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "formater-commons-components-vjs": "github:terresolide/formater-commons-components-vjs",
+    "formaterre-keywords-vjs": "github:terresolide/formaterre-keywords-vjs#vue2",
     "gdm-tio-vjs": "github:terresolide/gdm-tio-vjs",
     "highcharts": "^11.1.0",
     "leaflet": "^1.7.1",
