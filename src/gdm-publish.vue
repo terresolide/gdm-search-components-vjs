@@ -61,7 +61,7 @@
       </div>
       <h2>Mots-clés</h2>
       {{ post.keywords }}
-      <formaterre-keywords ref="keywords" v-model="post.keywords" :recommanded="recommanded" :excluded="excluded">Complétez les informations par des mots-clés de thésaurus:<ul>
+      <formaterre-keywords ref="keywords" v-model="post.keywords" :recommanded="recommanded" :excluded="excluded" :fixed="fixed">Complétez les informations par des mots-clés de thésaurus:<ul>
         <li>Discipline</li>
         <li>Objet d'intérêt</li>
       </ul></formaterre-keywords>
@@ -115,7 +115,7 @@ export default {
       },
       recommanded: ['external.discipline.formater-discipline', 'external.theme.formater-foi-gn'],
       excluded: ['external.dataCentre.formater-distributor'],
-      fixed: [],
+      fixed: ['external.platform.formater-platform-gn', 'external.product.formaterre-product-gn', 'local.theme.ron', 'local.theme.polarisation'],
       post: {
         title: {fr: '', en: ''},
         purpose: {fr: '', en: ''},
