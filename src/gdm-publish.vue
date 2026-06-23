@@ -170,38 +170,33 @@ export default {
          en: json.feature.properties.temporalExtent[0].substring(0,10) + ' to ' + json.feature.properties.temporalExtent[1].substring(0,10)
        }
        if (json.metadata) {
-         console.log('update')
          this.type = 'update'
          var keywords = json.metadata.keywords
-         console.log(keywords)
-         if (keywords.thesaurus.ron) {
-          console.log(keywords.thesaurus.ron)
-          keywords.thesaurus['local.theme.ron'] = [{
-            vocab: 'local.themes.ron',
-            uri: keywords.thesaurus.ron[0].uri,
-            value: keywords.thesaurus.ron[0].fr,
-            values: {
-              fr: keywords.thesaurus.ron[0].fr,
-              en: keywords.thesaurus.ron[0].en
+      
+         var mapping = {
+          discipline: 'external.discipline.formater-discipline',
+          platform: 'external.platform.formater-platform-gn',
+          ron: 'local.theme.ron',
+          polarisation: 'local.theme.polarisation',
+          foi: 'external.theme.formater-foi-gn',
+          product: 'external.product.formaterres-product-gn'
+
+         }
+         for (var th in mapping) {
+            if (keywords.thesaurus[th]) {
+                keywords.thesaurus[mapping[th]] = []
+                keywords.thesaurus[th].forEach(function (item) {
+                  var kw = {
+                    uri: item.uri,
+                    value: item.fr,
+                    values: {fr: item.fr, en: item.en},
+                    vocab: mapping[th]
+                  }
+                  keywords.thesaurus[mapping[th]].push(kw)
+                })
+                delete keywords[th]
             }
-          }]
-          console.log(keywords.thesaurus['local.theme.ron'])
-          delete keywords.thesaurus.ron
          }
-         if (keywords.thesaurus.discipline) {
-            keywords.thesaurus['external.discipline.formater-discipline'] = []
-            keywords.thesaurus.discipline.forEach(function (item) {
-              var kw = {
-                uri: item.uri,
-                value: item.fr,
-                values: {fr: item.fr, en: item.en},
-                vocab: 'external.discipline.formater-discipline'
-              }
-              keywords.thesaurus['external.discipline.formater-discipline'].push(kw)
-            })
-            delete keywords.discipline
-         }
-         this.post.keywords = keywords
          if (json.metadata.title.fr) {
              this.post.title = json.metadata.title
          } else {
@@ -223,6 +218,7 @@ export default {
            thesaurus: {
              'local.theme.polarisation': [
                 {
+                  vocab: 'local.theme.polarisation',
                   value: json.feature.properties.parameters.polarisation.toUpperCase(),
                   values: {
                     fr: json.feature.properties.parameters.polarisation.toUpperCase(),
@@ -249,12 +245,36 @@ export default {
                 },
                  uri: 'https://service.poleterresolide.fr/voc/platform/P010100'
               }
-             ]
-                 
+             ]   
            },
            free: {}
          }
+        
        }
+       if (!keywords.thesaurus['external.product.formaterre-product-gn']) {
+          keywords.thesaurus['external.product.formaterre-product-gn'] = [{
+                vocab: 'external.product.formaterre-product-gn',
+                value: 'Interférogramme',
+                values: { fr: 'Interférogramme', en: 'Interferogram'},
+                uri: 'https://service.poleterresolide.fr/voc/product/c_460292ab'
+              },
+              {
+                vocab: 'external.product.formaterre-product-gn',
+                value: 'Données auxiliaires',
+                values: { fr: 'Données auxiliaires', en: 'Auxiliary data'},
+                uri: 'https://service.poleterresolide.fr/voc/product/c_67446f9c'
+              }]
+       }
+       if (this.hasSerie) {
+          keywords.thesaurus['external.product.formaterre-product-gn'].push(
+             {
+                vocab: 'external.product.formaterre-product-gn',
+                value: 'Série temporelle',
+                values: { fr: 'Série temporelle', en: 'Time series'},
+                uri: 'https://service.poleterresolide.fr/voc/product/c_6fff7a77'
+              }
+          )
+        } 
       //  var vocabularies = this.$refs.keywords.vocabularies;
       //  vocabularies.forEach(function (vocab) {
       //    console.log(vocab)
@@ -270,18 +290,18 @@ export default {
        if (!keywords.free) {
          keywords.free = {}
        } else {
-          var keys = Object.keys(types)
-          for(var key in keywords.free) {
-            if (keys.indexOf(key) < 0) {
-              keywords.free.theme.concat(keywords.free[key])
-            }
-          }
+          // var keys = Object.keys(types)
+          // for(var key in keywords.free) {
+          //   if (keys.indexOf(key) < 0) {
+          //     keywords.free.theme.concat(keywords.free[key])
+          //   }
+          // }
        }
-       for(var type in types) {
-          if (!keywords.free[type]) {
-            keywords.free[type] = []
-          }
-        }
+      //  for(var type in types) {
+      //     if (!keywords.free[type]) {
+      //       keywords.free[type] = []
+      //     }
+      //   }
        this.post.keywords = keywords
     },
     getProcess() {
