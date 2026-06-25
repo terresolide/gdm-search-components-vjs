@@ -3,10 +3,10 @@
   <div v-if="running" class="gdm-processing fa fa-spinner fa-spin fa-3x fa-fw running" ></div>
    <h1 v-if="type === 'insert'">Catalogue FormaTerre - publication du job N°{{processId}} &laquo;{{this.post.title.fr }}&raquo;</h1>
    <h1 v-else>Catalogue FormaTerre - M.a.j des métadonnées du job N°{{ processId }} - {{ this.post.title.fr }}</h1>
-   <em style="display:block;">Une grande partie des métadonnées provient des informations sur le calcul et du backup_product.json (emprise géographique, dates, liens...) mais ces informations sont insuffisantes
+   <em style="display:block;">Une grande partie des métadonnées provient des informations sur le calcul et des résultats (emprise géographique, dates, liens...) mais ces informations sont insuffisantes
     pour   l'indexation de vos produits dans le catalogue FormaTerre et par suite celui de DataTerra<br><br>
     Nous vous encourageons donc à compléter au mieux les informations ci-dessous.<br>
-    <div v-if="metaUrl">
+    <!-- <div v-if="metaUrl">
       Des fiches de métadonnées ont été publiées pour ce job: <a :href="metaUrl" target="_blank">Fiche de métadonnées racine enregistrée</a>
     </div>
     <div v-if="!metaUrl">
@@ -24,8 +24,9 @@
          </ul>
       Une fois publié, vous pourrez toujours modifier ces informations. 
      </div>
+     -->
    </em>
-   <div style="color:darkred;margin:10px 0;border:1px solid darkred;padding:10px;display:block;max-width:900px;">
+   <!--<div style="color:darkred;margin:10px 0;border:1px solid darkred;padding:10px;display:block;max-width:900px;">
     <i class="fa fa-exclamation-triangle" style="vertical-align:top;width:30px;"></i> 
     <div style="display:inline-block;width:calc(100% - 50px);">
       <div v-if="errorGn" style="margin-bottom:5px;">L'application a renvoyé le message d'erreur suivant: {{ errorGn }}. 
@@ -36,14 +37,13 @@
       </div>
     </div>
 
-  </div>
+  </div>-->
   <div v-if="running">En cours</div>
   <div style="border:1px solid darkgrey;padding:10px; max-width:900px;box-shadow: 0 1px 5px rgba(0,0,0,.65);">
      <div style="text-align:right;">
       <button class="btn btn-publish" @click="save" :disabled="errorProcess || running" title="Enregistrer les informations en interne">Sauvegarder</button>
       <button class="btn btn-publish" @click="publish" :disabled="errorGn || errorProcess || running" title="Publier dans le catalogue FormaTerre">
-        <template v-if="metaUrl">Modifier dans le catalogue</template> 
-        <template v-else >Publier dans le catalogue</template>
+        Demander la publication
       </button>
      </div>
      <h2>Titre principal</h2> 
@@ -60,7 +60,7 @@
         <div><span class="lang-label">EN: </span><textarea v-model="post.purpose.en" style="vertical-align: top;"></textarea></div> 
       </div>
       <h2>Mots-clés</h2>
-      {{ post.keywords }}
+ 
       <formaterre-keywords ref="keywords" v-model="post.keywords" :recommanded="recommanded" :excluded="excluded" :fixed="fixed">Complétez les informations par des mots-clés de thésaurus:<ul>
         <li>Discipline</li>
         <li>Objet d'intérêt</li>
@@ -115,7 +115,7 @@ export default {
       },
       recommanded: ['external.discipline.formater-discipline', 'external.theme.formater-foi-gn'],
       excluded: ['external.dataCentre.formater-distributor'],
-      fixed: ['external.platform.formater-platform-gn', 'external.product.formaterre-product-gn', 'local.theme.ron', 'local.theme.polarisation'],
+      fixed: ['external.platform.formater-platform-gn', 'external.product.formaterre-product-gn', 'local.theme.ron', 'local.theme.polarisation', 'local.theme.formaterre_provider'],
       post: {
         title: {fr: '', en: ''},
         purpose: {fr: '', en: ''},
@@ -148,6 +148,34 @@ export default {
          this.errorProcess = 'Aucun résultat à publier pour ce job'
          return
        }
+       var groundDeformation = {
+          vocab: 'local.theme.formaterre_themes',
+          uri: 'https://registry.geonetwork-opensource.org/theme/formaterre_themes#a12a3cc2-baf3-454b-b155-e0cb615da129',
+          value: 'Déformation du sol',
+          values: {fr: 'Déformation du sol', en: 'Ground deformation'},
+          fixed: true
+       }
+       var discipline = {
+          vocab:'external.discipline.formater-discipline',
+          uri: 'https://service.poleterresolide.fr/voc/science_field/D120000',
+          value: 'Déformation du sol',
+          values: {fr: 'Déformation du sol', en: 'Ground deformation'},
+          fixed: true
+       }
+       var provider =  {
+          vocab: 'local.theme.formaterre_provider',
+          uri: 'https://registry.geonetwork-opensource.org/theme/formaterre_provider#905d59ea-ce82-4bf8-b3fe-be9968c4e7d2',
+          value: 'CNES',
+          values: {fr: 'CNES', en: 'CNES'}
+       }
+       if (json.serviceName === 'GDM-SAR-In-UGA') {
+           var  provider = {
+              vocab: 'local.theme.formaterre_provider',
+              uri: 'https://registry.geonetwork-opensource.org/theme/formaterre_provider#b82bf736-666a-4470-8605-ca6c8122509e',
+              value: 'UGA',
+              values: {fr: 'UGA', en: 'UGA'}
+           }
+       }
        this.resultDir = json.result.dir
        if (json.result['series']) {
          this.hasSerie = true
@@ -179,22 +207,29 @@ export default {
           ron: 'local.theme.ron',
           polarisation: 'local.theme.polarisation',
           foi: 'external.theme.formater-foi-gn',
+          variable: 'external.theme.formater-variable-gn',
           product: 'external.product.formaterres-product-gn'
 
          }
+         var truc = ['network', 'process', 'instrument']
+         for (var th in truc) {
+            delete keywords.thesaurus[truc[th]]
+         }         
          for (var th in mapping) {
             if (keywords.thesaurus[th]) {
+                if (keywords.thesaurus[th].length > 0) {
                 keywords.thesaurus[mapping[th]] = []
-                keywords.thesaurus[th].forEach(function (item) {
-                  var kw = {
-                    uri: item.uri,
-                    value: item.fr,
-                    values: {fr: item.fr, en: item.en},
-                    vocab: mapping[th]
-                  }
-                  keywords.thesaurus[mapping[th]].push(kw)
-                })
-                delete keywords[th]
+                  keywords.thesaurus[th].forEach(function (item) {
+                    var kw = {
+                      uri: item.uri,
+                      value: item.fr,
+                      values: {fr: item.fr, en: item.en},
+                      vocab: mapping[th]
+                    }
+                    keywords.thesaurus[mapping[th]].push(kw)
+                  })
+                }
+                delete keywords.thesaurus[th]
             }
          }
          if (json.metadata.title.fr) {
@@ -265,6 +300,25 @@ export default {
                 uri: 'https://service.poleterresolide.fr/voc/product/c_67446f9c'
               }]
        }
+       if (!keywords.thesaurus['local.theme.formaterre_provider']) {
+          keywords.thesaurus['local.theme.formaterre_provider'] = [provider]
+       }
+       var tab = ['discipline', 'groundDeformation']
+       for (var i in tab) {
+          var x = eval(tab[i])
+          console.log(x)
+          if (!keywords.thesaurus[x.vocab]) {
+              keywords.thesaurus[x.vocab] = [x]
+          } else {
+              var index = keywords.thesaurus[x.vocab].findIndex(x => x.uri === x.uri)
+              if (index >= 0) {
+                keywords.thesaurus[x.vocab][index] = x
+              } else {
+                keywords.thesaurus[x.vocab].push(x)
+              }
+          }
+       }
+       
        if (this.hasSerie) {
           keywords.thesaurus['external.product.formaterre-product-gn'].push(
              {
@@ -275,33 +329,9 @@ export default {
               }
           )
         } 
-      //  var vocabularies = this.$refs.keywords.vocabularies;
-      //  vocabularies.forEach(function (vocab) {
-      //    console.log(vocab)
-      //    if (!keywords.thesaurus[vocab.id]) {
-      //      keywords.thesaurus[vocab.id] = []
-      //    }
-      //  })
-      //  keywords.thesaurus.polarisation[0].disabled = true
-      //  keywords.thesaurus.ron[0].disabled = true
-      //  keywords.thesaurus.platform[0].disabled = true
-      //  var types = this.$refs.keywords.types
-      
        if (!keywords.free) {
          keywords.free = {}
-       } else {
-          // var keys = Object.keys(types)
-          // for(var key in keywords.free) {
-          //   if (keys.indexOf(key) < 0) {
-          //     keywords.free.theme.concat(keywords.free[key])
-          //   }
-          // }
-       }
-      //  for(var type in types) {
-      //     if (!keywords.free[type]) {
-      //       keywords.free[type] = []
-      //     }
-      //   }
+       } 
        this.post.keywords = keywords
     },
     getProcess() {
