@@ -1,11 +1,20 @@
 <template>
  <div class="gdm-publish">
   <div v-if="running" class="gdm-processing fa fa-spinner fa-spin fa-3x fa-fw running" ></div>
-   <h1 v-if="type === 'insert'">Catalogue FormaTerre - publication du job N°{{processId}} &laquo;{{this.post.title.fr }}&raquo;</h1>
-   <h1 v-else>Catalogue FormaTerre - M.a.j des métadonnées du job N°{{ processId }} - {{ this.post.title.fr }}</h1>
-   <em style="display:block;">Une grande partie des métadonnées provient des informations sur le calcul et des résultats (emprise géographique, dates, liens...) mais ces informations sont insuffisantes
+   <h1 v-if="lang === 'fr'">Publication du job N°{{processId}} &laquo;{{this.post.title.fr }}&raquo;</h1>
+   <h1 v-else>Publication of job N°{{processId}} &laquo;{{this.post.title.en }}&raquo;</h1>
+   <em style="display:block;">
+    <template v-if="lang === 'fr'">Une grande partie des métadonnées provient des informations sur le calcul et des résultats (emprise géographique, dates, liens...) mais ces informations sont insuffisantes
     pour   l'indexation de vos produits dans le catalogue FormaTerre et par suite celui de DataTerra<br><br>
     Nous vous encourageons donc à compléter au mieux les informations ci-dessous.<br>
+    Vous pouvez simplement "Sauvegarder" et revenir plus tard. Attention, toutefois, les résultats seront effacés le <span v-if="process && process.datePurge">{{ str2date(process.datePurge)}}</span> et toute demande de publication sera impossible!
+    </template>
+    <template v-else>
+     A large portion of the metadata is derived from the computation details and results (geographic extent, dates, links, etc.), but this information is insufficient
+    for indexing your products in the FormaTerre catalog—and consequently the DataTerra catalog.<br><br>
+    We therefore encourage you to provide as much detail as possible in the information below.<br>
+    You can simply "Save" and return later. Please note, however, that the results will be deleted on <span v-if="process && process.datePurge">{{ str2date(process.datePurge)}}</span>, and it will no longer be possible to submit a publication request!
+    </template>
     <!-- <div v-if="metaUrl">
       Des fiches de métadonnées ont été publiées pour ce job: <a :href="metaUrl" target="_blank">Fiche de métadonnées racine enregistrée</a>
     </div>
@@ -26,7 +35,7 @@
      </div>
      -->
    </em>
-   <!--<div style="color:darkred;margin:10px 0;border:1px solid darkred;padding:10px;display:block;max-width:900px;">
+   <!--<div style="color:darkred;margin:10px 0;border:1px solid darkred;padding:10px;display:block;">
     <i class="fa fa-exclamation-triangle" style="vertical-align:top;width:30px;"></i> 
     <div style="display:inline-block;width:calc(100% - 50px);">
       <div v-if="errorGn" style="margin-bottom:5px;">L'application a renvoyé le message d'erreur suivant: {{ errorGn }}. 
@@ -39,7 +48,7 @@
 
   </div>-->
   <div v-if="running">En cours</div>
-  <div style="border:1px solid darkgrey;padding:10px; max-width:900px;box-shadow: 0 1px 5px rgba(0,0,0,.65);">
+  <div style="border:1px solid darkgrey;padding:10px;box-shadow: 0 1px 5px rgba(0,0,0,.65);">
      <div style="text-align:right;">
       <button class="btn btn-publish" @click="save" :disabled="errorProcess || running" title="Enregistrer les informations en interne">Sauvegarder</button>
       <button class="btn btn-publish" @click="publish" :disabled="errorGn || errorProcess || running" title="Publier dans le catalogue FormaTerre">
@@ -60,12 +69,19 @@
         <div><span class="lang-label">EN: </span><textarea v-model="post.purpose.en" style="vertical-align: top;"></textarea></div> 
       </div>
       <h2>Mots-clés</h2>
- 
-      <formaterre-keywords ref="keywords" v-model="post.keywords" :recommanded="recommanded" :excluded="excluded" :fixed="fixed">Complétez les informations par des mots-clés de thésaurus:<ul>
+       <em>Il est important de compléter au mieux les mots-clés. Ils sont utilisés pour l'indexation des fiches de métadonnées et favorisent la visibilité de vos données.<br />
+      La classification principale est obligatoire. Nous imposons déjà le mot-clé "Déformation du sol", mais vous pouvez en choisir d'autres.<br />
+      Une partie est complétée automatiquement comme la polarisation, le type de produits ou le fournisseur... </em>
+      <formaterre-keywords ref="keywords" v-model="post.keywords" :recommanded="recommanded" :excluded="excluded" :fixed="fixed">Recherchez des mots-clés dans les thésaurus/ontologies.<br />
+        Certains sont recommandés, les autres facultatifs.<br />
+        Les thésaurus recommandés sont<ul>
         <li>Discipline</li>
-        <li>Objet d'intérêt</li>
-      </ul></formaterre-keywords>
-   </div>
+        <li>Objet d'intérêt (quel objet vous observez, )</li>
+      </ul>
+      Nous vous encourageons aussi à saisir une localisation, si vous ne la trouvez pas dans le thésaurus "Continents, countries, sea regions of the world", vous pouvez proposer un mot-clé libre.<br />
+      En règle générale, vous pouvez saisir des <b>mots-clés libres</b>, si vous ne les trouvez pas dans les thésaurus, vous pouvez même proposer de les ajouter dans les thésaurus. 
+      </formaterre-keywords>
+    </div>
  </div>
 </template>
 <script>
@@ -89,6 +105,10 @@ export default {
     api: {
       type: String,
       default: 'https://gdm.formater/api'
+    },
+    lang: {
+      type: String,
+      default: 'en'
     }
   },
   created () {
@@ -132,7 +152,23 @@ export default {
     }
   },
   methods: {
-    
+    str2date (str) {
+      var date = new Date(str)
+      var options = {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        }
+      if (this.lang === 'fr') {
+        var date = new Date(str)
+        
+        
+        return date.toLocaleDateString('fr-FR', options)
+      } else {
+        return date.toDateString(options)
+      }
+    },
     getMetadata () {
       this.$http.get(this.api + '/process/' + this.processId + '/catalog', {credentials: true})
       .then(resp => {
@@ -142,7 +178,9 @@ export default {
       })
     },
     treatmentProcess(resp) {
+     
       var json = resp.body
+       this.process = json
        console.log(resp)
        if (!json.result) {
          this.errorProcess = 'Aucun résultat à publier pour ce job'
