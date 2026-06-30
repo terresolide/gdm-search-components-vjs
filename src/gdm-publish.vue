@@ -1,61 +1,57 @@
+<i18n>
+  {
+    "fr": {
+      "keywords": "Mots-clés",
+      "main_title": "Titre principal",
+      "ongoing": "En cours",
+      "publish": "Demander la publication",
+      "purpose": "Objectif",
+      "save": "Sauvegarder"
+    },
+    "en": {
+      "keywords": "Keywords",
+      "main_title": "Main title",
+      "ongoing": "On going",
+      "publish": "Request for publication",
+      "purpose": "Purpose",
+      "save": "Save"
+    }
+  }
+</i18n>
 <template>
  <div class="gdm-publish">
   <div v-if="running" class="gdm-processing fa fa-spinner fa-spin fa-3x fa-fw running" ></div>
    <h1 v-if="lang === 'fr'">Publication du job N°{{processId}} &laquo;{{this.post.title.fr }}&raquo;</h1>
    <h1 v-else>Publication of job N°{{processId}} &laquo;{{this.post.title.en }}&raquo;</h1>
-   <em style="display:block;">
-    <template v-if="lang === 'fr'">Une grande partie des métadonnées provient des informations sur le calcul et des résultats (emprise géographique, dates, liens...) mais ces informations sont insuffisantes
-    pour   l'indexation de vos produits dans le catalogue FormaTerre et par suite celui de DataTerra<br><br>
-    Nous vous encourageons donc à compléter au mieux les informations ci-dessous.<br>
-    Vous pouvez simplement "Sauvegarder" et revenir plus tard. Attention, toutefois, les résultats seront effacés le <span v-if="process && process.datePurge">{{ str2date(process.datePurge)}}</span> et toute demande de publication sera impossible!
-    </template>
-    <template v-else>
-     A large portion of the metadata is derived from the computation details and results (geographic extent, dates, links, etc.), but this information is insufficient
-    for indexing your products in the FormaTerre catalog—and consequently the DataTerra catalog.<br><br>
-    We therefore encourage you to provide as much detail as possible in the information below.<br>
-    You can simply "Save" and return later. Please note, however, that the results will be deleted on <span v-if="process && process.datePurge">{{ str2date(process.datePurge)}}</span>, and it will no longer be possible to submit a publication request!
-    </template>
-    <!-- <div v-if="metaUrl">
-      Des fiches de métadonnées ont été publiées pour ce job: <a :href="metaUrl" target="_blank">Fiche de métadonnées racine enregistrée</a>
-    </div>
-    <div v-if="!metaUrl">
-      <br>Vous pouvez dans un premier temps sauvegarder les métadonnées et lorsque vous êtes satisfait publier dans le catalogue FormaTerre.
-      <br>Un ensemble de fiches de métadonnées sera généré:
-         <ul>
-           <li>une fiche parent comprenant un ensemble de fiches enfants:
-              <ul>
-                 <li>une fiche par interférogramme (pour toutes les versions de l'interférogramme: enroulé, déroulé, filtré...)</li>
-                 <li>une fiche pour les données auxiliaires</li>
-                 <li>et s'il existe une série temporelle, une fiche pour la série temporelle</li>
-              </ul>
-           </li>
-     
-         </ul>
-      Une fois publié, vous pourrez toujours modifier ces informations. 
-     </div>
-     -->
-   </em>
-   <!--<div style="color:darkred;margin:10px 0;border:1px solid darkred;padding:10px;display:block;">
-    <i class="fa fa-exclamation-triangle" style="vertical-align:top;width:30px;"></i> 
-    <div style="display:inline-block;width:calc(100% - 50px);">
-      <div v-if="errorGn" style="margin-bottom:5px;">L'application a renvoyé le message d'erreur suivant: {{ errorGn }}. 
-        <br>Vous ne pourrez pas publier  dans le catalogue FormaTerre pour le moment, mais vous pouvez toujours enregistrer les informations auprès de GDM et finaliser plus tard.</div>
-      <div v-if="errorProcess" style="margin-bottom:5px;">{{ errorProcess }}</div>
-      <div v-if="!errorProcess">Vous devez vous assurer que le répertoire des résultats est <b>pérenne</b>! 
-        <div v-if="resultDir && !errorProcess">Le répertoire enregistré en DB est: <br><a :href="resultDir" target="_blank">{{ resultDir }}</a> </div>
-      </div>
-    </div>
+   <template v-if="!back">
+      <em style="display:block;margin-bottom:10px;">
 
-  </div>-->
-  <div v-if="running">En cours</div>
+        <template v-if="lang === 'fr'">Une grande partie des métadonnées provient des informations sur le calcul et des résultats (emprise géographique, dates, liens...) mais ces informations sont insuffisantes
+        pour   l'indexation de vos produits dans le catalogue FormaTerre et par suite celui de DataTerra<br><br>
+        Nous vous encourageons donc à compléter au mieux les informations ci-dessous.<br>
+        Vous pouvez simplement "Sauvegarder" et revenir plus tard. Attention, toutefois, les résultats seront effacés le <span v-if="process && process.datePurge">{{ str2date(process.datePurge)}}</span> et toute demande de publication sera impossible!
+        </template>
+        <template v-else>
+        A large portion of the metadata is derived from the computation details and results (geographic extent, dates, links, etc.), but this information is insufficient
+        for indexing your products in the FormaTerre catalog—and consequently the DataTerra catalog.<br><br>
+        We therefore encourage you to provide as much detail as possible in the information below.<br>
+        You can simply "Save" and return later. Please note, however, that the results will be deleted on <span v-if="process && process.datePurge">{{ str2date(process.datePurge)}}</span>, and it will no longer be possible to submit a publication request!
+        </template>
+      </em>
+   </template>
+   
+  <div v-if="running">{{$t('ongoing')}}</div>
   <div style="border:1px solid darkgrey;padding:10px;box-shadow: 0 1px 5px rgba(0,0,0,.65);">
      <div style="text-align:right;">
-      <button class="btn btn-publish" @click="save" :disabled="errorProcess || running" title="Enregistrer les informations en interne">Sauvegarder</button>
-      <button class="btn btn-publish" @click="publish" :disabled="errorGn || errorProcess || running" title="Publier dans le catalogue FormaTerre">
-        Demander la publication
+      <button class="btn btn-publish" @click="save" :disabled="errorProcess || running" title="Enregistrer les informations">{{$t('save')}}</button>
+      <button v-if="back" class="btn btn-publish" >
+        Valider
+      </button>
+      <button v-else class="btn btn-publish" @click="publish" :disabled="errorGn || errorProcess || running" title="Publier dans le catalogue FormaTerre">
+        {{$t('publish')}}
       </button>
      </div>
-     <h2>Titre principal</h2> 
+     <h2>{{$t('main_title')}}</h2> 
      <div style="margin-left:10px;">
          <div style="margin-bottom:5px;"><span class="lang-label">FR: </span>GDM-SAR-In <input type="text" v-model="post.title.fr" />
            collection d'interférogrammes<span v-if="hasSerie"> et série temporelle</span> {{temporal.fr}}  </div>
@@ -63,23 +59,32 @@
            collection of interferograms<span v-if="hasSerie"> and time serie</span> {{ temporal.en }} </div>
      </div>
   
-     <h2>Objectif</h2>
+     <h2>{{$t('purpose')}}</h2>
      <div style="margin-left:10px;">
         <div><span class="lang-label">FR: </span><textarea v-model="post.purpose.fr" style="vertical-align: top;"></textarea></div> 
         <div><span class="lang-label">EN: </span><textarea v-model="post.purpose.en" style="vertical-align: top;"></textarea></div> 
       </div>
-      <h2>Mots-clés</h2>
-       <em>Il est important de compléter au mieux les mots-clés. Ils sont utilisés pour l'indexation des fiches de métadonnées et favorisent la visibilité de vos données.<br />
+      <h2>{{$t('keywords')}}</h2>
+       <em>
+        <template v-if="lang === 'fr'">Il est important de compléter au mieux les mots-clés. Ils sont utilisés pour l'indexation des fiches de métadonnées et favorisent la visibilité de vos données.<br />
       La classification principale est obligatoire. Nous imposons déjà le mot-clé "Déformation du sol", mais vous pouvez en choisir d'autres.<br />
-      Une partie est complétée automatiquement comme la polarisation, le type de produits ou le fournisseur... </em>
-      <formaterre-keywords ref="keywords" v-model="post.keywords" :recommanded="recommanded" :excluded="excluded" :fixed="fixed">Recherchez des mots-clés dans les thésaurus/ontologies.<br />
-        Certains sont recommandés, les autres facultatifs.<br />
-        Les thésaurus recommandés sont<ul>
-        <li>Discipline</li>
-        <li>Objet d'intérêt (quel objet vous observez, )</li>
-      </ul>
-      Nous vous encourageons aussi à saisir une localisation, si vous ne la trouvez pas dans le thésaurus "Continents, countries, sea regions of the world", vous pouvez proposer un mot-clé libre.<br />
-      En règle générale, vous pouvez saisir des <b>mots-clés libres</b>, si vous ne les trouvez pas dans les thésaurus, vous pouvez même proposer de les ajouter dans les thésaurus. 
+      Une partie des mots-clés a été automatiquement prédéfinie comme la polarisation, le type de produits ou le fournisseur... 
+       </template>
+        <template v-else>
+       It is important to fill in the keywords as thoroughly as possible. They are used to index metadata records and help boost the visibility of your data.<br />
+      The primary classification is mandatory. We have already set the keyword "Ground deformation," but you may select others.<br />
+      Some keywords have been predefined automatically, such as polarization, product type, or provider...
+       </template>
+      </em>
+  
+      <formaterre-keywords ref="keywords" :lang="lang" v-model="post.keywords" :recommanded="recommanded" :excluded="excluded" :fixed="fixed">
+        <template v-if="lang === 'fr'">Ci-dessous vous pouvez rechercher des mots-clés dans les thésaurus/ontologies utilisés par FormaTerre.<br />
+          Si vous ne trouvez pas le terme recherché, vous pouvez saisir un <b>mot-clé libre</b>.<br />Vous pouvez même suggérer qu'il soit ajouté à une ontologie.
+        </template>
+      <template v-else>
+        Below, you can search for keywords within the thesauri/ontologies used by FormaTerre.<br />
+          If you do not find the term you are looking for, you can enter a <b>free-text keyword</b>.<br />You can even suggest adding it to an ontology.
+      </template>
       </formaterre-keywords>
     </div>
  </div>
@@ -93,7 +98,10 @@ export default {
     FormaterreKeywords
   },
   props: {
-    
+    back: {
+      type: Boolean,
+      default: false
+    },
     processId: {
       type: Number,
       default: null
@@ -115,6 +123,7 @@ export default {
     if (!this.geonetwork) {
       this.errorGn = 'PAS DE GEONETWORK CONFIGURÉ'
     }
+    this.$i18n.locale = this.lang === 'fr' ? 'fr' : 'en'
     this.getProcess()
   },
   data () {
