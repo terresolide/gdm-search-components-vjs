@@ -24,6 +24,7 @@
    <h1 v-if="lang === 'fr'">Publication du job N°{{processId}} &laquo;{{this.post.title.fr }}&raquo;</h1>
    <h1 v-else>Publication of job N°{{processId}} &laquo;{{this.post.title.en }}&raquo;</h1>
    <template v-if="!back">
+      {{ post.keywords }}
       <em style="display:block;margin-bottom:10px;">
 
         <template v-if="lang === 'fr'">Une grande partie des métadonnées provient des informations sur le calcul et des résultats (emprise géographique, dates, liens...) mais ces informations sont insuffisantes
@@ -39,7 +40,6 @@
         </template>
       </em>
    </template>
-   
   <div v-if="running">{{$t('ongoing')}}</div>
   <div style="border:1px solid darkgrey;padding:10px;box-shadow: 0 1px 5px rgba(0,0,0,.65);">
      <div style="text-align:right;">
@@ -148,14 +148,7 @@ export default {
       post: {
         title: {fr: '', en: ''},
         purpose: {fr: '', en: ''},
-        keywords: {thesaurus: {'external.platform.formater-platform-gn': [{
-                value: 'SENTINEL-1',
-                values: {
-                  fr: 'SENTINEL-1',
-                  en: 'SENTINEL-1',
-                },
-                 uri: 'https://service.poleterresolide.fr/voc/platform/P010100'
-              }]}, free: {}}
+        keywords: {thesaurus: {}, free: {}}
         
       }
     }
@@ -197,29 +190,31 @@ export default {
        }
        var groundDeformation = {
           vocab: 'local.theme.formaterre_themes',
-          uri: 'https://registry.geonetwork-opensource.org/theme/formaterre_themes#a12a3cc2-baf3-454b-b155-e0cb615da129',
-          value: 'Déformation du sol',
+          scheme: 'https://registry.geonetwork-opensource.org/theme/formaterre_themes',
+          url: 'https://registry.geonetwork-opensource.org/theme/formaterre_themes#a12a3cc2-baf3-454b-b155-e0cb615da129',
+          title: 'Ground deformation',
           values: {fr: 'Déformation du sol', en: 'Ground deformation'},
           fixed: true
        }
        var discipline = {
           vocab:'external.discipline.formater-discipline',
-          uri: 'https://service.poleterresolide.fr/voc/science_field/D120000',
-          value: 'Déformation du sol',
+          url: 'https://service.poleterresolide.fr/voc/science_field/D120000',
+          title: 'Ground deformation',
           values: {fr: 'Déformation du sol', en: 'Ground deformation'},
           fixed: true
        }
        var provider =  {
           vocab: 'local.theme.formaterre_provider',
-          uri: 'https://registry.geonetwork-opensource.org/theme/formaterre_provider#905d59ea-ce82-4bf8-b3fe-be9968c4e7d2',
-          value: 'CNES',
+          scheme: '',
+          url: 'https://registry.geonetwork-opensource.org/theme/formaterre_provider#905d59ea-ce82-4bf8-b3fe-be9968c4e7d2',
+          title: 'CNES',
           values: {fr: 'CNES', en: 'CNES'}
        }
        if (json.serviceName === 'GDM-SAR-In-UGA') {
            var  provider = {
               vocab: 'local.theme.formaterre_provider',
-              uri: 'https://registry.geonetwork-opensource.org/theme/formaterre_provider#b82bf736-666a-4470-8605-ca6c8122509e',
-              value: 'UGA',
+              url: 'https://registry.geonetwork-opensource.org/theme/formaterre_provider#b82bf736-666a-4470-8605-ca6c8122509e',
+              title: 'UGA',
               values: {fr: 'UGA', en: 'UGA'}
            }
        }
@@ -249,36 +244,105 @@ export default {
          var keywords = json.metadata.keywords
       
          var mapping = {
-          discipline: 'external.discipline.formater-discipline',
-          platform: 'external.platform.formater-platform-gn',
-          ron: 'local.theme.ron',
-          polarisation: 'local.theme.polarisation',
-          foi: 'external.theme.formater-foi-gn',
-          variable: 'external.theme.formater-variable-gn',
-          product: 'external.product.formaterres-product-gn'
-
+          discipline: {
+            key: 'external.discipline.formater-discipline',
+            scheme: 'https://service.poleterresolide.fr/voc/science_field'
+          },
+          theme: {
+            key: 'local.theme.formaterre_themes',
+            scheme: 'https://registry.geonetwork-opensource.org/theme/formaterre_themes'
+          },
+          platform: {
+            key: 'external.platform.formater-platform-gn',
+            scheme: 'https://service.poleterresolide.fr/voc/platform'
+          },
+          ron: {
+            key: 'local.theme.ron',
+            scheme: 'https://catalogue-terresolide.ipgp.fr/geonetwork/srv/api/registries/vocabularies/local.theme.ron'
+          },
+          polarisation: {
+            key: 'local.theme.polarisation',
+            scheme: 'https://catalogue-terresolide.ipgp.fr/geonetwork/srv/api/registries/vocabularies/local.theme.polarisation'
+          },
+          foi: {
+            key: 'external.theme.formater-foi-gn',
+            scheme: 'https://service.poleterresolide.fr/voc/FOI'
+          },
+          variable: {
+            key: 'external.theme.formater-variable-gn',
+            scheme: 'https://service.poleterresolide.fr/voc/variable',
+          },
+          provider: {
+            key: 'local.theme.formaterre_provider',
+            scheme: 'https://registry.geonetwork-opensource.org/theme/formaterre_provider'
+          },
+          product: {
+            key: 'external.product.formaterre-product-gn',
+            scheme: 'https://service.poleterresolide.fr/voc/product'
+          }
          }
          var truc = ['network', 'process', 'instrument']
          for (var th in truc) {
             delete keywords.thesaurus[truc[th]]
-         }         
+         } 
+        
          for (var th in mapping) {
             if (keywords.thesaurus[th]) {
                 if (keywords.thesaurus[th].length > 0) {
                 keywords.thesaurus[mapping[th]] = []
                   keywords.thesaurus[th].forEach(function (item) {
                     var kw = {
-                      uri: item.uri,
-                      value: item.fr,
+                      url: item.uri || item.url,
+                      title: item.en,
                       values: {fr: item.fr, en: item.en},
-                      vocab: mapping[th]
+                      vocab: mapping[th].key,
+                      scheme: mapping[th].scheme
                     }
-                    keywords.thesaurus[mapping[th]].push(kw)
+                    keywords.thesaurus[mapping[th.key]].push(kw)
                   })
                 }
                 delete keywords.thesaurus[th]
             }
          }
+         /**
+          * change props to stac denomination
+          */
+         for (th in keywords.thesaurus) {
+            for (var i in keywords.thesaurus[th]) {
+              var kw = keywords.thesaurus[th][i]
+              if (keywords.thesaurus[th][i].url && keywords.thesaurus[th][i].id) {
+                continue
+              } else {
+                console.log(th)
+                console.log(Object.values(mapping))
+                var thesaurus = Object.values(mapping).find(x => x.key === keywords.thesaurus[th][i].vocab)
+                switch(th) {
+                  case 'local.theme.ron':
+                      var id = keywords.thesaurus[th][i].values.fr
+                      var url = 'https://catalogue-terresolide.ipgp.fr/geonetwork/srv/api/registries/vocabularies/local.theme.ron#' + id
+                      break
+                  case 'local.theme.polarisation':
+                      var id = keywords.thesaurus[th][i].values.fr.toLowerCase()
+                      var url = 'https://catalogue-terresolide.ipgp.fr/geonetwork/srv/api/registries/vocabularies/local.theme.polarisation#' + id.toLowerCase()
+                      break
+                  default:
+                      var url = keywords.thesaurus[th][i].uri || keywords.thesaurus[th][i].url
+                      var id = url.replace(thesaurus.scheme, '')
+                      id = id.replace(/[\/#]?/, '')
+                }
+               
+                var kw = {
+                  vocab: keywords.thesaurus[th][i].vocab,
+                  scheme: thesaurus.scheme,
+                  title: keywords.thesaurus[th][i].values.en,
+                  url: url,
+                  id: id,
+                  values: keywords.thesaurus[th][i].values
+                }
+                keywords.thesaurus[th][i] = kw
+              }
+            }
+         }        
          if (json.metadata.title.fr) {
              this.post.title = json.metadata.title
          } else {
@@ -301,7 +365,10 @@ export default {
              'local.theme.polarisation': [
                 {
                   vocab: 'local.theme.polarisation',
-                  value: json.feature.properties.parameters.polarisation.toUpperCase(),
+                  id: json.feature.properties.parameters.polarisation.toLowerCase(),
+                  url: 'https://catalogue-terresolide.ipgp.fr/geonetwork/srv/api/registries/vocabularies/local.theme.polarisation#' + json.feature.properties.parameters.polarisation.toLowerCase(),
+                  scheme: 'https://catalogue-terresolide.ipgp.fr/geonetwork/srv/api/registries/vocabularies/local.theme.polarisation',
+                  title: json.feature.properties.parameters.polarisation.toUpperCase(),
                   values: {
                     fr: json.feature.properties.parameters.polarisation.toUpperCase(),
                     en: json.feature.properties.parameters.polarisation.toUpperCase()
@@ -311,7 +378,10 @@ export default {
              'local.theme.ron': [
                 {
                   vocab: 'local.theme.ron',
-                  value: ron,
+                  id: ron,
+                  url: 'https://catalogue-terresolide.ipgp.fr/geonetwork/srv/api/registries/vocabularies/local.theme.ron#' + ron,
+                  scheme: 'https://catalogue-terresolide.ipgp.fr/geonetwork/srv/api/registries/vocabularies/local.theme.ron',
+                  title: ron,
                   values: { 
                     fr: ron,
                     en: ron
@@ -320,12 +390,15 @@ export default {
              ],
              'external.platform.formater-platform-gn': [
               {
-                value: 'SENTINEL-1',
+                vocab: 'external.platform.formater-platform-gn',
+                'scheme': 'https://service.poleterresolide.fr/voc/platform',
+                title: 'SENTINEL-1',
                 values: {
                   fr: 'SENTINEL-1',
                   en: 'SENTINEL-1',
                 },
-                 uri: 'https://service.poleterresolide.fr/voc/platform/P010100'
+                id:'P010100',
+                url: 'https://service.poleterresolide.fr/voc/platform/P010100'
               }
              ]   
            },
@@ -336,15 +409,19 @@ export default {
        if (!keywords.thesaurus['external.product.formaterre-product-gn']) {
           keywords.thesaurus['external.product.formaterre-product-gn'] = [{
                 vocab: 'external.product.formaterre-product-gn',
-                value: 'Interférogramme',
+                scheme: 'https://service.poleterresolide.fr/voc/product',
+                title: 'Interferogram',
                 values: { fr: 'Interférogramme', en: 'Interferogram'},
-                uri: 'https://service.poleterresolide.fr/voc/product/c_460292ab'
+                id: 'c_460292ab',
+                url: 'https://service.poleterresolide.fr/voc/product/c_460292ab'
               },
               {
                 vocab: 'external.product.formaterre-product-gn',
-                value: 'Données auxiliaires',
+                scheme: 'https://service.poleterresolide.fr/voc/product',
+                title: 'Auxiliary data',
                 values: { fr: 'Données auxiliaires', en: 'Auxiliary data'},
-                uri: 'https://service.poleterresolide.fr/voc/product/c_67446f9c'
+                id: 'c_67446f9c',
+                url: 'https://service.poleterresolide.fr/voc/product/c_67446f9c'
               }]
        }
        if (!keywords.thesaurus['local.theme.formaterre_provider']) {
@@ -370,9 +447,11 @@ export default {
           keywords.thesaurus['external.product.formaterre-product-gn'].push(
              {
                 vocab: 'external.product.formaterre-product-gn',
-                value: 'Série temporelle',
+                scheme: 'https://service.poleterresolide.fr/voc/product',
+                title: 'Time series',
                 values: { fr: 'Série temporelle', en: 'Time series'},
-                uri: 'https://service.poleterresolide.fr/voc/product/c_6fff7a77'
+                id: 'c_6fff7a77',
+                url: 'https://service.poleterresolide.fr/voc/product/c_6fff7a77'
               }
           )
         } 
