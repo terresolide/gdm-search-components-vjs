@@ -43,11 +43,11 @@
   <div v-if="running">{{$t('ongoing')}}</div>
   <div style="border:1px solid darkgrey;padding:10px;box-shadow: 0 1px 5px rgba(0,0,0,.65);">
      <div style="text-align:right;">
-      <button class="btn btn-publish" @click="save" :disabled="errorProcess || running" title="Enregistrer les informations">{{$t('save')}}</button>
+      <button class="btn btn-publish" @click="save" :disabled="errorProcess || running" >{{$t('save')}}</button>
       <button v-if="back" class="btn btn-publish" >
         Valider
       </button>
-      <button v-else class="btn btn-publish" @click="publish" :disabled="errorGn || errorProcess || running" title="Publier dans le catalogue FormaTerre">
+      <button v-else class="btn btn-publish" @click="publish" :disabled="errorGn || errorProcess || running" >
         {{$t('publish')}}
       </button>
      </div>
@@ -490,23 +490,13 @@ export default {
       if (this.running) {
         return
       }
-      this.$http.put(this.api + '/process/' + this.processId + '/catalog',
-        this.post,
-        {
-          credentials: true,
-          headers: {'Content-Type': 'application/json'}
-        }
-      ).then(
-        resp => {
-          
-          this.taskId = resp.body.task
-          var self = this
-          this.running = setInterval(function (){
-            self.getTask()
-          }, 10000)
-        },
-        resp => {console.log('pb publish')}
-      )
+      this.save()
+      fetch(
+          this.api.replace('api', 'requests') + '/publish/' + this.process.id,
+          {headers: { 'accept-language': this.lang, "Content-Type": "application/x-www-form-urlencoded"}, credentials: 'include', body: "purpose=notempty", method:'POST'})
+      .then(resp => resp.json())
+      .then(json => {console.log(json)})
+      
     },
     save () {
       this.$http.post(this.api + '/process/' + this.processId + '/catalog',
