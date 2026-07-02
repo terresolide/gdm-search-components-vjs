@@ -24,7 +24,6 @@
    <h1 v-if="lang === 'fr'">Publication du job N°{{processId}} &laquo;{{this.post.title.fr }}&raquo;</h1>
    <h1 v-else>Publication of job N°{{processId}} &laquo;{{this.post.title.en }}&raquo;</h1>
    <template v-if="!back">
-      {{ post.keywords }}
       <em style="display:block;margin-bottom:10px;">
 
         <template v-if="lang === 'fr'">Une grande partie des métadonnées provient des informations sur le calcul et des résultats (emprise géographique, dates, liens...) mais ces informations sont insuffisantes
@@ -143,7 +142,7 @@ export default {
         en: ''
       },
       recommanded: ['external.discipline.formater-discipline', 'external.theme.formater-foi-gn'],
-      excluded: ['external.dataCentre.formater-distributor'],
+      excluded: ['external.dataCentre.formater-distributor', 'external.theme.gemet', 'external.theme.httpinspireeceuropaeutheme-theme'],
       fixed: ['external.platform.formater-platform-gn', 'external.product.formaterre-product-gn', 'local.theme.ron', 'local.theme.polarisation', 'local.theme.formaterre_provider'],
       post: {
         title: {fr: '', en: ''},
@@ -242,7 +241,9 @@ export default {
        if (json.metadata) {
          this.type = 'update'
          var keywords = json.metadata.keywords
-      
+        /**
+         *   où l'on traduit l'ancien format dans un nouveau
+         * */
          var mapping = {
           discipline: {
             key: 'external.discipline.formater-discipline',
@@ -304,9 +305,7 @@ export default {
                 delete keywords.thesaurus[th]
             }
          }
-         /**
-          * change props to stac denomination
-          */
+        // Ou l'on change pour un format STAC
          for (th in keywords.thesaurus) {
             for (var i in keywords.thesaurus[th]) {
               var kw = keywords.thesaurus[th][i]
@@ -342,7 +341,10 @@ export default {
                 keywords.thesaurus[th][i] = kw
               }
             }
-         }        
+         }  
+         /**
+          * FIN CHANGEMENT DE FORMAT QUI POURRA ÊTRE EFFACÉ ENSUITE
+          *  */      
          if (json.metadata.title.fr) {
              this.post.title = json.metadata.title
          } else {
@@ -444,6 +446,8 @@ export default {
        }
        
        if (this.hasSerie) {
+        var find = keywords.thesaurus['external.product.formaterre-product-gn'].find(x => x.url === 'https://service.poleterresolide.fr/voc/product/c_6fff7a77')
+        if (!find) {
           keywords.thesaurus['external.product.formaterre-product-gn'].push(
              {
                 vocab: 'external.product.formaterre-product-gn',
@@ -454,7 +458,8 @@ export default {
                 url: 'https://service.poleterresolide.fr/voc/product/c_6fff7a77'
               }
           )
-        } 
+        }
+       } 
        if (!keywords.free) {
          keywords.free = {}
        } 
@@ -499,16 +504,16 @@ export default {
       
     },
     save () {
-      this.$http.post(this.api + '/process/' + this.processId + '/catalog',
-        this.post,
+      fetch(this.api + '/process/' + this.processId + '/catalog',
         {
-          credentials: true,
-          headers: {'Content-Type': 'application/json'}
+          method: 'post',
+          credentials: 'include',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(this.post)
         }
-      ).then(
-        resp => {console.log()},
-        resp => {console.log('pb')}
-      )
+      ).then(resp => resp.json())
+      .then(json => {console.log(json)})
+      .catch(err => {console.log(err)})
     }
   }
 }
