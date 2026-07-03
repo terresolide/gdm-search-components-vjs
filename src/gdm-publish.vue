@@ -23,6 +23,11 @@
   <div v-if="saving" class="gdm-processing fa fa-spinner fa-spin fa-3x fa-fw running" ></div>
    <h1 v-if="lang === 'fr'">Publication du job N°{{processId}} &laquo;{{this.post.title.fr }}&raquo;</h1>
    <h1 v-else>Publication of job N°{{processId}} &laquo;{{this.post.title.en }}&raquo;</h1>
+   <div v-if="error" style="font-size:2em;color:darkred;margin-bottom:10px;">{{ error }}</div>
+   <div v-if="requestPublish" style="font-size:1.3em;color:darkred;padding:10px;border:1px solid darkred;margin-bottom:10px;"">
+      <template v-if="lang === 'fr'">Une demande de publication a été déposée: son status est {{ requestPublish }}</template>
+      <template v-else>A publication request has been submitted: its status is {{ requestPublish }}</template>
+   </div>
    <template v-if="!back">
       <em style="display:block;margin-bottom:10px;">
 
@@ -42,19 +47,20 @@
   
   <div style="border:1px solid darkgrey;padding:10px;box-shadow: 0 1px 5px rgba(0,0,0,.65);">
      <div style="text-align:right;">
-      <button class="btn btn-publish" @click="save" :disabled="saved || saving" >{{$t('save')}}</button>
-      <button v-if="back" class="btn btn-publish" >
+      <button class="btn btn-publish" @click="save" :disabled="saved || saving || (!back && requestPublish)" >{{$t('save')}}</button>
+      <button v-if="back" class="btn btn-publish"  @click="validate" :disabled="!requestPublish || requestPublish !== 'WAITING'" 
+      title="Envoyer un courrier pour déplacer le répertoire!">
         Valider
       </button>
-      <button v-else class="btn btn-publish" @click="publish" :disabled="requestPublish" >
+      <button v-else class="btn btn-publish" @click="publish" :disabled="requestPublish || !process || !process.metadata" >
         {{$t('publish')}}
       </button>
      </div>
      <h2>{{$t('main_title')}}</h2> 
      <div style="margin-left:10px;">
-         <div style="margin-bottom:5px;"><span class="lang-label">FR: </span>GDM-SAR-In <input type="text" v-model="post.title.fr" />
+         <div style="margin-bottom:5px;"><span class="lang-label">FR: </span><template v-if="process">{{process.serviceName}}</template> <input type="text" v-model="post.title.fr" />
            collection d'interférogrammes<span v-if="hasSerie"> et série temporelle</span> {{temporal.fr}}  </div>
-         <div><span class="lang-label">EN: </span>GDM-SAR-In <input type="text" v-model="post.title.en" /> 
+         <div><span class="lang-label">EN: </span><template v-if="process">{{process.serviceName}}</template> <input type="text" v-model="post.title.en" /> 
            collection of interferograms<span v-if="hasSerie"> and time serie</span> {{ temporal.en }} </div>
      </div>
   
@@ -119,19 +125,15 @@ export default {
     }
   },
   created () {
-    if (!this.geonetwork) {
-      this.errorGn = 'PAS DE GEONETWORK CONFIGURÉ'
-    }
     this.$i18n.locale = this.lang === 'fr' ? 'fr' : 'en'
+    this.getPublish()
     this.getProcess()
   },
   data () {
     return {
-      errorGn: null,
-      errorProcess: null,
+      error: null,
       resultDir: null,
       process: null,
-      metaUrl: null,
       hasSerie: false,
       type: 'insert',
       saving: null,
@@ -180,19 +182,29 @@ export default {
         return date.toDateString(options)
       }
     },
-    getMetadata () {
-      this.$http.get(this.api + '/process/' + this.processId + '/catalog', {credentials: true})
-      .then(resp => {
-              this.metaUrl = resp.body.url
-      }, resp => {
-        this.errorGn = resp.body.error
-      })
+    // getMetadata () {
+    //   this.$http.get(this.api + '/process/' + this.processId + '/catalog', {credentials: true})
+    //   .then(resp => {
+    //           this.metaUrl = resp.body.url
+    //   }, resp => {
+    //     this.errorGn = resp.body.error
+    //   })
+    // },
+    getPublish () {
+      fetch(
+          this.api.replace('api', 'requests') + '/publish/' + this.processId,
+          { credentials: 'include'}
+      ).then(resp => resp.json())
+      .then(json => {
+         if (json.exists) {
+          this.requestPublish = json.status
+         } else {
+          this.requestPublish = false
+         }}
+      ).catch(err => { console.log(err)})
     },
-    treatmentProcess(resp) {
-     
-      var json = resp.body
+    treatmentProcess(json) {
        this.process = json
-       console.log(resp)
        if (!json.result) {
          this.errorProcess = 'Aucun résultat à publier pour ce job'
          return
@@ -240,7 +252,6 @@ export default {
            }
          }
        }
-       this.getMetadata()
        if (json.metadata) {
          this.post = Object.assign(this.post,json.metadata)
        }
@@ -476,15 +487,10 @@ export default {
        this.post.keywords = keywords
     },
     getProcess() {
-      this.$http.get(this.api + '/process/' + this.processId, {credentials: true})
-      .then(
-        resp => { this.treatmentProcess(resp)},
-        resp => { if (resp.body.error) {
-            this.errorProcess = 'Le serveur a répondu lors de l\'accès au job: ' + resp.body.error
-          } else {
-            this.errorProcess = 'Le serveur a répondu lors de l\'accès au job: UNKNOWN ERROR' 
-          }
-      })
+      fetch(this.api + '/process/' + this.processId, {credentials: 'include'})
+      .then( resp => resp.json())
+      .then( json => { this.treatmentProcess(json)})
+      .catch( err => { console.log(err)})
     },
     publish () {
       if (this.saving) {
@@ -495,9 +501,18 @@ export default {
           this.api.replace('api', 'requests') + '/publish/' + this.process.id,
           {headers: { 'accept-language': this.lang, "Content-Type": "application/x-www-form-urlencoded"}, credentials: 'include', body: "purpose=notempty", method:'POST'})
       .then(resp => resp.json())
-      .then(json => {console.log(json)})
+      .then(json => {if (json.success) {this.requestPublish = 'WAITING'}})
       .catch(err => { })
       
+    },
+    validate () {
+       this.save()
+       fetch(
+          this.api.replace('api', 'requests') + '/validate/' + this.process.id,
+          {credentials: 'include', method:'POST'})
+       .then(resp => resp.json())
+       .then(json => {if (json.success) {this.requestPublish = 'VALID'}})
+       .catch(err => { })
     },
     save () {
       this.saving = true
@@ -512,6 +527,7 @@ export default {
       .then(json => {
          this.saving = false
          this.saved = true
+         this.process.metadata = this.post
          console.log(json)
       })
       .catch(err => {console.log(err)})
