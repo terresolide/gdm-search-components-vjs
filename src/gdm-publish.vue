@@ -20,7 +20,7 @@
 </i18n>
 <template>
  <div class="gdm-publish">
-  <div v-if="running" class="gdm-processing fa fa-spinner fa-spin fa-3x fa-fw running" ></div>
+  <div v-if="saving" class="gdm-processing fa fa-spinner fa-spin fa-3x fa-fw running" ></div>
    <h1 v-if="lang === 'fr'">Publication du job N°{{processId}} &laquo;{{this.post.title.fr }}&raquo;</h1>
    <h1 v-else>Publication of job N°{{processId}} &laquo;{{this.post.title.en }}&raquo;</h1>
    <template v-if="!back">
@@ -39,14 +39,14 @@
         </template>
       </em>
    </template>
-  <div v-if="running">{{$t('ongoing')}}</div>
+  
   <div style="border:1px solid darkgrey;padding:10px;box-shadow: 0 1px 5px rgba(0,0,0,.65);">
      <div style="text-align:right;">
-      <button class="btn btn-publish" @click="save" :disabled="errorProcess || running" >{{$t('save')}}</button>
+      <button class="btn btn-publish" @click="save" :disabled="saved || saving" >{{$t('save')}}</button>
       <button v-if="back" class="btn btn-publish" >
         Valider
       </button>
-      <button v-else class="btn btn-publish" @click="publish" :disabled="errorGn || errorProcess || running" >
+      <button v-else class="btn btn-publish" @click="publish" :disabled="requestPublish" >
         {{$t('publish')}}
       </button>
      </div>
@@ -134,7 +134,9 @@ export default {
       metaUrl: null,
       hasSerie: false,
       type: 'insert',
-      running: null,
+      saving: null,
+      saved: true,
+      requestPublish: false,
       taskId: null,
       count: 0,
       temporal: {
@@ -150,6 +152,14 @@ export default {
         keywords: {thesaurus: {}, free: {}}
         
       }
+    }
+  },
+  watch: {
+    post: {
+      handler (newvalue) {
+        this.saved = false
+      },
+      deep: true
     }
   },
   methods: {
@@ -476,23 +486,8 @@ export default {
           }
       })
     },
-    getTask () {
-      if (!this.taskId) {
-        return
-      }
-      this.$http.get(this.api + '/tasks/' + this.taskId, {credentials: true})
-      .then(resp => {
-        if (resp.body.task && ['COMPLETED', 'FAILED'].indexOf(resp.body.task.tks_status) >= 0) {
-          if (this.running) {
-            clearInterval(this.running)
-            this.running = null
-          }
-          this.taskId = null
-        }
-      })
-    },
     publish () {
-      if (this.running) {
+      if (this.saving) {
         return
       }
       this.save()
@@ -501,9 +496,11 @@ export default {
           {headers: { 'accept-language': this.lang, "Content-Type": "application/x-www-form-urlencoded"}, credentials: 'include', body: "purpose=notempty", method:'POST'})
       .then(resp => resp.json())
       .then(json => {console.log(json)})
+      .catch(err => { })
       
     },
     save () {
+      this.saving = true
       fetch(this.api + '/process/' + this.processId + '/catalog',
         {
           method: 'post',
@@ -512,7 +509,11 @@ export default {
           body: JSON.stringify(this.post)
         }
       ).then(resp => resp.json())
-      .then(json => {console.log(json)})
+      .then(json => {
+         this.saving = false
+         this.saved = true
+         console.log(json)
+      })
       .catch(err => {console.log(err)})
     }
   }
