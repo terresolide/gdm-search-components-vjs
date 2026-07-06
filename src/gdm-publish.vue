@@ -508,8 +508,8 @@ export default {
     validate () {
        this.save()
        fetch(
-          this.api.replace('api', 'requests') + '/validate/' + this.process.id,
-          {credentials: 'include', method:'POST'})
+          this.api.replace('api', 'requests') + '/publish/' + this.process.id,
+          {credentials: 'include', method:'PUT'})
        .then(resp => resp.json())
        .then(json => {if (json.success) {this.requestPublish = 'VALID'}})
        .catch(err => { })
