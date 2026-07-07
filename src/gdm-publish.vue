@@ -21,17 +21,17 @@
 <template>
  <div class="gdm-publish">
   <div v-if="saving" class="gdm-processing fa fa-spinner fa-spin fa-3x fa-fw running" ></div>
-   <h1 v-if="lang === 'fr'">Publication du job N°{{processId}} &laquo;{{this.post.title.fr }}&raquo;</h1>
-   <h1 v-else>Publication of job N°{{processId}} &laquo;{{this.post.title.en }}&raquo;</h1>
+   <h1 v-if="locale === 'fr'">Publication du job N°{{processId}} &laquo;{{this.post.short.fr }}&raquo;</h1>
+   <h1 v-else>Publication of job N°{{processId}} &laquo;{{this.post.short.en }}&raquo;</h1>
    <div v-if="error" style="font-size:2em;color:darkred;margin-bottom:10px;">{{ error }}</div>
    <div v-if="requestPublish" style="font-size:1.3em;color:darkred;padding:10px;border:1px solid darkred;margin-bottom:10px;"">
-      <template v-if="lang === 'fr'">Une demande de publication a été déposée: son status est {{ requestPublish }}</template>
+      <template v-if="locale === 'fr'">Une demande de publication a été déposée: son status est {{ requestPublish }}</template>
       <template v-else>A publication request has been submitted: its status is {{ requestPublish }}</template>
    </div>
    <template v-if="!back">
       <em style="display:block;margin-bottom:10px;">
 
-        <template v-if="lang === 'fr'">Une grande partie des métadonnées provient des informations sur le calcul et des résultats (emprise géographique, dates, liens...) mais ces informations sont insuffisantes
+        <template v-if="locale === 'fr'">Une grande partie des métadonnées provient des informations sur le calcul et des résultats (emprise géographique, dates, liens...) mais ces informations sont insuffisantes
         pour   l'indexation de vos produits dans le catalogue FormaTerre et par suite celui de DataTerra<br><br>
         Nous vous encourageons donc à compléter au mieux les informations ci-dessous.<br>
         Vous pouvez simplement "Sauvegarder" et revenir plus tard. Attention, toutefois, les résultats seront effacés le <span v-if="process && process.datePurge">{{ str2date(process.datePurge)}}</span> et toute demande de publication sera impossible!
@@ -58,9 +58,9 @@
      </div>
      <h2>{{$t('main_title')}}</h2> 
      <div style="margin-left:10px;">
-         <div style="margin-bottom:5px;"><span class="lang-label">FR: </span><template v-if="process">{{process.serviceName}}</template> <input type="text" v-model="post.title.fr" />
+         <div style="margin-bottom:5px;"><span class="lang-label">FR: </span><template v-if="process">{{process.serviceName}}</template> <input type="text" v-model="post.short.fr" />
            collection d'interférogrammes<span v-if="hasSerie"> et série temporelle</span> {{temporal.fr}}  </div>
-         <div><span class="lang-label">EN: </span><template v-if="process">{{process.serviceName}}</template> <input type="text" v-model="post.title.en" /> 
+         <div><span class="lang-label">EN: </span><template v-if="process">{{process.serviceName}}</template> <input type="text" v-model="post.short.en" /> 
            collection of interferograms<span v-if="hasSerie"> and time serie</span> {{ temporal.en }} </div>
      </div>
   
@@ -71,7 +71,7 @@
       </div>
       <h2>{{$t('keywords')}}</h2>
        <em>
-        <template v-if="lang === 'fr'">Il est important de compléter au mieux les mots-clés. Ils sont utilisés pour l'indexation des fiches de métadonnées et favorisent la visibilité de vos données.<br />
+        <template v-if="locale === 'fr'">Il est important de compléter au mieux les mots-clés. Ils sont utilisés pour l'indexation des fiches de métadonnées et favorisent la visibilité de vos données.<br />
       La classification principale est obligatoire. Nous imposons déjà le mot-clé "Déformation du sol", mais vous pouvez en choisir d'autres.<br />
       Une partie des mots-clés a été automatiquement prédéfinie comme la polarisation, le type de produits ou le fournisseur... 
        </template>
@@ -82,8 +82,8 @@
        </template>
       </em>
   
-      <formaterre-keywords ref="keywords" :lang="lang" v-model="post.keywords" :recommanded="recommanded" :excluded="excluded" :fixed="fixed">
-        <template v-if="lang === 'fr'">Ci-dessous vous pouvez rechercher des mots-clés dans les thésaurus/ontologies utilisés par FormaTerre.<br />
+      <formaterre-keywords ref="keywords" :lang="locale" v-model="post.keywords" :recommanded="recommanded" :excluded="excluded" :fixed="fixed">
+        <template v-if="locale === 'fr'">Ci-dessous vous pouvez rechercher des mots-clés dans les thésaurus/ontologies utilisés par FormaTerre.<br />
           Si vous ne trouvez pas le terme recherché, vous pouvez saisir un <b>mot-clé libre</b>.<br />Vous pouvez même suggérer qu'il soit ajouté à une ontologie.
         </template>
       <template v-else>
@@ -115,17 +115,35 @@ export default {
       type: String,
       default: null
     },
+    lang: {
+      type: String,
+      default:'en'
+    },
     api: {
       type: String,
       default: 'https://gdm.formater/api'
+    }
+  },
+  computed: {
+    locale () {
+      if (this.lang === 'fr') {
+        return 'fr'
+      } else {
+        return 'en'
+      }
     },
-    lang: {
-      type: String,
-      default: 'en'
+    title () {
+      if (!this.process) {
+        return null
+      }
+      return {
+        fr: this.process.serviceName + ' ' + this.post.short.fr + ' collection d\'interférogrammes ' + (this.hasSerie ? 'et série temporelle ' : '') + this.temporal.fr, 
+        en: this.process.serviceName + ' ' + this.post.short.en + ' collection of interferograms ' + (this.hasSerie ? 'and time serie ': '') + this.temporal.en
+      }
     }
   },
   created () {
-    this.$i18n.locale = this.lang === 'fr' ? 'fr' : 'en'
+    this.$i18n.locale = this.locale
     this.getPublish()
     this.getProcess()
   },
@@ -149,7 +167,7 @@ export default {
       excluded: ['external.dataCentre.formater-distributor', 'external.theme.gemet', 'external.theme.httpinspireeceuropaeutheme-theme'],
       fixed: ['external.platform.formater-platform-gn', 'external.product.formaterre-product-gn', 'local.theme.ron', 'local.theme.polarisation', 'local.theme.formaterre_provider'],
       post: {
-        title: {fr: '', en: ''},
+        short: {fr: '', en: ''},
         purpose: {fr: '', en: ''},
         keywords: {thesaurus: {}, free: {}}
         
@@ -173,7 +191,7 @@ export default {
           month: "long",
           day: "numeric"
         }
-      if (this.lang === 'fr') {
+      if (this.locale === 'fr') {
         var date = new Date(str)
         
         
@@ -367,16 +385,16 @@ export default {
           * FIN CHANGEMENT DE FORMAT QUI POURRA ÊTRE EFFACÉ ENSUITE
           *  */      
          if (json.metadata.title.fr) {
-             this.post.title = json.metadata.title
+             this.post.short = json.metadata.title
          } else {
-           this.post.title = {
+           this.post.short = {
              fr: json.metadata.title,
              en: json.metadata.title
            }
          }
          this.post.goal = json.metadata.goal
        } else {
-         this.post.title = {
+         this.post.short = {
            fr: json.feature.properties.processusName,
            en: json.feature.properties.processusName
          }
@@ -499,7 +517,7 @@ export default {
       this.save()
       fetch(
           this.api.replace('api', 'requests') + '/publish/' + this.process.id,
-          {headers: { 'accept-language': this.lang, "Content-Type": "application/x-www-form-urlencoded"}, credentials: 'include', body: "purpose=notempty", method:'POST'})
+          {headers: { 'accept-language': this.locale, "Content-Type": "application/x-www-form-urlencoded"}, credentials: 'include', body: "purpose=notempty", method:'POST'})
       .then(resp => resp.json())
       .then(json => {if (json.success) {this.requestPublish = 'WAITING'}})
       .catch(err => { })
@@ -516,6 +534,7 @@ export default {
     },
     save () {
       this.saving = true
+      this.post.title = this.title
       fetch(this.api + '/process/' + this.processId + '/catalog',
         {
           method: 'post',
