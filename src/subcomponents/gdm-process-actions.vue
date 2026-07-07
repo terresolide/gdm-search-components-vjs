@@ -99,6 +99,7 @@
           </div>
         </form>
       </div>
+      <!--
       <div v-if="showCatalog && back" class="publish-box">
            <div style="float:right;"><span class="gdm-close fa fa-close" @click="showCatalog=false"></span></div>
               <div style="margin:10px 0;"> Vous souhaitez publier ce job dans un catalogue. Il existe deux catalogues:
@@ -113,6 +114,8 @@
                      <input type="button" class="button" disabled value="ISDeform" />
              </div>
       </div>
+      -->
+    
       <div v-if="showPublish && !back" class="publish-box">
         <div style="float:right;"><span class="gdm-close fa fa-close" @click="showPublish=false"></span></div>
         <div v-html="$t('continue_publish')" style="margin:10px 0;"></div>
@@ -160,21 +163,30 @@
       <!--  PURGED NOTHING TO DO => CREATE NEW PROCESS WITH THIS-->
       <span v-else-if="process.status === 'PURGED' || process.status === 'ABORTED' || process.status === 'TERMINATED'">
          <a class="button" @click="duplicate"  :class="{disabled: !canDuplicate}">{{$t('duplicate')}}</a>
-         <a class="button" v-if="back && process.status ==='TERMINATED' && !process.isExample" @click="showPublish=true"  :class="{disabled: !canEdit}">{{$t('publish')}}</a>
-          <a class="button" v-if="back && process.isExample && process.status ==='TERMINATED'" @click="showPublish=true">Modifier url résultat</a>
+         <template v-if="process.serviceName.indexOf('SAR-I') >= 0">
+            <a class="button" v-if="back && process.status ==='TERMINATED' && !process.isExample" :href="url + 'process/metadata/' + process.id"  :class="{disabled: !canEdit}">Métadonnées</a>
+            <a class="button" v-if="back && process.status ==='TERMINATED' && !process.isExample" @click="showPublish=true"  :class="{disabled: !canEdit}">Modifier url résultat</a>
+    
+          </template>
+         <template v-else>
+            <a class="button" v-if="back && process.status ==='TERMINATED' && !process.isExample" @click="showPublish=true"  :class="{disabled: !canEdit}">Publier</a>
+         </template>
+         <a class="button" v-if="back && process.isExample && process.status ==='TERMINATED'" @click="showPublish=true" title="Url du résultat et publier">Modifier url résultat</a>
           <a class="button" v-if="back && process.isExample && process.status ==='TERMINATED'" @click="unpublish">Dépublier</a>
          
          <!--  for SAR TERMINATED process -->
          <span v-if="process.serviceName.indexOf('SAR-I') >= 0 && process.status === 'TERMINATED'">
 	         <a class="button" v-if="!back && userId === process.userId && !process.isExample" 
-	         @click="showPublish = true" :class="{disabled: process.keep}">{{$t('publish')}}</a>
+	         :href="url + 'process/' + process.id + '/metadata'" :class="{disabled: process.keep}">{{$t('publish')}}</a>
           
            <a class="button" v-if="back && !process.isExample && !process.keep" @click="changeKeep">Ne pas purger</a>
            <a class="button" v-else-if="back && !process.isExample && process.keep" @click="changeKeep">À purger</a>
            
            <!-- catalogue -->
+           <!--
            <a class="button" v-if="back && !process.metadata" @click="showCatalog=true" title="Publier dans un catalogue">Catalogue</a>
-           <a class="button" v-if="back && process.metadata" :href="metadataUrl" title="Modifier les métadonnées pour le catalogue FormaTerre">Catalogue FormaTerre</a>
+           <a class="button" v-if="back && process.metadata" :href="metadataUrl" title="Modifier les métadonnées pour le catalogue">Catalogue</a>
+           -->
            <!--  button purge -->
           <a class="button" v-if="!process.isExample && !process.keep" @click="purge"  :class="{disabled: !canEdit}">
            <i class="fa fa-trash"></i> {{$t('purge')}}</a>
