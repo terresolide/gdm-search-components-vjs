@@ -85,10 +85,14 @@
       <formaterre-keywords ref="keywords" :lang="locale" v-model="post.keywords" :recommanded="recommanded" :excluded="excluded" :fixed="fixed">
         <template v-if="locale === 'fr'">Ci-dessous vous pouvez rechercher des mots-clés dans les thésaurus/ontologies utilisés par FormaTerre.<br />
           Si vous ne trouvez pas le terme recherché, vous pouvez saisir un <b>mot-clé libre</b>.<br />Vous pouvez même suggérer qu'il soit ajouté à une ontologie.
+          <br />Pour les thésaurus hierarchisés, ne sélectionnez pas la branche entière, mais uniquement le terme le plus précis que vous désirez. Par exemple, si vous sélectionnez 'Merapi' dans les objets d'intérêt, ne sélectionnez pas le terme 'Volcan' plus général.
         </template>
       <template v-else>
         Below, you can search for keywords within the thesauri/ontologies used by FormaTerre.<br />
           If you do not find the term you are looking for, you can enter a <b>free-text keyword</b>.<br />You can even suggest adding it to an ontology.
+          <br />For hierarchical thesauri, do not select the entire branch; select only the most specific term you require. For example, if you select 'Merapi' from the objects of interest, do not select the more general term 'Volcano'.
+
+
       </template>
       </formaterre-keywords>
     </div>
@@ -383,14 +387,23 @@ export default {
          }  
          /**
           * FIN CHANGEMENT DE FORMAT QUI POURRA ÊTRE EFFACÉ ENSUITE
-          *  */      
-         if (json.metadata.title.fr) {
-             this.post.short = json.metadata.title
+          *  */  
+         if (json.metadata.hasOwnProperty('short')) {    
+            if (json.metadata.short.fr) {
+                this.post.short = json.metadata.short
+            } else {
+              this.post.short = {
+                fr: json.metadata.short,
+                en: json.metadata.short
+              }
+            }
+         } else if (json.metadata.title.fr) {
+            this.post.short = json.metadata.title
          } else {
-           this.post.short = {
-             fr: json.metadata.title,
-             en: json.metadata.title
-           }
+            this.post.short = {
+                fr: json.metadata.title,
+                en: json.metadata.title
+              }
          }
          this.post.goal = json.metadata.goal
        } else {
