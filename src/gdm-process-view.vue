@@ -764,7 +764,7 @@ export default {
       if (this.process.gin && this.process.gin.removed) {
         this.dataRemoved = true
       }
-      
+
       this.addResult(this.process.result)
       if (this.$el && this.$el.querySelector && this.$el.querySelector('.gdm-process-header')) {
         this.headerHeight = this.$el.querySelector('.gdm-process-header').clientHeight
