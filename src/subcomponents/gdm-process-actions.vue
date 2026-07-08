@@ -95,7 +95,7 @@
           <input v-model="resultUrl" type="url"  style="min-width:430px;"/>
           <div style="margin:10px 0;text-align:right;">
             <input type="button" class="button" @click="showPublish=false" value="Annuler" />
-           <input type="button" class="button" @click="publish"  :value="process.isExample ? $t('save') : $t('publish')" />
+           <input type="button" class="button" @click="publish"  value="Enregistrer" />
           </div>
         </form>
       </div>
@@ -177,7 +177,7 @@
          <!--  for SAR TERMINATED process -->
          <span v-if="process.serviceName.indexOf('SAR-I') >= 0 && process.status === 'TERMINATED'">
 	         <a class="button" v-if="!back && userId === process.userId && !process.isExample" 
-	         :href="url + 'process/' + process.id + '/metadata'" :class="{disabled: process.keep}">{{$t('publish')}}</a>
+	         :href="url + 'process/' + process.id + '/metadata'" >{{$t('publish')}}</a>
           
            <a class="button" v-if="back && !process.isExample && !process.keep" @click="changeKeep">Ne pas purger</a>
            <a class="button" v-else-if="back && !process.isExample && process.keep" @click="changeKeep">À purger</a>
@@ -587,6 +587,17 @@ export default {
       .then(function (resp) {
         this.showPublish = false
         this.process.keep = 1
+        console.log(resp)
+        if (resp.body.process && resp.body.process.result) {
+          this.process.result = resp.body.process.result
+        }
+        this.submitting = false
+        if (resp.body.send) {
+          alert('Le répertoire a été modifié. Un courrier a été envoyé à l\'utilisateur!')
+        }
+        if (resp.body.error) {
+          alert(this.$i18n.t('error_occured') + ': ' + resp.body.error)
+        }
         // location.reload()
       }, function (e) {
         this.submitting = false

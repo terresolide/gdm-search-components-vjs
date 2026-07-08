@@ -21,12 +21,18 @@
 <template>
  <div class="gdm-publish">
   <div v-if="saving" class="gdm-processing fa fa-spinner fa-spin fa-3x fa-fw running" ></div>
-   <h1 v-if="locale === 'fr'">Publication du job N°{{processId}} &laquo;{{this.post.short.fr }}&raquo;</h1>
-   <h1 v-else>Publication of job N°{{processId}} &laquo;{{this.post.short.en }}&raquo;</h1>
+  <template v-if="back"><h1>Métadonnées pour le job N° {{ processId }} &laquo;{{this.post.short.fr }}&raquo;</h1></template>
+  <template v-else>
+    <h1 v-if="locale === 'fr'">Demande de publication du job N°{{processId}} &laquo;{{this.post.short.fr }}&raquo;</h1>
+    <h1 v-else>Request to publish the job N°{{processId}} &laquo;{{this.post.short.en }}&raquo;</h1>
+   </template>
    <div v-if="error" style="font-size:2em;color:darkred;margin-bottom:10px;">{{ error }}</div>
-   <div v-if="requestPublish" style="font-size:1.3em;color:darkred;padding:10px;border:1px solid darkred;margin-bottom:10px;"">
+   <div v-if="requestPublish" style="font-size:1.3em;color:darkred;padding:10px;border:1px solid darkred;margin-bottom:10px;">
       <template v-if="locale === 'fr'">Une demande de publication a été déposée: son status est {{ requestPublish }}</template>
       <template v-else>A publication request has been submitted: its status is {{ requestPublish }}</template>
+   </div>
+   <div v-else-if="back" style="font-size:1.3em;color:darkred;padding:10px;border:1px solid darkred;margin-bottom:10px;">Aucune demande n'a été réalisée pour ce job!!
+    Vous ne pouvez donc rien valider!!!
    </div>
    <template v-if="!back">
       <em style="display:block;margin-bottom:10px;">
@@ -48,11 +54,11 @@
   <div style="border:1px solid darkgrey;padding:10px;box-shadow: 0 1px 5px rgba(0,0,0,.65);">
      <div style="text-align:right;">
       <button class="btn btn-publish" @click="save" :disabled="saved || saving || (!back && requestPublish)" >{{$t('save')}}</button>
-      <button v-if="back" class="btn btn-publish"  @click="validate" :disabled="!requestPublish || requestPublish !== 'WAITING'" 
+      <button v-if="back" class="btn btn-publish"  @click="validate" :disabled="!requestPublish || requestPublish !== 'WAITING' || saving" 
       title="Envoyer un courrier pour déplacer le répertoire!">
         Valider
       </button>
-      <button v-else class="btn btn-publish" @click="publish" :disabled="requestPublish || !process || !process.metadata" >
+      <button v-else class="btn btn-publish" @click="publish" :disabled="requestPublish || !process || !process.metadata || saving" >
         {{$t('publish')}}
       </button>
      </div>
@@ -528,22 +534,30 @@ export default {
         return
       }
       this.save()
+      this.saving = true
       fetch(
           this.api.replace('api', 'requests') + '/publish/' + this.process.id,
           {headers: { 'accept-language': this.locale, "Content-Type": "application/x-www-form-urlencoded"}, credentials: 'include', body: "purpose=notempty", method:'POST'})
       .then(resp => resp.json())
-      .then(json => {if (json.success) {this.requestPublish = 'WAITING'}})
-      .catch(err => { })
+      .then(json => {
+        if (json.success) {this.requestPublish = 'WAITING'}
+        this.saving = false
+      })
+      .catch(err => { this.saving = false})
       
     },
     validate () {
        this.save()
+       this.saving = true
        fetch(
           this.api.replace('api', 'requests') + '/publish/' + this.process.id,
           {credentials: 'include', method:'PUT'})
        .then(resp => resp.json())
-       .then(json => {if (json.success) {this.requestPublish = 'VALID'}})
-       .catch(err => { })
+       .then(json => {
+          if (json.success) {this.requestPublish = 'VALID'}
+            this.saving = false
+          })
+       .catch(err => { this.saving = false })
     },
     save () {
       this.saving = true
