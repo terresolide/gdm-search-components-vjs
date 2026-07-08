@@ -82,7 +82,7 @@
        </template>
       </em>
   
-      <formaterre-keywords ref="keywords" :lang="locale" v-model="post.keywords" :recommanded="recommanded" :excluded="excluded" :fixed="fixed">
+      <formaterre-keywords ref="keywords" :lang="locale" v-model="post.keywords" :geonetwork="geonetwork" :recommanded="recommanded" :excluded="excluded" :fixed="fixed">
         <template v-if="locale === 'fr'">Ci-dessous vous pouvez rechercher des mots-clés dans les thésaurus/ontologies utilisés par FormaTerre.<br />
           Si vous ne trouvez pas le terme recherché, vous pouvez saisir un <b>mot-clé libre</b>.<br />Vous pouvez même suggérer qu'il soit ajouté à une ontologie.
           <br />Pour les thésaurus hierarchisés, ne sélectionnez pas la branche entière, mais uniquement le terme le plus précis que vous désirez. Par exemple, si vous sélectionnez 'Merapi' dans les objets d'intérêt, ne sélectionnez pas le terme 'Volcan' plus général.
