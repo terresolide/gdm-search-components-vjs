@@ -76,6 +76,7 @@
         <div><span class="lang-label">EN: </span><textarea v-model="post.purpose.en" style="vertical-align: top;"></textarea></div> 
       </div>
       <h2>{{$t('keywords')}}</h2>
+      {{ post.keywords.free }}
        <em>
         <template v-if="locale === 'fr'">Il est important de compléter au mieux les mots-clés. Ils sont utilisés pour l'indexation des fiches de métadonnées et favorisent la visibilité de vos données.<br />
       La classification principale est obligatoire. Nous imposons déjà le mot-clé "Déformation du sol", mais vous pouvez en choisir d'autres.<br />
@@ -290,6 +291,9 @@ export default {
        if (json.metadata) {
          this.type = 'update'
          var keywords = json.metadata.keywords
+         if (Array.isArray(keywords.free)) {
+            keywords.free = {}
+         }
         /**
          *   où l'on traduit l'ancien format dans un nouveau
          * */
