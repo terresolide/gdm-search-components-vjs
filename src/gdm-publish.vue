@@ -76,20 +76,20 @@
         <div><span class="lang-label">EN: </span><textarea v-model="post.purpose.en" style="vertical-align: top;"></textarea></div> 
       </div>
       <h2>{{$t('keywords')}}</h2>
-      {{ post.keywords.free }}
        <em>
         <template v-if="locale === 'fr'">Il est important de compléter au mieux les mots-clés. Ils sont utilisés pour l'indexation des fiches de métadonnées et favorisent la visibilité de vos données.<br />
       La classification principale est obligatoire. Nous imposons déjà le mot-clé "Déformation du sol", mais vous pouvez en choisir d'autres.<br />
-      Une partie des mots-clés a été automatiquement prédéfinie comme la polarisation, le type de produits ou le fournisseur... 
+      Une partie des mots-clés a été automatiquement prédéfinie comme le type de produits ou la plateforme... 
        </template>
         <template v-else>
        It is important to fill in the keywords as thoroughly as possible. They are used to index metadata records and help boost the visibility of your data.<br />
       The primary classification is mandatory. We have already set the keyword "Ground deformation," but you may select others.<br />
-      Some keywords have been predefined automatically, such as polarization, product type, or provider...
+      Some keywords have been predefined automatically, such as  product type or platform..
        </template>
       </em>
   
-      <formaterre-keywords ref="keywords" :lang="locale" v-model="post.keywords" :geonetwork="geonetwork" :recommanded="recommanded" :excluded="excluded" :fixed="fixed">
+      <formaterre-keywords ref="keywords" :lang="locale" v-model="post.keywords" :geonetwork="geonetwork" 
+      :listed="listed" :recommanded="recommanded" :excluded="excluded" :fixed="fixed">
         <template v-if="locale === 'fr'">Ci-dessous vous pouvez rechercher des mots-clés dans les thésaurus/ontologies utilisés par FormaTerre.<br />
           Si vous ne trouvez pas le terme recherché, vous pouvez saisir un <b>mot-clé libre</b>.<br />Vous pouvez même suggérer qu'il soit ajouté à une ontologie.
           <br />Pour les thésaurus hierarchisés, ne sélectionnez pas la branche entière, mais uniquement le terme le plus précis que vous désirez. Par exemple, si vous sélectionnez 'Merapi' dans les objets d'intérêt, ne sélectionnez pas le terme 'Volcan' plus général.
@@ -174,9 +174,10 @@ export default {
         fr: '',
         en: ''
       },
-      recommanded: ['external.discipline.formater-discipline', 'external.theme.formater-foi-gn'],
+      listed: ['external.discipline.formater-discipline'],
+      recommanded: ['external.theme.formater-foi-gn'],
       excluded: ['external.dataCentre.formater-distributor', 'external.theme.gemet', 'external.theme.httpinspireeceuropaeutheme-theme'],
-      fixed: ['external.platform.formater-platform-gn', 'external.product.formaterre-product-gn', 'local.theme.ron', 'local.theme.polarisation', 'local.theme.formaterre_provider'],
+      fixed: ['external.platform.formater-platform-gn', 'external.product.formaterre-product-gn'],
       post: {
         short: {fr: '', en: ''},
         purpose: {fr: '', en: ''},
@@ -238,14 +239,7 @@ export default {
          this.errorProcess = 'Aucun résultat à publier pour ce job'
          return
        }
-       var groundDeformation = {
-          vocab: 'local.theme.formaterre_themes',
-          scheme: 'https://registry.geonetwork-opensource.org/theme/formaterre_themes',
-          url: 'https://registry.geonetwork-opensource.org/theme/formaterre_themes#a12a3cc2-baf3-454b-b155-e0cb615da129',
-          title: 'Ground deformation',
-          values: {fr: 'Déformation du sol', en: 'Ground deformation'},
-          fixed: true
-       }
+      
        var discipline = {
           vocab:'external.discipline.formater-discipline',
           url: 'https://service.poleterresolide.fr/voc/science_field/D120000',
@@ -253,21 +247,8 @@ export default {
           values: {fr: 'Déformation du sol', en: 'Ground deformation'},
           fixed: true
        }
-       var provider =  {
-          vocab: 'local.theme.formaterre_provider',
-          scheme: '',
-          url: 'https://registry.geonetwork-opensource.org/theme/formaterre_provider#905d59ea-ce82-4bf8-b3fe-be9968c4e7d2',
-          title: 'CNES',
-          values: {fr: 'CNES', en: 'CNES'}
-       }
-       if (json.serviceName === 'GDM-SAR-In-UGA') {
-           var  provider = {
-              vocab: 'local.theme.formaterre_provider',
-              url: 'https://registry.geonetwork-opensource.org/theme/formaterre_provider#b82bf736-666a-4470-8605-ca6c8122509e',
-              title: 'UGA',
-              values: {fr: 'UGA', en: 'UGA'}
-           }
-       }
+      
+       
        this.resultDir = json.result.dir
        if (json.result['series']) {
          this.hasSerie = true
@@ -302,21 +283,9 @@ export default {
             key: 'external.discipline.formater-discipline',
             scheme: 'https://service.poleterresolide.fr/voc/science_field'
           },
-          theme: {
-            key: 'local.theme.formaterre_themes',
-            scheme: 'https://registry.geonetwork-opensource.org/theme/formaterre_themes'
-          },
           platform: {
             key: 'external.platform.formater-platform-gn',
             scheme: 'https://service.poleterresolide.fr/voc/platform'
-          },
-          ron: {
-            key: 'local.theme.ron',
-            scheme: 'https://catalogue-terresolide.ipgp.fr/geonetwork/srv/api/registries/vocabularies/local.theme.ron'
-          },
-          polarisation: {
-            key: 'local.theme.polarisation',
-            scheme: 'https://catalogue-terresolide.ipgp.fr/geonetwork/srv/api/registries/vocabularies/local.theme.polarisation'
           },
           foi: {
             key: 'external.theme.formater-foi-gn',
@@ -326,21 +295,19 @@ export default {
             key: 'external.theme.formater-variable-gn',
             scheme: 'https://service.poleterresolide.fr/voc/variable',
           },
-          provider: {
-            key: 'local.theme.formaterre_provider',
-            scheme: 'https://registry.geonetwork-opensource.org/theme/formaterre_provider'
-          },
           product: {
             key: 'external.product.formaterre-product-gn',
             scheme: 'https://service.poleterresolide.fr/voc/product'
           }
          }
-         var truc = ['network', 'process', 'instrument']
+         var truc = ['network', 'process', 'instrument', 'ron', 'polarisation', 'local.theme.formaterre_provider',
+         'provider', 'theme', 'local.theme.ron', 'local.theme.polarisation', 'local.theme.formaterre_themes' ]
          for (var th in truc) {
             delete keywords.thesaurus[truc[th]]
          } 
         
          for (var th in mapping) {
+
             if (keywords.thesaurus[th]) {
                 if (keywords.thesaurus[th].length > 0) {
                 keywords.thesaurus[mapping[th]] = []
@@ -358,42 +325,32 @@ export default {
                 delete keywords.thesaurus[th]
             }
          }
+
         // Ou l'on change pour un format STAC
          for (th in keywords.thesaurus) {
+          console.log(th)
             for (var i in keywords.thesaurus[th]) {
+              console.log(i)
               var kw = keywords.thesaurus[th][i]
+              console.log(kw)
               if (keywords.thesaurus[th][i].url && keywords.thesaurus[th][i].id) {
                 continue
-              } else {
-                console.log(th)
-                console.log(Object.values(mapping))
-                var thesaurus = Object.values(mapping).find(x => x.key === keywords.thesaurus[th][i].vocab)
-                switch(th) {
-                  case 'local.theme.ron':
-                      var id = keywords.thesaurus[th][i].values.fr
-                      var url = 'https://catalogue-terresolide.ipgp.fr/geonetwork/srv/api/registries/vocabularies/local.theme.ron#' + id
-                      break
-                  case 'local.theme.polarisation':
-                      var id = keywords.thesaurus[th][i].values.fr.toLowerCase()
-                      var url = 'https://catalogue-terresolide.ipgp.fr/geonetwork/srv/api/registries/vocabularies/local.theme.polarisation#' + id.toLowerCase()
-                      break
-                  default:
-                      var url = keywords.thesaurus[th][i].uri || keywords.thesaurus[th][i].url
-                      var id = url.replace(thesaurus.scheme, '')
-                      id = id.replace(/[\/#]?/, '')
-                }
-               
-                var kw = {
-                  vocab: keywords.thesaurus[th][i].vocab,
-                  scheme: thesaurus.scheme,
-                  title: keywords.thesaurus[th][i].values.en,
-                  url: url,
-                  id: id,
-                  values: keywords.thesaurus[th][i].values
-                }
-                keywords.thesaurus[th][i] = kw
+              } 
+              var url = keywords.thesaurus[th][i].uri || keywords.thesaurus[th][i].url
+              var thesaurus = Object.values(mapping).find(x => x.key === keywords.thesaurus[th][i].vocab)
+              var id = url.replace(thesaurus.scheme, '')
+              id = id.replace(/[\/#]?/, '')
+              var kw = {
+                vocab: keywords.thesaurus[th][i].vocab,
+                scheme: thesaurus.scheme,
+                title: keywords.thesaurus[th][i].values.en,
+                url: url,
+                id: id,
+                values: keywords.thesaurus[th][i].values
               }
+              keywords.thesaurus[th][i] = kw
             }
+            
          }  
          /**
           * FIN CHANGEMENT DE FORMAT QUI POURRA ÊTRE EFFACÉ ENSUITE
@@ -421,37 +378,9 @@ export default {
            fr: json.feature.properties.processusName,
            en: json.feature.properties.processusName
          }
-         var rOrbit = json.feature.properties.parameters.relative_orbit
-         var ron = rOrbit[0].toUpperCase() + rOrbit.slice(1).padStart(3, 0)
       
          var keywords = {
            thesaurus: {
-             'local.theme.polarisation': [
-                {
-                  vocab: 'local.theme.polarisation',
-                  id: json.feature.properties.parameters.polarisation.toLowerCase(),
-                  url: 'https://catalogue-terresolide.ipgp.fr/geonetwork/srv/api/registries/vocabularies/local.theme.polarisation#' + json.feature.properties.parameters.polarisation.toLowerCase(),
-                  scheme: 'https://catalogue-terresolide.ipgp.fr/geonetwork/srv/api/registries/vocabularies/local.theme.polarisation',
-                  title: json.feature.properties.parameters.polarisation.toUpperCase(),
-                  values: {
-                    fr: json.feature.properties.parameters.polarisation.toUpperCase(),
-                    en: json.feature.properties.parameters.polarisation.toUpperCase()
-                  }
-                }
-             ],
-             'local.theme.ron': [
-                {
-                  vocab: 'local.theme.ron',
-                  id: ron,
-                  url: 'https://catalogue-terresolide.ipgp.fr/geonetwork/srv/api/registries/vocabularies/local.theme.ron#' + ron,
-                  scheme: 'https://catalogue-terresolide.ipgp.fr/geonetwork/srv/api/registries/vocabularies/local.theme.ron',
-                  title: ron,
-                  values: { 
-                    fr: ron,
-                    en: ron
-                  }
-                }
-             ],
              'external.platform.formater-platform-gn': [
               {
                 vocab: 'external.platform.formater-platform-gn',
@@ -488,10 +417,10 @@ export default {
                 url: 'https://service.poleterresolide.fr/voc/product/c_67446f9c'
               }]
        }
-       if (!keywords.thesaurus['local.theme.formaterre_provider']) {
-          keywords.thesaurus['local.theme.formaterre_provider'] = [provider]
-       }
-       var tab = ['discipline', 'groundDeformation']
+      //  if (!keywords.thesaurus['local.theme.formaterre_provider']) {
+      //     keywords.thesaurus['local.theme.formaterre_provider'] = [provider]
+      //  }
+       var tab = ['discipline']
        for (var i in tab) {
           var x = eval(tab[i])
           console.log(x)
