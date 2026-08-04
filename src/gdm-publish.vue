@@ -328,11 +328,8 @@ export default {
 
         // Ou l'on change pour un format STAC
          for (th in keywords.thesaurus) {
-          console.log(th)
             for (var i in keywords.thesaurus[th]) {
-              console.log(i)
               var kw = keywords.thesaurus[th][i]
-              console.log(kw)
               if (keywords.thesaurus[th][i].url && keywords.thesaurus[th][i].id) {
                 continue
               } 
@@ -423,7 +420,6 @@ export default {
        var tab = ['discipline']
        for (var i in tab) {
           var x = eval(tab[i])
-          console.log(x)
           if (!keywords.thesaurus[x.vocab]) {
               keywords.thesaurus[x.vocab] = [x]
           } else {
