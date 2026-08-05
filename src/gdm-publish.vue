@@ -2,6 +2,7 @@
   {
     "fr": {
       "event_date":"Dates de l'évènement",
+      "event_date_label": "Précisez si possible la date ou l'interval temporel de l'évènement que vous étudiez (séisme, glissement de terrain....)",
       "keywords": "Mots-clés",
       "main_title": "Titre principal",
       "ongoing": "En cours",
@@ -11,6 +12,7 @@
     },
     "en": {
       "event_date": "Event dates",
+      "event_date_label": "If possible, specify the date or time interval of the event you are studying (earthquake, landslide, etc.).",
       "keywords": "Keywords",
       "main_title": "Main title",
       "ongoing": "On going",
@@ -64,21 +66,22 @@
         {{$t('publish')}}
       </button>
      </div>
+     <h2>{{ title }}</h2>
      <h2>{{ $t('event_date') }}</h2>
-     <div><span style="vertical-align:top;">Précisez la ou les date(s) de l'évènement</span>
-      <div style="display:inline-block;max-width:300px;">
+     <div style="margin-left:10px;">{{ $t('event_date_label') }}
+      <div style="margin-left:30px;;max-width:300px;">
           <formater-temporal-search :lang="locale" color="#8B0000" 
         :format="format" daymin="2015-01-01" @change="dateChange"></formater-temporal-search></div>
       </div>
 
      <h2>{{$t('main_title')}}</h2> 
-     <div style="margin-bottom:5px;">
+     <div style="margin-bottom:5px;margin-left:10px;">
      Le titre doit être de la forme <em>[Processus]_[location]_[time]_[ts]</em>.<br />
      Exemples: Earthquake_Wushi_2024-jan-22,   Volcano_Merapi_2022-dec, Landslide_Maca_2019
      </div>
      
      <div style="margin-left:10px;">
-         <div style="margin-bottom:15px;">
+         <div style="margin:15px 0;">
          <input type="text" v-model="post.foi" list="list-foi" placeholder="Processus" required/><datalist id="list-foi">
             <option value="Volcano"></option>
             <option value="Earthquake"></option>
@@ -92,9 +95,19 @@
      </div>
   
      <h2>{{$t('purpose')}}</h2>
+     <div style="margin-left:10px;margin-bottom:10px;font-style:italic;">
+      <template v-if="locale==='fr'">
+        De préférence en anglais. Pas plus de 600 caractères.<br />
+
+        Indiquez l’objectif du traitement, et les points intéressants qui en ressortent.<br />
+         Pour les <a href="https://www.isdeform.fr/acces-aux-collections/">cibles ISDeform</a>:  indiquez la complémentarité avec les données FAST-SAR.
+      </template>
+      <template v-else></template>
+    </div>
      <div style="margin-left:10px;">
-        <div><span class="lang-label">FR: </span><textarea v-model="post.purpose.fr" style="vertical-align: top;"></textarea></div> 
         <div><span class="lang-label">EN: </span><textarea v-model="post.purpose.en" style="vertical-align: top;"></textarea></div> 
+     
+        <div><span class="lang-label">FR: </span><textarea v-model="post.purpose.fr" style="vertical-align: top;"></textarea></div> 
       </div>
       <h2>{{$t('keywords')}}</h2>
        <em>
@@ -123,7 +136,10 @@
 
       </template>
       </formaterre-keywords>
+        <h2>{{ $t('provider') }}</h2>
     </div>
+  
+
  </div>
 </template>
 <script>
@@ -177,13 +193,11 @@ export default {
       }
     },
     title () {
-      if (!this.process) {
+      if (!this.process || !this.post.foi || !this.post.location) {
         return null
       }
-      return {
-        fr: this.post.foi + '_' + this.post.location + '_' + (this.hasSerie ? '_ts' : '') + this.temporal.fr, 
-        en: this.process.serviceName + ' ' + this.post.short.en + ' collection of interferograms ' + (this.hasSerie ? 'and time serie ': '') + this.temporal.en
-      }
+      return  this.post.foi + '_' + this.post.location + '_' + this.temporal + (this.hasSerie ? '_ts' : '')
+       
     }
   },
   created () {
@@ -236,10 +250,18 @@ export default {
     dateChange (event) {
       console.log(event)
       if (event.name === 'from') {
-        this.post.temporal.start = event.value
+        if (event.value !== 'Invalid date') {
+          this.post.temporal.start = event.value
+        } else {
+          this.post.temporal.start = null
+        }
       }
       if (event.name === 'to') {
-        this.post.temporal.end = event.value
+        if (event.value !== 'Invalid date') {
+          this.post.temporal.end = event.value
+        } else {
+          this.post.temporal.end = null
+        }
       }
 
     },
@@ -640,6 +662,9 @@ export default {
 }
 .gdm-publish h1 {
   text-transform:uppercase;
+}
+.gdm-publish .dp-header h2 {
+  color: white;
 }
 .lang-label {
   color:#333;
