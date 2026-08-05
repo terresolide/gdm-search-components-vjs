@@ -617,7 +617,8 @@ export default {
     z-index:2001;
   }
 
-.btn {
+.btn,
+div[id="app"] .btn {
   display: inline-block;
   font-weight: 400;
   text-align: center;
@@ -638,24 +639,31 @@ export default {
   border-radius: .25rem;
   transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
-.btn-publish {
+.btn-publish,
+div[id="app"] .btn-publish {
   color: #fff;
   background-color: #8b0000;
   border-color: #8b0000;
 }
-.btn-publish:disabled {
+.btn-publish:disabled,
+div[id="app"]  .btn-publish:disabled{
   opacity:0.6;
   pointer-events: none;
 }
-.btn-publish:hover {
+.btn-publish:hover,
+div[id="app"] .btn-publish:hover {
   background-color: #7d0e0e;
   border-color: #9c0000;
 }
-.btn-publish:focus {
+.btn-publish:focus,
+div[id="app"] .btn-publish:focus {
   box-shadow: 0 0 0 .2rem rgba(139,0,0,.5);
 }
 .gdm-publish {
   font-family: Arial, Helvetica, sans-serif;
+}
+div[id="app"] .gdm-publish {
+  margin:30px;
 }
 .gdm-publish h1, .gdm-publish h2, .gdm-publish h3 {
   color: darkred;
