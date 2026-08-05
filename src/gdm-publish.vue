@@ -55,7 +55,7 @@
       </em>
    </template>
   
-  <div style="border:1px solid darkgrey;padding:10px;box-shadow: 0 1px 5px rgba(0,0,0,.65);">
+  <form style="border:1px solid darkgrey;padding:10px;box-shadow: 0 1px 5px rgba(0,0,0,.65);" @submit="save">
      <div style="text-align:right;">
       <button class="btn btn-publish" @click="save" :disabled="saved || saving || (!back && requestPublish)" >{{$t('save')}}</button>
       <button v-if="back" class="btn btn-publish"  @click="validate" :disabled="!requestPublish || requestPublish !== 'WAITING' || saving" 
@@ -137,7 +137,7 @@
       </template>
       </formaterre-keywords>
         <h2>{{ $t('provider') }}</h2>
-    </div>
+    </form>
   
 
  </div>
@@ -196,8 +196,8 @@ export default {
       if (!this.process || !this.post.foi || !this.post.location) {
         return null
       }
-      return  this.post.foi + '_' + this.post.location + '_' + this.temporal + (this.hasSerie ? '_ts' : '')
-       
+      var title =  this.post.foi + '_' + this.post.location + '_' + this.temporal + (this.hasSerie ? '_ts' : '')
+      this.post.title = title
     }
   },
   created () {
@@ -450,29 +450,10 @@ export default {
          /**
           * FIN CHANGEMENT DE FORMAT QUI POURRA ÊTRE EFFACÉ ENSUITE
           *  */  
-         if (json.metadata.hasOwnProperty('short')) {    
-            if (json.metadata.short.fr) {
-                this.post.short = json.metadata.short
-            } else {
-              this.post.short = {
-                fr: json.metadata.short,
-                en: json.metadata.short
-              }
-            }
-         } else if (json.metadata.title.fr) {
-            this.post.short = json.metadata.title
-         } else {
-            this.post.short = {
-                fr: json.metadata.title,
-                en: json.metadata.title
-              }
-         }
+         
          this.post.goal = json.metadata.goal
        } else {
-         this.post.short = {
-           fr: json.feature.properties.processusName,
-           en: json.feature.properties.processusName
-         }
+         
       
          var keywords = {
            thesaurus: {
