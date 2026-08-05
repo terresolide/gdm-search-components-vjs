@@ -1,6 +1,7 @@
 <i18n>
   {
     "fr": {
+      "event_date":"Dates de l'évènement",
       "keywords": "Mots-clés",
       "main_title": "Titre principal",
       "ongoing": "En cours",
@@ -9,6 +10,7 @@
       "save": "Sauvegarder"
     },
     "en": {
+      "event_date": "Event dates",
       "keywords": "Keywords",
       "main_title": "Main title",
       "ongoing": "On going",
@@ -38,13 +40,13 @@
       <em style="display:block;margin-bottom:10px;">
 
         <template v-if="locale === 'fr'">Une grande partie des métadonnées provient des informations sur le calcul et des résultats (emprise géographique, dates, liens...) mais ces informations sont insuffisantes
-        pour   l'indexation de vos produits dans le catalogue FormaTerre et par suite celui de DataTerra<br><br>
+        pour   l'indexation de vos produits dans le catalogue FormaTerre ou ISDeform et par suite celui de DataTerra<br><br>
         Nous vous encourageons donc à compléter au mieux les informations ci-dessous.<br>
         Vous pouvez simplement "Sauvegarder" et revenir plus tard. Attention, toutefois, les résultats seront effacés le <span v-if="process && process.datePurge">{{ str2date(process.datePurge)}}</span> et toute demande de publication sera impossible!
         </template>
         <template v-else>
         A large portion of the metadata is derived from the computation details and results (geographic extent, dates, links, etc.), but this information is insufficient
-        for indexing your products in the FormaTerre catalog—and consequently the DataTerra catalog.<br><br>
+        for indexing your products in the FormaTerre/ISDeform catalog—and consequently the DataTerra catalog.<br><br>
         We therefore encourage you to provide as much detail as possible in the information below.<br>
         You can simply "Save" and return later. Please note, however, that the results will be deleted on <span v-if="process && process.datePurge">{{ str2date(process.datePurge)}}</span>, and it will no longer be possible to submit a publication request!
         </template>
@@ -62,14 +64,22 @@
         {{$t('publish')}}
       </button>
      </div>
+     <h2>{{ $t('event_date') }}</h2>
+     <div><span style="vertical-align:top;">Précisez la ou les date(s) de l'évènement</span>
+      <div style="display:inline-block;max-width:300px;">
+          <formater-temporal-search :lang="locale" color="#8B0000" 
+        :format="format" daymin="2015-01-01" @change="dateChange"></formater-temporal-search></div>
+      </div>
+
      <h2>{{$t('main_title')}}</h2> 
      <div style="margin-bottom:5px;">
      Le titre doit être de la forme <em>[Processus]_[location]_[time]_[ts]</em>.<br />
      Exemples: Earthquake_Wushi_2024-jan-22,   Volcano_Merapi_2022-dec, Landslide_Maca_2019
      </div>
+     
      <div style="margin-left:10px;">
          <div style="margin-bottom:15px;">
-         <input type="text" v-model="post.foi" list="list-foi" placeholder="Processus"/><datalist id="list-foi">
+         <input type="text" v-model="post.foi" list="list-foi" placeholder="Processus" required/><datalist id="list-foi">
             <option value="Volcano"></option>
             <option value="Earthquake"></option>
             <option value="Landslide"></option>
@@ -77,8 +87,7 @@
             <option value="Subsidence"></option>
             <option value="Fire"></option>
             <option value="Flooding"></option>
-         </datalist>_<input type="text" v-model="post.location" placeholder="location" />_{{ temporal }}
-         <template v-if="hasSerie">_ts</template>
+         </datalist>_<input type="text" v-model="post.location" required placeholder="location" />_{{ temporal }}<template v-if="hasSerie">_ts</template>
          </div>
      </div>
   
@@ -120,10 +129,12 @@
 <script>
 // import GdmKeywords from './subcomponents/gdm-keywords.vue'
 import FormaterreKeywords from 'formaterre-keywords-vjs/src/FormaterreKeywords.vue'
+import {FormaterTemporalSearch} from 'formater-commons-components-vjs'
 export default {
   name: 'GdmPublish',
   components: {
-    FormaterreKeywords
+    FormaterreKeywords,
+    FormaterTemporalSearch
   },
   props: {
     back: {
@@ -155,6 +166,16 @@ export default {
         return 'en'
       }
     },
+    temporal () {
+      if (!this.process) {
+        return '??'
+      }
+      if (this.post.temporal.start || this.post.temporal.end) {
+        return this.temporal2str(this.post.temporal.start, this.post.temporal.end)
+      } else {
+        return this.temporal2str(this.process.feature.properties.temporalExtent[0], this.process.feature.properties.temporalExtent[1])
+      }
+    },
     title () {
       if (!this.process) {
         return null
@@ -167,6 +188,7 @@ export default {
   },
   created () {
     this.$i18n.locale = this.locale
+    this.format = this.locale === 'fr' ? 'DD/MM/YYYY' : 'MM/DD/YYYY'
     this.getPublish()
     this.getProcess()
   },
@@ -179,19 +201,21 @@ export default {
       type: 'insert',
       saving: null,
       saved: true,
+      format: 'DD/MM/YYYY',
       requestPublish: false,
       taskId: null,
       count: 0,
-      temporal: {
-        fr: '',
-        en: ''
-      },
+      // temporal: {
+      //   fr: '',
+      //   en: ''
+      // },
       listed: ['external.discipline.formater-discipline'],
       recommanded: ['external.theme.formater-foi-gn'],
       excluded: ['external.dataCentre.formater-distributor', 'external.theme.gemet', 'external.theme.httpinspireeceuropaeutheme-theme'],
       fixed: ['external.platform.formater-platform-gn', 'external.product.formaterre-product-gn'],
       post: {
         short: {fr: '', en: ''},
+        temporal: {start: null, end: null},
         foi: '',
         location: '',
         purpose: {fr: '', en: ''},
@@ -209,8 +233,27 @@ export default {
     }
   },
   methods: {
+    dateChange (event) {
+      console.log(event)
+      if (event.name === 'from') {
+        this.post.temporal.start = event.value
+      }
+      if (event.name === 'to') {
+        this.post.temporal.end = event.value
+      }
+
+    },
+    extractDate (str) {
+      if (!str) {
+        return null
+      }
+      return {y:parseInt(str.substring(0,4)), m: parseInt(str.substring(5,7)), d: parseInt(str.substring(8,10))}
+    },
     str2date (str) {
-      var date = new Date(str)
+      
+      var tab = this.extractDate(str)
+      console.log(tab)
+      var date = new Date(tab.y, tab.m - 1, tab.d)
       var options = {
           weekday: "long",
           year: "numeric",
@@ -218,13 +261,34 @@ export default {
           day: "numeric"
         }
       if (this.locale === 'fr') {
-        var date = new Date(str)
-        
-        
         return date.toLocaleDateString('fr-FR', options)
       } else {
         return date.toDateString(options)
       }
+    },
+    temporal2str (startStr, endStr) {
+      var start = this.extractDate(startStr)
+
+       var end = this.extractDate(endStr)
+       var months = ['', 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+       var temporal = null
+       if (!start) {
+        start = end
+       }
+       if (!end) {
+        end = start
+       }
+       if (start.y === end.y && start.m === end.m) {
+          if (start.d === end.d) {
+            temporal =  start.y + '-' + months[start.m] + '-' + start.d
+          } else {
+            temporal =  start.y + '-' + months[start.m]
+          }
+
+       } else {
+          temporal = start.y + '-' + months[start.m] + '_' + end.y + '-' + months[end.m]
+       }
+       return temporal
     },
     // getMetadata () {
     //   this.$http.get(this.api + '/process/' + this.processId + '/catalog', {credentials: true})
@@ -279,30 +343,8 @@ export default {
        if (json.metadata) {
          this.post = Object.assign(this.post,json.metadata)
        }
-       function extractDate (str) {
-        return {y:parseInt(str.substring(0,4)), m: parseInt(str.substring(5,7)), d: parseInt(str.substring(8,10))}
-       }
        
-       var start = extractDate(json.feature.properties.temporalExtent[0])
-       console.log(start)
-       var end = extractDate(json.feature.properties.temporalExtent[1])
-       var months = ['', 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
-       var temporal = null
-       if (start.y === end.y && start.m === end.m) {
-          if (start.d === end.d) {
-            temporal =  start.y + '-' + months[start.m] + '-' + start.d
-          } else {
-            temporal =  start.y + '-' + months[start.m]
-          }
-
-       } else {
-          temporal = start.y + '-' + months[start.m] + '_' + end.y + '-' + months[end.m]
-       }
-       console.log(temporal)
-       this.temporal = {
-         fr: json.feature.properties.temporalExtent[0].substring(0,10) + ' à ' + json.feature.properties.temporalExtent[1].substring(0,10),
-         en: json.feature.properties.temporalExtent[0].substring(0,10) + ' to ' + json.feature.properties.temporalExtent[1].substring(0,10)
-       }
+      
        if (json.metadata) {
          this.type = 'update'
          var keywords = json.metadata.keywords
