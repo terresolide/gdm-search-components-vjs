@@ -63,11 +63,23 @@
       </button>
      </div>
      <h2>{{$t('main_title')}}</h2> 
+     <div style="margin-bottom:5px;">
+     Le titre doit être de la forme <em>[Processus]_[location]_[time]_[ts]</em>.<br />
+     Exemples: Earthquake_Wushi_2024-jan-22,   Volcano_Merapi_2022-dec, Landslide_Maca_2019
+     </div>
      <div style="margin-left:10px;">
-         <div style="margin-bottom:5px;"><span class="lang-label">FR: </span><template v-if="process">{{process.serviceName}}</template> <input type="text" v-model="post.short.fr" />
-           collection d'interférogrammes<span v-if="hasSerie"> et série temporelle</span> {{temporal.fr}}  </div>
-         <div><span class="lang-label">EN: </span><template v-if="process">{{process.serviceName}}</template> <input type="text" v-model="post.short.en" /> 
-           collection of interferograms<span v-if="hasSerie"> and time serie</span> {{ temporal.en }} </div>
+         <div style="margin-bottom:15px;">
+         <input type="text" v-model="post.foi" list="list-foi" placeholder="Processus"/><datalist id="list-foi">
+            <option value="Volcano"></option>
+            <option value="Earthquake"></option>
+            <option value="Landslide"></option>
+            <option value="Post-seismic"></option>
+            <option value="Subsidence"></option>
+            <option value="Fire"></option>
+            <option value="Flooding"></option>
+         </datalist>_<input type="text" v-model="post.location" placeholder="location" />_{{ temporal }}
+         <template v-if="hasSerie">_ts</template>
+         </div>
      </div>
   
      <h2>{{$t('purpose')}}</h2>
@@ -148,7 +160,7 @@ export default {
         return null
       }
       return {
-        fr: this.process.serviceName + ' ' + this.post.short.fr + ' collection d\'interférogrammes ' + (this.hasSerie ? 'et série temporelle ' : '') + this.temporal.fr, 
+        fr: this.post.foi + '_' + this.post.location + '_' + (this.hasSerie ? '_ts' : '') + this.temporal.fr, 
         en: this.process.serviceName + ' ' + this.post.short.en + ' collection of interferograms ' + (this.hasSerie ? 'and time serie ': '') + this.temporal.en
       }
     }
@@ -180,6 +192,8 @@ export default {
       fixed: ['external.platform.formater-platform-gn', 'external.product.formaterre-product-gn'],
       post: {
         short: {fr: '', en: ''},
+        foi: '',
+        location: '',
         purpose: {fr: '', en: ''},
         keywords: {thesaurus: {}, free: {}}
         
@@ -265,6 +279,26 @@ export default {
        if (json.metadata) {
          this.post = Object.assign(this.post,json.metadata)
        }
+       function extractDate (str) {
+        return {y:parseInt(str.substring(0,4)), m: parseInt(str.substring(5,7)), d: parseInt(str.substring(8,10))}
+       }
+       
+       var start = extractDate(json.feature.properties.temporalExtent[0])
+       console.log(start)
+       var end = extractDate(json.feature.properties.temporalExtent[1])
+       var months = ['', 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+       var temporal = null
+       if (start.y === end.y && start.m === end.m) {
+          if (start.d === end.d) {
+            temporal =  start.y + '-' + months[start.m] + '-' + start.d
+          } else {
+            temporal =  start.y + '-' + months[start.m]
+          }
+
+       } else {
+          temporal = start.y + '-' + months[start.m] + '_' + end.y + '-' + months[end.m]
+       }
+       console.log(temporal)
        this.temporal = {
          fr: json.feature.properties.temporalExtent[0].substring(0,10) + ' à ' + json.feature.properties.temporalExtent[1].substring(0,10),
          en: json.feature.properties.temporalExtent[0].substring(0,10) + ' to ' + json.feature.properties.temporalExtent[1].substring(0,10)
@@ -503,7 +537,6 @@ export default {
          this.saving = false
          this.saved = true
          this.process.metadata = this.post
-         console.log(json)
       })
       .catch(err => {console.log(err)})
     }
