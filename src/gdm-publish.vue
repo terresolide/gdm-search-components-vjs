@@ -2,23 +2,31 @@
   {
     "fr": {
       "event_date":"Dates de l'évènement",
-      "event_date_label": "Précisez si possible la date ou l'interval temporel de l'évènement que vous étudiez (séisme, glissement de terrain....)",
+      "event_date_label": "Précisez si possible la date ou l'intervalle temporel de l'évènement que vous étudiez (séisme, glissement de terrain....)",
+      "generated_title": "Titre généré",
       "keywords": "Mots-clés",
       "main_title": "Titre principal",
+      "message_to_moderator": "Avant de demander la publication, ajouter un message pour le modérateur",
       "ongoing": "En cours",
+      "provider": "Fournisseur",
       "publish": "Demander la publication",
       "purpose": "Objectif",
-      "save": "Sauvegarder"
+      "save": "Sauvegarder",
+      "temp_information": "Pour information, l'étendue temporelle des images traitées est du {start} au {end}."
     },
     "en": {
       "event_date": "Event dates",
       "event_date_label": "If possible, specify the date or time interval of the event you are studying (earthquake, landslide, etc.).",
+      "generated_title": "Generated title",
       "keywords": "Keywords",
       "main_title": "Main title",
+      "message_to_moderator": "Before requesting publication, add a message for the moderator",
       "ongoing": "On going",
+      "provider": "Provider",
       "publish": "Request for publication",
       "purpose": "Purpose",
-      "save": "Save"
+      "save": "Save",
+      "temp_information": "For information, the time span of the processed images is from {start} to {end}."
     }
   }
 </i18n>
@@ -66,13 +74,16 @@
         {{$t('publish')}}
       </button>
      </div>
-     <h2>{{ title }}</h2>
+     <div><label>{{ $t('message_to_moderator') }}</label></div>
+     <textarea v-model="post.message"></textarea>
+     
      <h2>{{ $t('event_date') }}</h2>
      <div style="margin-left:10px;">{{ $t('event_date_label') }}
       <div style="margin-left:30px;;max-width:300px;">
           <formater-temporal-search :lang="locale" color="#8B0000" 
         :format="format" daymin="2015-01-01" @change="dateChange"></formater-temporal-search></div>
       </div>
+      <div style="margin-left:10px;"><em>{{$t('temp_information', {start: str2date(process.tempStart), end:str2date(process.tempEnd)}) }}</em></div>
 
      <h2>{{$t('main_title')}}</h2> 
      <div style="margin-bottom:5px;margin-left:10px;">
@@ -93,7 +104,7 @@
          </datalist>_<input type="text" v-model="post.location" required placeholder="location" />_{{ temporal }}<template v-if="hasSerie">_ts</template>
          </div>
      </div>
-  
+     <div style="margin-left:10px;">{{ $t('generated_title') }}: <b>{{ title }}</b></div>
      <h2>{{$t('purpose')}}</h2>
      <div style="margin-left:10px;margin-bottom:10px;font-style:italic;">
       <template v-if="locale==='fr'">
@@ -137,6 +148,9 @@
       </template>
       </formaterre-keywords>
         <h2>{{ $t('provider') }}</h2>
+        <ul v-for="provider in post.providers" style="margin-left:10px;">
+          <a :href="provider.url" target="_blank">{{ provider.name }}</a> ({{ provider.roles.join(', ') }})
+        </ul>
     </form>
   
 
@@ -198,6 +212,7 @@ export default {
       }
       var title =  this.post.foi + '_' + this.post.location + '_' + this.temporal + (this.hasSerie ? '_ts' : '')
       this.post.title = title
+      return title
     }
   },
   created () {
@@ -226,12 +241,13 @@ export default {
       listed: ['external.discipline.formater-discipline'],
       recommanded: ['external.theme.formater-foi-gn'],
       excluded: ['external.dataCentre.formater-distributor', 'external.theme.gemet', 'external.theme.httpinspireeceuropaeutheme-theme'],
-      fixed: ['external.platform.formater-platform-gn', 'external.product.formaterre-product-gn'],
+      fixed: ['external.process.formaterre-process-gn','external.platform.formater-platform-gn', 'external.product.formaterre-product-gn'],
       post: {
         short: {fr: '', en: ''},
         temporal: {start: null, end: null},
         foi: '',
         location: '',
+        provider: null,
         purpose: {fr: '', en: ''},
         keywords: {thesaurus: {}, free: {}}
         
@@ -339,7 +355,20 @@ export default {
          this.errorProcess = 'Aucun résultat à publier pour ce job'
          return
        }
-      
+       // provider
+       if (this.process.serviceName.indexOf('UGA') > 0) {
+          this.post.providers = [{
+            name: 'UGA',
+            url: 'https://ror.org/02rx3b187',
+            roles: ['processor']
+          }]
+       } else {
+          this.post.providers = [{
+            name: 'CNES',
+            url: 'https://ror.org/04h1h0y33',
+            roles: ['processor']
+          }]
+       }
        var discipline = {
           vocab:'external.discipline.formater-discipline',
           url: 'https://service.poleterresolide.fr/voc/science_field/D120000',
@@ -468,13 +497,26 @@ export default {
                 },
                 id:'P010100',
                 url: 'https://service.poleterresolide.fr/voc/platform/P010100'
-              }
-             ]   
+              }]
            },
            free: {}
          }
         
        }
+       if (!keywords.thesaurus['external.process.formaterre-process-gn']) {
+          keywords.thesaurus['external.process.formaterre-process-gn'] = [
+            {
+              vocab: 'external.process.formaterre-process-gn',
+              title: 'GDM-SAR-In',
+              values:{
+                fr: 'GDM-SAR-In',
+                en: 'GDM-SAR-In'
+              },
+              id: 'c_b22668da',
+              url: 'https://service.poleterresolide.fr/voc/process/c_b22668da'
+            }
+          ]  
+        }
        if (!keywords.thesaurus['external.product.formaterre-product-gn']) {
           keywords.thesaurus['external.product.formaterre-product-gn'] = [{
                 vocab: 'external.product.formaterre-product-gn',
@@ -589,6 +631,12 @@ export default {
 }
 </script>
 <style>
+.keyword.checked span.close {
+  color:#bbb;
+}
+.keyword.checked span.close:hover {
+  color: #fff;
+}
 .gdm-processing {
     position:fixed;
     top: 48%;
