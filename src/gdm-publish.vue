@@ -12,7 +12,8 @@
       "publish": "Demander la publication",
       "purpose": "Objectif",
       "save": "Sauvegarder",
-      "temp_information": "Pour information, l'étendue temporelle des images traitées est du {start} au {end}."
+      "temp_information": "Pour information, l'étendue temporelle des images traitées est du {start} au {end}.",
+      "unauthorized": "Vous n'êtes pas autorisé à consulter ou éditer ces informations"
     },
     "en": {
       "event_date": "Event dates",
@@ -26,12 +27,13 @@
       "publish": "Request for publication",
       "purpose": "Purpose",
       "save": "Save",
-      "temp_information": "For information, the time span of the processed images is from {start} to {end}."
+      "temp_information": "For information, the time span of the processed images is from {start} to {end}.",
+      "unauthorized": "You are not authorized to view or edit this information."
     }
   }
 </i18n>
 <template>
- <div class="gdm-publish">
+  <div><div v-if="process" class="gdm-publish">
   <div v-if="saving" class="gdm-processing fa fa-spinner fa-spin fa-3x fa-fw running" ></div>
   <template v-if="back"><h1>Métadonnées pour le job N° {{ processId }} &laquo;{{this.post.short.fr }}&raquo;</h1></template>
   <template v-else>
@@ -63,7 +65,7 @@
       </em>
    </template>
   
-  <form style="border:1px solid darkgrey;padding:10px;box-shadow: 0 1px 5px rgba(0,0,0,.65);" @submit="save">
+    <form style="border:1px solid darkgrey;padding:10px;box-shadow: 0 1px 5px rgba(0,0,0,.65);" @submit="save">
      <div style="text-align:right;">
       <button class="btn btn-publish" @click="save" :disabled="saved || saving || (!back && requestPublish)" >{{$t('save')}}</button>
       <button v-if="back" class="btn btn-publish"  @click="validate" :disabled="!requestPublish || requestPublish !== 'WAITING' || saving" 
@@ -74,13 +76,21 @@
         {{$t('publish')}}
       </button>
      </div>
-     <div><label>{{ $t('message_to_moderator') }}</label></div>
+     <div>
+     <template v-if="back">
+      <div><label>Message de l'utilisateur {{ process.email }}</label></div>
+      <div class="user-message">{{ post.message }}</div>
+     </template>
+     <template v-else>
+      <div><label>{{ $t('message_to_moderator') }}</label></div>
      <textarea v-model="post.message"></textarea>
-     
+     </template>
+     </div>
      <h2>{{ $t('event_date') }}</h2>
      <div style="margin-left:10px;">{{ $t('event_date_label') }}
       <div style="margin-left:30px;;max-width:300px;">
-          <formater-temporal-search :lang="locale" color="#8B0000" 
+          <formater-temporal-search :lang="locale" color="#8B0000" :default-from="post.temporal.start"
+          :default-to="post.temporal.end"
         :format="format" daymin="2015-01-01" @change="dateChange"></formater-temporal-search></div>
       </div>
       <div style="margin-left:10px;"><em>{{$t('temp_information', {start: str2date(process.tempStart), end:str2date(process.tempEnd)}) }}</em></div>
@@ -90,7 +100,10 @@
      Le titre doit être de la forme <em>[Processus]_[location]_[time]_[ts]</em>.<br />
      Exemples: Earthquake_Wushi_2024-jan-22,   Volcano_Merapi_2022-dec, Landslide_Maca_2019
      </div>
-     
+     <template v-if="back">
+       <div style="margin-left:10px;">Titre: <input type="text" v-model="post.title" style="width:400px;"/></div>
+     </template>
+     <template v-else>
      <div style="margin-left:10px;">
          <div style="margin:15px 0;">
          <input type="text" v-model="post.foi" list="list-foi" placeholder="Processus" required/><datalist id="list-foi">
@@ -105,6 +118,7 @@
          </div>
      </div>
      <div style="margin-left:10px;">{{ $t('generated_title') }}: <b>{{ title }}</b></div>
+     </template>
      <h2>{{$t('purpose')}}</h2>
      <div style="margin-left:10px;margin-bottom:10px;font-style:italic;">
       <template v-if="locale==='fr'">
@@ -132,7 +146,6 @@
       Some keywords have been predefined automatically, such as  product type or platform..
        </template>
       </em>
-  
       <formaterre-keywords ref="keywords" :lang="locale" v-model="post.keywords" :geonetwork="geonetwork" 
       :listed="listed" :recommanded="recommanded" :excluded="excluded" :fixed="fixed">
         <template v-if="locale === 'fr'">Ci-dessous vous pouvez rechercher des mots-clés dans les thésaurus/ontologies utilisés par FormaTerre.<br />
@@ -152,7 +165,8 @@
           <a :href="provider.url" target="_blank">{{ provider.name }}</a> ({{ provider.roles.join(', ') }})
         </ul>
     </form>
-  
+  </div>
+  <div v-else style="color:darkred;">{{ $t('unauthorized') }}</div>
 
  </div>
 </template>
@@ -210,6 +224,9 @@ export default {
       if (!this.process || !this.post.foi || !this.post.location) {
         return null
       }
+      if (this.back) {
+        return this.post.title
+      }
       var title =  this.post.foi + '_' + this.post.location + '_' + this.temporal + (this.hasSerie ? '_ts' : '')
       this.post.title = title
       return title
@@ -246,8 +263,10 @@ export default {
         short: {fr: '', en: ''},
         temporal: {start: null, end: null},
         foi: '',
+        message: '',
+        title: '',
         location: '',
-        provider: null,
+        providers: [],
         purpose: {fr: '', en: ''},
         keywords: {thesaurus: {}, free: {}}
         
@@ -264,7 +283,6 @@ export default {
   },
   methods: {
     dateChange (event) {
-      console.log(event)
       if (event.name === 'from') {
         if (event.value !== 'Invalid date') {
           this.post.temporal.start = event.value
@@ -290,7 +308,6 @@ export default {
     str2date (str) {
       
       var tab = this.extractDate(str)
-      console.log(tab)
       var date = new Date(tab.y, tab.m - 1, tab.d)
       var options = {
           weekday: "long",
@@ -323,6 +340,8 @@ export default {
             temporal =  start.y + '-' + months[start.m]
           }
 
+       } else if (start.y === end.y && end.m - start.m > 8) {
+          return start.y
        } else {
           temporal = start.y + '-' + months[start.m] + '_' + end.y + '-' + months[end.m]
        }
@@ -340,8 +359,15 @@ export default {
       fetch(
           this.api.replace('api', 'requests') + '/publish/' + this.processId,
           { credentials: 'include'}
-      ).then(resp => resp.json())
-      .then(json => {
+      ).then(resp => {
+        switch(resp.status) {
+          case 401:
+          case 403:
+          case 404:
+            return {error: resp.status}
+        }
+        return resp.json()
+      }).then(json => {
          if (json.exists) {
           this.requestPublish = json.status
          } else {
@@ -350,6 +376,9 @@ export default {
       ).catch(err => { console.log(err)})
     },
     treatmentProcess(json) {
+       if (json.error) {
+        return
+       }
        this.process = json
        if (!json.result) {
          this.errorProcess = 'Aucun résultat à publier pour ce job'
@@ -480,7 +509,7 @@ export default {
           * FIN CHANGEMENT DE FORMAT QUI POURRA ÊTRE EFFACÉ ENSUITE
           *  */  
          
-         this.post.goal = json.metadata.goal
+         // this.post.goal = json.metadata.goal
        } else {
          
       
@@ -503,10 +532,11 @@ export default {
          }
         
        }
-       if (!keywords.thesaurus['external.process.formaterre-process-gn']) {
+       //if (!keywords.thesaurus['external.process.formaterre-process-gn']) {
           keywords.thesaurus['external.process.formaterre-process-gn'] = [
             {
               vocab: 'external.process.formaterre-process-gn',
+              scheme: 'https://service.poleterresolide.fr/voc/process',
               title: 'GDM-SAR-In',
               values:{
                 fr: 'GDM-SAR-In',
@@ -516,7 +546,7 @@ export default {
               url: 'https://service.poleterresolide.fr/voc/process/c_b22668da'
             }
           ]  
-        }
+       // }
        if (!keywords.thesaurus['external.product.formaterre-product-gn']) {
           keywords.thesaurus['external.product.formaterre-product-gn'] = [{
                 vocab: 'external.product.formaterre-product-gn',
@@ -575,7 +605,16 @@ export default {
     },
     getProcess() {
       fetch(this.api + '/process/' + this.processId, {credentials: 'include'})
-      .then( resp => resp.json())
+      .then( resp => {
+        switch(resp.status) {
+          case 401:
+          case 403:
+          case 404:
+            return {error: resp.status}
+          
+        }
+        return resp.json()
+      })
       .then( json => { this.treatmentProcess(json)})
       .catch( err => { console.log(err)})
     },
@@ -585,9 +624,11 @@ export default {
       }
       this.save()
       this.saving = true
+      var formData = new FormData()
+      formData.append('purpose', this.post.message)
       fetch(
           this.api.replace('api', 'requests') + '/publish/' + this.process.id,
-          {headers: { 'accept-language': this.locale, "Content-Type": "application/x-www-form-urlencoded"}, credentials: 'include', body: "purpose=notempty", method:'POST'})
+          {headers: { 'accept-language': this.locale}, credentials: 'include', body: formData, method:'POST'})
       .then(resp => resp.json())
       .then(json => {
         if (json.success) {this.requestPublish = 'WAITING'}
@@ -631,6 +672,13 @@ export default {
 }
 </script>
 <style>
+div.user-message {
+  border:1px solid #888;
+  max-width:700px;
+  color: #333;
+  padding:10px;
+  background: #ddd;
+}
 .keyword.checked span.close {
   color:#bbb;
 }
