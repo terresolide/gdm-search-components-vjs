@@ -257,7 +257,7 @@ export default {
       // },
       listed: ['external.discipline.formater-discipline'],
       recommanded: ['external.theme.formater-foi-gn'],
-      excluded: ['external.dataCentre.formater-distributor', 'external.theme.gemet', 'external.theme.httpinspireeceuropaeutheme-theme'],
+      excluded: ['external.dataCentre.formater-distributor', 'external.theme.gemet', 'external.theme.httpinspireeceuropaeutheme-theme', 'external.place.regions'],
       fixed: ['external.process.formaterre-process-gn','external.platform.formater-platform-gn', 'external.product.formaterre-product-gn'],
       post: {
         short: {fr: '', en: ''},
@@ -491,11 +491,11 @@ export default {
               } 
               var url = keywords.thesaurus[th][i].uri || keywords.thesaurus[th][i].url
               var thesaurus = Object.values(mapping).find(x => x.key === keywords.thesaurus[th][i].vocab)
-              var id = url.replace(thesaurus.scheme, '')
+              var id = url.replace(kw.scheme, '')
               id = id.replace(/[\/#]?/, '')
               var kw = {
                 vocab: keywords.thesaurus[th][i].vocab,
-                scheme: thesaurus.scheme,
+                scheme: kw.scheme,
                 title: keywords.thesaurus[th][i].values.en,
                 url: url,
                 id: id,
@@ -532,6 +532,7 @@ export default {
          }
         
        }
+       delete keywords.thesaurus['external.place.regions']
        //if (!keywords.thesaurus['external.process.formaterre-process-gn']) {
           keywords.thesaurus['external.process.formaterre-process-gn'] = [
             {
